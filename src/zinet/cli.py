@@ -1,4 +1,4 @@
-"""`gir` command-line tool: validate, diff, slice, render, prettify, and schema for graph.yaml files.
+"""`zinet` command-line tool: validate, diff, slice, render, prettify, and schema for graph.yaml files.
 
 Exit codes: 0 success, 1 validation errors, differences found, or a file needing prettify,
 2 usage, load, or render failure.
@@ -101,8 +101,8 @@ def _cmd_schema(args: argparse.Namespace) -> int:
 
 
 def _build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(prog="gir", description="graph.yaml intermediate representation tools")
-    parser.add_argument("--version", action="version", version=f"gir {__version__}")
+    parser = argparse.ArgumentParser(prog="zinet", description="graph.yaml intermediate representation tools")
+    parser.add_argument("--version", action="version", version=f"zinet {__version__}")
     sub = parser.add_subparsers(dest="command", required=True)
 
     p_diff = sub.add_parser("diff", help="show node-level differences between two graphs")
@@ -144,8 +144,8 @@ def main(argv: Sequence[str] | None = None) -> int:
     try:
         return args.handler(args)
     except KeyError as exc:
-        print(f"gir: error: {exc.args[0]}", file=sys.stderr)
+        print(f"zinet: error: {exc.args[0]}", file=sys.stderr)
         return 2
     except (OSError, ValueError, RuntimeError) as exc:
-        print(f"gir: error: {exc}", file=sys.stderr)
+        print(f"zinet: error: {exc}", file=sys.stderr)
         return 2

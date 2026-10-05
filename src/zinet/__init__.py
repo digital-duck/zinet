@@ -1,4 +1,4 @@
-"""graph-ir: the shared graph.yaml intermediate representation.
+"""zinet: the shared graph.yaml intermediate representation.
 
 Primitives -> concepts -> applications, with typed dependency edges, a structural
 validator, and graph transforms reused by every ZiNets back-end (spl3, mg, cba, gfc, solver).

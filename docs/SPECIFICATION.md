@@ -1,8 +1,8 @@
 # graph.yaml Specification (v1.0)
 
-This document specifies the `graph.yaml` format as implemented by graph-ir 0.1.0. The machine-readable
+This document specifies the `graph.yaml` format as implemented by zinet 0.1.0. The machine-readable
 schema is [`schemas/graph.schema.json`](../schemas/graph.schema.json), generated from the Pydantic
-models by `gir schema`. If this document and the schema disagree, the schema is the reference
+models by `zinet schema`. If this document and the schema disagree, the schema is the reference
 for structure and this document is the reference for the rules that a schema cannot express.
 
 Keywords MUST, MUST NOT, and MAY are used as in RFC 2119.
@@ -46,7 +46,7 @@ Nothing MAY depend on an application (see rule V4). Applications are terminal in
 | `label` | string | no | none | Human-readable name. Used by `render`. |
 | `deps` | list of ids | no | `[]` | Ids this node depends on. These are its incoming edges. |
 | `edge_types` | mapping: dep id → edge type | no | `{}` | Optional type for individual dependencies (section 3). Each key MUST appear in `deps`. |
-| `meta` | mapping | no | `{}` | Domain payload. Opaque to graph-ir: it is never read, validated, or transformed. |
+| `meta` | mapping | no | `{}` | Domain payload. Opaque to zinet: it is never read, validated, or transformed. |
 
 Unknown fields on a node are an error. Domain data belongs in `meta`.
 
@@ -111,14 +111,14 @@ Namespacing and optional imports are not in v1.0. See `docs/DEV/readme-todo.md`.
 
 ## 6. Formatting
 
-The canonical form is the output of `gir prettify --write`:
+The canonical form is the output of `zinet prettify --write`:
 
 - `version` first, then `imports` if present, then the layers in order `primitives`, `concepts`, `applications`.
 - Node keys in the order `id`, `label`, `deps`, `edge_types`, `meta`.
 - Fields holding their default value are omitted, except `version`, which is always written.
 - List items are indented under their parent key.
 
-Formatting does not change meaning. Comments are not preserved, so `gir prettify --write` refuses
+Formatting does not change meaning. Comments are not preserved, so `zinet prettify --write` refuses
 to rewrite a file that contains comments.
 
 ---

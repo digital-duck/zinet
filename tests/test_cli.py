@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from graph_ir.cli import main
+from zinet.cli import main
 
 FIXTURES = Path(__file__).parent / "fixtures"
 

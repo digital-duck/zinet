@@ -4,9 +4,9 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
-from graph_ir import EdgeType, Graph, Node
-from graph_ir.cli import main
-from graph_ir.schema import json_schema_text
+from zinet import EdgeType, Graph, Node
+from zinet.cli import main
+from zinet.schema import json_schema_text
 
 COMMITTED = Path(__file__).resolve().parent.parent / "schemas" / "graph.schema.json"
 
@@ -28,7 +28,7 @@ def test_index_rejects_duplicate_ids():
 
 
 def test_committed_json_schema_matches_models():
-    # If this fails, regenerate with: gir schema -o schemas/graph.schema.json
+    # If this fails, regenerate with: zinet schema -o schemas/graph.schema.json
     assert COMMITTED.read_text(encoding="utf-8") == json_schema_text()
 
 

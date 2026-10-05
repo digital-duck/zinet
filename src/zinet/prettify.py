@@ -1,4 +1,4 @@
-"""Canonical formatting for graph.yaml files (`gir prettify`).
+"""Canonical formatting for graph.yaml files (`zinet prettify`).
 
 The canonical form is what `to_yaml` writes: `version` first, layers in order, keys in model
 field order, and defaults omitted. Formatting works on one file only and never resolves imports,

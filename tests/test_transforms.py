@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from graph_ir import Node, diff_graphs, load_graph, slice_to
+from zinet import Node, diff_graphs, load_graph, slice_to
 
 FIXTURES = Path(__file__).parent / "fixtures"
 

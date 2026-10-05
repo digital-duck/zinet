@@ -3,8 +3,8 @@ from pathlib import Path
 
 import pytest
 
-from graph_ir import load_graph, render, to_dot, to_mermaid
-from graph_ir.cli import main
+from zinet import load_graph, render, to_dot, to_mermaid
+from zinet.cli import main
 
 FIXTURES = Path(__file__).parent / "fixtures"
 SOLVER = FIXTURES / "solver_problem.yaml"
@@ -12,7 +12,7 @@ SOLVER = FIXTURES / "solver_problem.yaml"
 
 def test_dot_has_layer_clusters_and_typed_edges():
     dot = to_dot(load_graph(SOLVER))
-    assert dot.startswith("digraph graph_ir {")
+    assert dot.startswith("digraph zinet {")
     assert 'subgraph "cluster_primitives"' in dot
     assert '"max_units" -> "capacity_constraint" [label="constraint"];' in dot
     assert '"unit_cost" -> "total_cost";' in dot

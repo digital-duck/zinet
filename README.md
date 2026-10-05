@@ -1,4 +1,4 @@
-# graph-ir
+# zinet
 
 Graph IR core package shared across SPL, ConceptBook, Graph-Code, Momagrid, and Solver domains.
 
@@ -36,7 +36,7 @@ applications:                    # capstones: nothing may depend on these
 From PyPI:
 
 ```bash
-pip install zigraf-ir
+pip install zinet
 ```
 
 From source, for development:
@@ -45,18 +45,18 @@ From source, for development:
 uv venv .venv && uv pip install -p .venv/bin/python -e ".[dev]"
 ```
 
-## CLI: `gir`
+## CLI: `zinet`
 
 ```bash
-gir validate graph.yaml            # exit 1 on errors; warnings are printed but do not fail
-gir diff old.yaml new.yaml         # exit 1 when the graphs differ
-gir slice graph.yaml target_id -o part.yaml   # target plus its prerequisite closure
-gir render graph.yaml                              # svg to stdout (default)
-gir render graph.yaml --format mermaid             # mermaid flowchart text
-gir render graph.yaml --format png -o graph.png    # png and pdf need -o
-gir prettify graph.yaml                            # diff against canonical formatting (exit 1 if it would change)
-gir prettify graph.yaml --write                    # rewrite in place (refuses files with comments)
-gir schema -o schemas/graph.schema.json            # JSON Schema for editors and other tools
+zinet validate graph.yaml            # exit 1 on errors; warnings are printed but do not fail
+zinet diff old.yaml new.yaml         # exit 1 when the graphs differ
+zinet slice graph.yaml target_id -o part.yaml   # target plus its prerequisite closure
+zinet render graph.yaml                              # svg to stdout (default)
+zinet render graph.yaml --format mermaid             # mermaid flowchart text
+zinet render graph.yaml --format png -o graph.png    # png and pdf need -o
+zinet prettify graph.yaml                            # diff against canonical formatting (exit 1 if it would change)
+zinet prettify graph.yaml --write                    # rewrite in place (refuses files with comments)
+zinet schema -o schemas/graph.schema.json            # JSON Schema for editors and other tools
 ```
 
 `render` supports `svg`, `png`, `pdf`, and `mermaid`. Mermaid needs nothing installed. The
@@ -69,12 +69,12 @@ canonical form, so it can run in CI.
 
 The format is specified in [docs/SPECIFICATION.md](docs/SPECIFICATION.md). The machine-readable
 JSON Schema is [schemas/graph.schema.json](schemas/graph.schema.json), regenerated with
-`gir schema -o schemas/graph.schema.json`. A test fails if the committed schema is out of date.
+`zinet schema -o schemas/graph.schema.json`. A test fails if the committed schema is out of date.
 
 ## Python API
 
 ```python
-from graph_ir import load_graph, validate, diff_graphs, slice_to, dump_graph
+from zinet import load_graph, validate, diff_graphs, slice_to, dump_graph
 
 graph = load_graph("solver_pipeline.yaml")   # resolves imports
 for issue in validate(graph):
@@ -96,15 +96,15 @@ prereqs = slice_to(graph, "minimize_cost")
 ## Layout
 
 ```text
-src/graph_ir/
+src/zinet/
   schema.py       Pydantic models: Graph, Node, Layer, EdgeType
   dag.py          topological order, ancestors (domain-agnostic)
   validator.py    structural checks -> Issue list
   io.py           load_graph (with imports), dump_graph, to_yaml
-  prettify.py     canonical formatting for `gir prettify`
+  prettify.py     canonical formatting for `zinet prettify`
   transforms/     diff_graphs, slice_to
   render.py       DOT and Mermaid generation, svg/png/pdf via `dot`
-  cli.py          the `gir` command
+  cli.py          the `zinet` command
 docs/SPECIFICATION.md   the graph.yaml format specification
 schemas/graph.schema.json   generated JSON Schema
 tests/            pytest suite; tests/fixtures holds one graph per domain

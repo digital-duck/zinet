@@ -1,8 +1,8 @@
-# graph-ir Tutorial: Using the `gir` Command
+# zinet Tutorial: Using the `zinet` Command
 
-This tutorial walks through the `gir` command-line tool, which validates, compares, slices,
+This tutorial walks through the `zinet` command-line tool, which validates, compares, slices,
 renders, and formats `graph.yaml` files, and exports its JSON Schema. Every example uses the sample graphs in `tests/fixtures/`, and the
-outputs shown were produced by the current version (`gir 0.1.0`).
+outputs shown were produced by the current version (`zinet 0.1.0`).
 
 ---
 
@@ -15,7 +15,7 @@ uv venv .venv
 source .venv/bin/activate
 uv pip install -p .venv/bin/python -e ".[dev]"
 
-gir --version                    # gir 0.1.0
+zinet --version                    # zinet 0.1.0
 ```
 
 Rendering to SVG, PNG, or PDF also needs Graphviz's `dot` on your PATH. Mermaid output needs nothing.
@@ -58,12 +58,12 @@ Unknown keys are rejected on purpose, so a typo such as `primitves:` fails at lo
 
 ---
 
-## 3. Validate a graph: `gir validate`
+## 3. Validate a graph: `zinet validate`
 
 Run it on the bundled solver example:
 
 ```bash
-gir validate tests/fixtures/solver_problem.yaml
+zinet validate tests/fixtures/solver_problem.yaml
 ```
 
 ```text
@@ -89,7 +89,7 @@ applications:
 ```
 
 ```bash
-gir validate broken.yaml
+zinet validate broken.yaml
 ```
 
 ```text
@@ -130,14 +130,14 @@ concepts2_placeholder: 1
 ```
 
 ```text
-gir: error: typo.yaml: 1 validation error for Graph
+zinet: error: typo.yaml: 1 validation error for Graph
 concepts2_placeholder
   Extra inputs are not permitted [type=extra_forbidden, input_value=1, input_type=int]
 ```
 
 ---
 
-## 4. Draw a graph: `gir render`
+## 4. Draw a graph: `zinet render`
 
 `render` writes the graph to stdout by default, in SVG. Use `-o` to write a file.
 
@@ -150,14 +150,14 @@ concepts2_placeholder
 
 ```bash
 # Image files
-gir render tests/fixtures/solver_problem.yaml --format png -o solver.png
-gir render tests/fixtures/solver_problem.yaml --format pdf -o solver.pdf
+zinet render tests/fixtures/solver_problem.yaml --format png -o solver.png
+zinet render tests/fixtures/solver_problem.yaml --format pdf -o solver.pdf
 
 # SVG to a file
-gir render tests/fixtures/solver_problem.yaml -o solver.svg
+zinet render tests/fixtures/solver_problem.yaml -o solver.svg
 
 # Mermaid, for pasting into a Markdown file or GitHub comment
-gir render tests/fixtures/solver_problem.yaml --format mermaid
+zinet render tests/fixtures/solver_problem.yaml --format mermaid
 ```
 
 Mermaid output looks like this (shortened):
@@ -181,14 +181,14 @@ Use `--no-imports` to render only the file itself, without merging its imports.
 
 ---
 
-## 5. Extract a subgraph: `gir slice`
+## 5. Extract a subgraph: `zinet slice`
 
 `slice` keeps a target node and everything it transitively depends on. For a concept graph this is
 the prerequisite closure of the target:
 
 ```bash
-gir slice tests/fixtures/solver_problem.yaml budget_constraint -o budget_part.yaml
-gir validate budget_part.yaml
+zinet slice tests/fixtures/solver_problem.yaml budget_constraint -o budget_part.yaml
+zinet validate budget_part.yaml
 ```
 
 ```text
@@ -199,22 +199,22 @@ Without `-o`, the YAML goes to stdout, which you can pipe into another tool. An 
 an error:
 
 ```bash
-gir slice tests/fixtures/solver_problem.yaml nope
+zinet slice tests/fixtures/solver_problem.yaml nope
 ```
 
 ```text
-gir: error: unknown node: 'nope'
+zinet: error: unknown node: 'nope'
 ```
 
 ---
 
-## 6. Compare two graphs: `gir diff`
+## 6. Compare two graphs: `zinet diff`
 
 `diff` matches nodes by id and reports what was added, removed, or changed. Dependency order is
 ignored, so reordering a `deps` list is not a change.
 
 ```bash
-gir diff tests/fixtures/spl_pipeline.yaml tests/fixtures/concept_book.yaml
+zinet diff tests/fixtures/spl_pipeline.yaml tests/fixtures/concept_book.yaml
 ```
 
 ```text
@@ -238,7 +238,7 @@ Changed nodes print each field that differs, in the form `~ node.field: old -> n
 makes it usable in scripts:
 
 ```bash
-gir diff before.yaml after.yaml || echo "graph changed"
+zinet diff before.yaml after.yaml || echo "graph changed"
 ```
 
 ---
@@ -264,7 +264,7 @@ concepts:
 ```
 
 ```bash
-gir validate pipeline.yaml
+zinet validate pipeline.yaml
 ```
 
 Imports are merged, and ids must stay unique across the whole tree. Two files that define the same
@@ -277,7 +277,7 @@ id, or an import cycle, fail at load time with exit code 2. The merged graph is 
 Everything the CLI does is available from Python:
 
 ```python
-from graph_ir import load_graph, validate, slice_to, diff_graphs, dump_graph, to_mermaid
+from zinet import load_graph, validate, slice_to, diff_graphs, dump_graph, to_mermaid
 
 graph = load_graph("tests/fixtures/solver_problem.yaml")   # resolves imports
 
@@ -297,23 +297,23 @@ print(to_mermaid(graph))
 ## 9. Typical workflow
 
 ```bash
-gir validate pipeline.yaml                       # 1. check the graph
-gir render pipeline.yaml --format mermaid > pipeline.md   # 2. document it
-gir slice pipeline.yaml final_report -o part.yaml         # 3. extract what one target needs
-gir diff main.yaml feature.yaml                  # 4. review a change to the graph
+zinet validate pipeline.yaml                       # 1. check the graph
+zinet render pipeline.yaml --format mermaid > pipeline.md   # 2. document it
+zinet slice pipeline.yaml final_report -o part.yaml         # 3. extract what one target needs
+zinet diff main.yaml feature.yaml                  # 4. review a change to the graph
 ```
 
 ---
 
-## 10. Format a graph: `gir prettify`
+## 10. Format a graph: `zinet prettify`
 
 `prettify` compares a file with its canonical form: `version` first, layers in order, list items
 indented under their keys, and defaults omitted. Without `--write`, it prints a diff and changes
 nothing. It exits 1 when the file would change, so it can run in CI.
 
 ```bash
-gir prettify messy.yaml             # show the diff
-gir prettify messy.yaml --write     # rewrite the file in place
+zinet prettify messy.yaml             # show the diff
+zinet prettify messy.yaml --write     # rewrite the file in place
 ```
 
 ```text
@@ -335,14 +335,14 @@ changing it.
 
 ---
 
-## 11. JSON Schema: `gir schema`
+## 11. JSON Schema: `zinet schema`
 
 `schema` prints the JSON Schema for `graph.yaml`, which editors and other tools can use to check
 files. The committed copy is `schemas/graph.schema.json`:
 
 ```bash
-gir schema                                  # print to stdout
-gir schema -o schemas/graph.schema.json     # regenerate the committed file
+zinet schema                                  # print to stdout
+zinet schema -o schemas/graph.schema.json     # regenerate the committed file
 ```
 
 The specification in `docs/SPECIFICATION.md` covers the rules a schema cannot express, such as
@@ -353,11 +353,11 @@ the layer dependency rules and cycle detection.
 ## Quick reference
 
 ```text
-gir diff OLD NEW
-gir prettify FILE [--write]
-gir render FILE [--format svg|png|pdf|mermaid] [-o OUT] [--no-imports]
-gir schema [-o OUT]
-gir slice FILE TARGET [-o OUT]
-gir validate FILE [--no-imports]
-gir --version
+zinet diff OLD NEW
+zinet prettify FILE [--write]
+zinet render FILE [--format svg|png|pdf|mermaid] [-o OUT] [--no-imports]
+zinet schema [-o OUT]
+zinet slice FILE TARGET [-o OUT]
+zinet validate FILE [--no-imports]
+zinet --version
 ```

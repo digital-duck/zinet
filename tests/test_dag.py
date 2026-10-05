@@ -1,6 +1,6 @@
 import pytest
 
-from graph_ir import CycleError, ancestors, topological_order
+from zinet import CycleError, ancestors, topological_order
 
 
 def test_order_puts_dependencies_first():

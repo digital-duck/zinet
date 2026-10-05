@@ -1,8 +1,8 @@
 from pathlib import Path
 
-from graph_ir import load_graph
-from graph_ir.cli import main
-from graph_ir.prettify import has_comments, prettify_file
+from zinet import load_graph
+from zinet.cli import main
+from zinet.prettify import has_comments, prettify_file
 
 FIXTURES = Path(__file__).parent / "fixtures"
 

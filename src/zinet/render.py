@@ -33,7 +33,7 @@ def _mermaid_text(text: str) -> str:
 def to_dot(graph: Graph) -> str:
     """Graphviz DOT source: one cluster per layer, edges point from dependency to dependent."""
     lines = [
-        "digraph graph_ir {",
+        "digraph zinet {",
         "  rankdir=LR;",
         '  node [fontname="Helvetica"];',
     ]

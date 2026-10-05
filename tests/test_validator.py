@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from graph_ir import Graph, load_graph, validate
+from zinet import Graph, load_graph, validate
 
 FIXTURES = Path(__file__).parent / "fixtures"
 
