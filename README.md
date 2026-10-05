@@ -33,6 +33,14 @@ applications:                    # capstones: nothing may depend on these
 
 ## Install
 
+From PyPI:
+
+```bash
+pip install zigraf-ir
+```
+
+From source, for development:
+
 ```bash
 uv venv .venv && uv pip install -p .venv/bin/python -e ".[dev]"
 ```
@@ -46,12 +54,22 @@ gir slice graph.yaml target_id -o part.yaml   # target plus its prerequisite clo
 gir render graph.yaml                              # svg to stdout (default)
 gir render graph.yaml --format mermaid             # mermaid flowchart text
 gir render graph.yaml --format png -o graph.png    # png and pdf need -o
+gir prettify graph.yaml                            # diff against canonical formatting (exit 1 if it would change)
+gir prettify graph.yaml --write                    # rewrite in place (refuses files with comments)
+gir schema -o schemas/graph.schema.json            # JSON Schema for editors and other tools
 ```
 
 `render` supports `svg`, `png`, `pdf`, and `mermaid`. Mermaid needs nothing installed. The
 other formats need Graphviz's `dot` on PATH (`apt install graphviz`).
 
-Exit code 2 means a usage, load, or render error.
+Exit code 2 means a usage, load, or render error. `prettify` exits 1 when a file is not in
+canonical form, so it can run in CI.
+
+## Specification
+
+The format is specified in [docs/SPECIFICATION.md](docs/SPECIFICATION.md). The machine-readable
+JSON Schema is [schemas/graph.schema.json](schemas/graph.schema.json), regenerated with
+`gir schema -o schemas/graph.schema.json`. A test fails if the committed schema is out of date.
 
 ## Python API
 
@@ -83,9 +101,12 @@ src/graph_ir/
   dag.py          topological order, ancestors (domain-agnostic)
   validator.py    structural checks -> Issue list
   io.py           load_graph (with imports), dump_graph, to_yaml
+  prettify.py     canonical formatting for `gir prettify`
   transforms/     diff_graphs, slice_to
   render.py       DOT and Mermaid generation, svg/png/pdf via `dot`
   cli.py          the `gir` command
+docs/SPECIFICATION.md   the graph.yaml format specification
+schemas/graph.schema.json   generated JSON Schema
 tests/            pytest suite; tests/fixtures holds one graph per domain
 ```
 
@@ -98,6 +119,7 @@ tests/            pytest suite; tests/fixtures holds one graph per domain
 
 ## Not yet implemented
 
-- JSON Schema export (`schemas/graph.schema.json`) and domain overlays.
-- `graph.html` interactive explorer (belongs to `cba`) and `fmt`.
+- Domain-specific JSON Schema overlays (solver, spl, cba).
+- `graph.html` interactive explorer (belongs to `cba`).
+- Comment-preserving formatting. `prettify --write` refuses files with comments.
 - `spl3` integration, which is the next step: SPL scripts compiling to `GraphIR`.

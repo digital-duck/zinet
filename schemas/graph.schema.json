@@ -1,0 +1,102 @@
+{
+  "$defs": {
+    "EdgeType": {
+      "description": "Optional semantics for a dependency edge. Unannotated edges are DEPENDS_ON.",
+      "enum": [
+        "depends_on",
+        "data_flow",
+        "prerequisite",
+        "constraint",
+        "inheritance"
+      ],
+      "title": "EdgeType",
+      "type": "string"
+    },
+    "Node": {
+      "additionalProperties": false,
+      "description": "A graph node. `deps` lists the ids it depends on, i.e. its incoming edges.",
+      "properties": {
+        "id": {
+          "minLength": 1,
+          "title": "Id",
+          "type": "string"
+        },
+        "label": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Label"
+        },
+        "deps": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Deps",
+          "type": "array"
+        },
+        "edge_types": {
+          "additionalProperties": {
+            "$ref": "#/$defs/EdgeType"
+          },
+          "title": "Edge Types",
+          "type": "object"
+        },
+        "meta": {
+          "additionalProperties": true,
+          "title": "Meta",
+          "type": "object"
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "title": "Node",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "A whole graph.yaml document. Unknown top-level keys are rejected to catch typos.",
+  "properties": {
+    "version": {
+      "default": "1.0",
+      "title": "Version",
+      "type": "string"
+    },
+    "imports": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Imports",
+      "type": "array"
+    },
+    "primitives": {
+      "items": {
+        "$ref": "#/$defs/Node"
+      },
+      "title": "Primitives",
+      "type": "array"
+    },
+    "concepts": {
+      "items": {
+        "$ref": "#/$defs/Node"
+      },
+      "title": "Concepts",
+      "type": "array"
+    },
+    "applications": {
+      "items": {
+        "$ref": "#/$defs/Node"
+      },
+      "title": "Applications",
+      "type": "array"
+    }
+  },
+  "title": "Graph",
+  "type": "object"
+}

@@ -1,7 +1,14 @@
+import json
+from pathlib import Path
+
 import pytest
 from pydantic import ValidationError
 
 from graph_ir import EdgeType, Graph, Node
+from graph_ir.cli import main
+from graph_ir.schema import json_schema_text
+
+COMMITTED = Path(__file__).resolve().parent.parent / "schemas" / "graph.schema.json"
 
 
 def test_typed_edge_must_refer_to_a_dependency():
@@ -18,3 +25,20 @@ def test_index_rejects_duplicate_ids():
     graph = Graph.model_validate({"primitives": [{"id": "a"}], "concepts": [{"id": "a"}]})
     with pytest.raises(ValueError, match="duplicate node id"):
         graph.index()
+
+
+def test_committed_json_schema_matches_models():
+    # If this fails, regenerate with: gir schema -o schemas/graph.schema.json
+    assert COMMITTED.read_text(encoding="utf-8") == json_schema_text()
+
+
+def test_json_schema_names_the_layers_and_edge_types():
+    schema = json.loads(json_schema_text())
+    assert {"primitives", "concepts", "applications"} <= set(schema["properties"])
+    edge_enum = schema["$defs"]["EdgeType"]["enum"]
+    assert set(edge_enum) == {"depends_on", "data_flow", "prerequisite", "constraint", "inheritance"}
+
+
+def test_cli_schema_to_stdout(capfd):
+    assert main(["schema"]) == 0
+    assert json.loads(capfd.readouterr().out)["title"] == "Graph"

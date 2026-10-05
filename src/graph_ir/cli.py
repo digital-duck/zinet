@@ -1,18 +1,22 @@
-"""`gir` command-line tool: validate, diff, slice, and render graph.yaml files.
+"""`gir` command-line tool: validate, diff, slice, render, prettify, and schema for graph.yaml files.
 
-Exit codes: 0 success, 1 validation errors or differences found, 2 usage, load, or render failure.
+Exit codes: 0 success, 1 validation errors, differences found, or a file needing prettify,
+2 usage, load, or render failure.
 """
 
 from __future__ import annotations
 
 import argparse
+import difflib
 import sys
 from collections.abc import Sequence
 from pathlib import Path
 
 from . import __version__
 from .io import dump_graph, load_graph, to_yaml
+from .prettify import prettify_file
 from .render import BINARY_FORMATS, FORMATS, render
+from .schema import json_schema_text
 from .transforms import diff_graphs, slice_to
 from .validator import validate
 
@@ -63,6 +67,39 @@ def _cmd_render(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_prettify(args: argparse.Namespace) -> int:
+    result = prettify_file(args.file)
+    if not result.changed:
+        print(f"{args.file}: already formatted")
+        return 0
+    if args.write:
+        if result.has_comments:
+            raise ValueError(f"{args.file} has comments; prettify would drop them, so it was not rewritten")
+        Path(args.file).write_text(result.formatted, encoding="utf-8")
+        print(f"{args.file}: rewritten")
+        return 0
+    if result.has_comments:
+        print(f"note: {args.file} has comments; --write would drop them", file=sys.stderr)
+    sys.stdout.writelines(
+        difflib.unified_diff(
+            result.original.splitlines(keepends=True),
+            result.formatted.splitlines(keepends=True),
+            fromfile=args.file,
+            tofile=f"{args.file} (prettified)",
+        )
+    )
+    return 1
+
+
+def _cmd_schema(args: argparse.Namespace) -> int:
+    text = json_schema_text()
+    if args.output:
+        Path(args.output).write_text(text, encoding="utf-8")
+    else:
+        sys.stdout.write(text)
+    return 0
+
+
 def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="gir", description="graph.yaml intermediate representation tools")
     parser.add_argument("--version", action="version", version=f"gir {__version__}")
@@ -73,11 +110,10 @@ def _build_parser() -> argparse.ArgumentParser:
     p_diff.add_argument("new")
     p_diff.set_defaults(handler=_cmd_diff)
 
-    p_slice = sub.add_parser("slice", help="extract a target node and its prerequisites")
-    p_slice.add_argument("file")
-    p_slice.add_argument("target")
-    p_slice.add_argument("-o", "--output", help="write to this file instead of stdout")
-    p_slice.set_defaults(handler=_cmd_slice)
+    p_prettify = sub.add_parser("prettify", help="show or apply the canonical formatting of a graph.yaml")
+    p_prettify.add_argument("file")
+    p_prettify.add_argument("--write", action="store_true", help="rewrite the file in place instead of printing a diff")
+    p_prettify.set_defaults(handler=_cmd_prettify)
 
     p_render = sub.add_parser("render", help="visualize a graph as svg, png, pdf, or mermaid")
     p_render.add_argument("file")
@@ -85,6 +121,16 @@ def _build_parser() -> argparse.ArgumentParser:
     p_render.add_argument("-o", "--output", help="write to this file instead of stdout")
     p_render.add_argument("--no-imports", action="store_true", help="do not resolve imports")
     p_render.set_defaults(handler=_cmd_render)
+
+    p_schema = sub.add_parser("schema", help="print the JSON Schema for graph.yaml")
+    p_schema.add_argument("-o", "--output", help="write to this file instead of stdout")
+    p_schema.set_defaults(handler=_cmd_schema)
+
+    p_slice = sub.add_parser("slice", help="extract a target node and its prerequisites")
+    p_slice.add_argument("file")
+    p_slice.add_argument("target")
+    p_slice.add_argument("-o", "--output", help="write to this file instead of stdout")
+    p_slice.set_defaults(handler=_cmd_slice)
 
     p_validate = sub.add_parser("validate", help="check a graph.yaml for structural errors")
     p_validate.add_argument("file")

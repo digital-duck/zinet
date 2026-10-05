@@ -91,14 +91,16 @@ Repo: `~/projects/digital-duck/SPL.py` (per the vision doc). Not yet inspected i
 
 ## graph-ir (follow-ups from these items)
 
-- [ ] **Write `docs/SPECIFICATION.md`.** The formal `graph.yaml` spec, which the Gemini feedback
+- [x] **Write `docs/SPECIFICATION.md`.** The formal `graph.yaml` spec, which the Gemini feedback
   lists as the first action item. Include the layer rules, edge types, and import semantics.
-- [ ] **Export JSON Schema.** Generate `schemas/graph.schema.json` from the Pydantic models, so
-  non-Python tools (cba, spl3 in other languages) can validate.
+- [x] **Export JSON Schema.** `gir schema -o schemas/graph.schema.json` generates it from the
+  Pydantic models, so non-Python tools (cba, spl3 in other languages) can validate. A test fails
+  if the committed copy is stale.
 - [ ] **Decide on import namespacing.** See the graph-code item above. Record the decision and
   the migration path.
-- [ ] **Add `gir fmt`.** Canonical YAML formatting, the graph-ir counterpart of graph-code's
-  `prettify`.
+- [x] **Add `gir prettify`.** Canonical YAML formatting, the graph-ir counterpart of graph-code's
+  `prettify`. Shows a diff by default, and `--write` rewrites in place. Comments are not preserved,
+  so `--write` refuses files that contain them. Named `prettify`, not `fmt`, to match graph-code.
 - [ ] **Keep the tutorial current.** `docs/GUIDE/TUTORIAL.md` must follow any CLI change.
   Subcommands are now alphabetical in `gir -h`, but the tutorial's section order is still
   validate, diff, slice, render.

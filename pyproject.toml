@@ -3,12 +3,27 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "graph-ir"
+name = "zigraf-ir"
 version = "0.1.0"
 description = "graph.yaml intermediate representation: schema, validator and graph transforms shared across the ZiNets ecosystem"
 readme = "README.md"
-license = { text = "Apache-2.0" }
+license = { file = "LICENSE" }
 requires-python = ">=3.10"
+authors = [{ name = "Gong, Wen", email = "lucywang1049@gmail.com" }]
+keywords = ["graph", "ir", "intermediate-representation", "yaml", "dag", "validation", "knowledge-graph"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+]
 dependencies = [
     "networkx>=3.2",
     "pydantic>=2.5",
@@ -16,13 +31,29 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest>=8"]
+dev = ["build", "pytest>=8", "twine"]
+
+[project.urls]
+Homepage = "https://github.com/digital-duck/graph-ir"
+Repository = "https://github.com/digital-duck/graph-ir"
+"Bug Tracker" = "https://github.com/digital-duck/graph-ir/issues"
 
 [project.scripts]
 gir = "graph_ir.cli:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/graph_ir"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "src/graph_ir/",
+    "tests/",
+    "schemas/",
+    "docs/SPECIFICATION.md",
+    "README.md",
+    "LICENSE",
+    "pyproject.toml",
+]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

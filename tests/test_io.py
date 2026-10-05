@@ -37,6 +37,13 @@ def test_duplicate_id_across_files_is_an_error(tmp_path):
         load_graph(tmp_path / "main.yaml")
 
 
+def test_unsupported_version_is_rejected(tmp_path):
+    source = tmp_path / "future.yaml"
+    source.write_text('version: "2.0"\nprimitives:\n  - id: a\n')
+    with pytest.raises(ValueError, match="unsupported graph version '2.0'"):
+        load_graph(source)
+
+
 def test_dump_then_load_round_trips(tmp_path):
     graph = load_graph(FIXTURES / "spl_pipeline.yaml")
     target = tmp_path / "out.yaml"

@@ -1,7 +1,7 @@
 # graph-ir Tutorial: Using the `gir` Command
 
-This tutorial walks through the `gir` command-line tool, which validates, compares, slices, and
-renders `graph.yaml` files. Every example uses the sample graphs in `tests/fixtures/`, and the
+This tutorial walks through the `gir` command-line tool, which validates, compares, slices,
+renders, and formats `graph.yaml` files, and exports its JSON Schema. Every example uses the sample graphs in `tests/fixtures/`, and the
 outputs shown were produced by the current version (`gir 0.1.0`).
 
 ---
@@ -305,12 +305,59 @@ gir diff main.yaml feature.yaml                  # 4. review a change to the gra
 
 ---
 
+## 10. Format a graph: `gir prettify`
+
+`prettify` compares a file with its canonical form: `version` first, layers in order, list items
+indented under their keys, and defaults omitted. Without `--write`, it prints a diff and changes
+nothing. It exits 1 when the file would change, so it can run in CI.
+
+```bash
+gir prettify messy.yaml             # show the diff
+gir prettify messy.yaml --write     # rewrite the file in place
+```
+
+```text
+--- messy.yaml
++++ messy.yaml (prettified)
+@@ -1,3 +1,5 @@
++version: '1.0'
+ primitives:
+-  - meta: {x: 1}
+-    id: a
++  - id: a
++    meta:
++      x: 1
+```
+
+`prettify` formats one file and never resolves imports, so imported nodes are not copied into it.
+YAML comments are not kept. `--write` refuses a file that contains comments, and exits 2 without
+changing it.
+
+---
+
+## 11. JSON Schema: `gir schema`
+
+`schema` prints the JSON Schema for `graph.yaml`, which editors and other tools can use to check
+files. The committed copy is `schemas/graph.schema.json`:
+
+```bash
+gir schema                                  # print to stdout
+gir schema -o schemas/graph.schema.json     # regenerate the committed file
+```
+
+The specification in `docs/SPECIFICATION.md` covers the rules a schema cannot express, such as
+the layer dependency rules and cycle detection.
+
+---
+
 ## Quick reference
 
 ```text
-gir validate FILE [--no-imports]
 gir diff OLD NEW
-gir slice FILE TARGET [-o OUT]
+gir prettify FILE [--write]
 gir render FILE [--format svg|png|pdf|mermaid] [-o OUT] [--no-imports]
+gir schema [-o OUT]
+gir slice FILE TARGET [-o OUT]
+gir validate FILE [--no-imports]
 gir --version
 ```

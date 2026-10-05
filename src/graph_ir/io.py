@@ -24,20 +24,32 @@ def load_graph(path: str | Path, resolve_imports: bool = True) -> Graph:
     return graph
 
 
+class _IndentedDumper(yaml.SafeDumper):
+    """Indents list items under their parent key ("  - id: a") instead of PyYAML's flush style."""
+
+    def increase_indent(self, flow: bool = False, indentless: bool = False) -> None:
+        return super().increase_indent(flow, False)
+
+
 def to_yaml(graph: Graph) -> str:
     data = graph.model_dump(mode="json", exclude_defaults=True)
     data = {"version": graph.version, **data}  # always written, first, even when default
-    return yaml.safe_dump(data, sort_keys=False, allow_unicode=True)
+    return yaml.dump(data, Dumper=_IndentedDumper, sort_keys=False, allow_unicode=True)
 
 
 def dump_graph(graph: Graph, path: str | Path) -> None:
     Path(path).write_text(to_yaml(graph), encoding="utf-8")
 
 
+SUPPORTED_VERSIONS = ("1.0",)
+
+
 def _read(path: Path) -> Graph:
     data = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
     if not isinstance(data, dict):
         raise ValueError(f"{path}: top level must be a mapping")
+    if str(data.get("version", "1.0")) not in SUPPORTED_VERSIONS:
+        raise ValueError(f"{path}: unsupported graph version {data['version']!r}; supported: {', '.join(SUPPORTED_VERSIONS)}")
     try:
         return Graph.model_validate(data)
     except ValidationError as exc:
