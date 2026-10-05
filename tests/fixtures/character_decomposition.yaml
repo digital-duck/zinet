@@ -1,0 +1,19 @@
+version: "1.0"
+primitives:
+  - id: stroke_heng
+    label: 横 horizontal stroke
+  - id: stroke_shu
+    label: 竖 vertical stroke
+  - id: stroke_pie
+    label: 撇 left-falling stroke
+  - id: stroke_na
+    label: 捺 right-falling stroke
+concepts:
+  - id: radical_mu
+    label: 木 tree radical
+    deps: [stroke_heng, stroke_shu, stroke_pie, stroke_na]
+applications:
+  - id: char_lin
+    label: 林 forest
+    deps: [radical_mu]
+    meta: {character: 林}

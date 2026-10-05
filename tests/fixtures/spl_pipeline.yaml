@@ -1,0 +1,12 @@
+version: "1.0"
+primitives:
+  - id: tool_llm_call
+  - id: tool_cache_get
+concepts:
+  - id: step_summarize
+    deps: [tool_llm_call, tool_cache_get]
+    edge_types: {tool_cache_get: data_flow}
+applications:
+  - id: recipe_build_concept_book
+    deps: [step_summarize]
+    edge_types: {step_summarize: data_flow}

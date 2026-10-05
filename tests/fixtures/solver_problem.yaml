@@ -1,0 +1,27 @@
+version: "1.0"
+primitives:
+  - id: daily_budget
+    meta: {type: parameter, value: 500.0}
+  - id: unit_cost
+    meta: {type: parameter, value: 12.5}
+  - id: x_units
+    meta: {type: variable, bounds: [0, null]}
+  - id: max_units
+    meta: {type: parameter, value: 40}
+concepts:
+  - id: total_cost
+    deps: [unit_cost, x_units]
+    meta: {expression: "unit_cost * x_units"}
+  - id: budget_constraint
+    deps: [total_cost, daily_budget]
+    edge_types: {daily_budget: constraint}
+    meta: {expression: "total_cost <= daily_budget"}
+  - id: capacity_constraint
+    deps: [x_units, max_units]
+    edge_types: {max_units: constraint}
+    meta: {expression: "x_units <= max_units"}
+applications:
+  - id: minimize_cost
+    deps: [total_cost, budget_constraint, capacity_constraint]
+    edge_types: {budget_constraint: constraint, capacity_constraint: constraint}
+    meta: {objective: total_cost, solver: linprog}

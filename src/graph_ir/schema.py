@@ -1,0 +1,75 @@
+"""Pydantic models for graph.yaml: a three-layer DAG (primitives -> concepts -> applications)."""
+
+from __future__ import annotations
+
+from enum import Enum
+from typing import Any, Iterator
+
+from pydantic import BaseModel, ConfigDict, Field, model_validator
+
+
+class Layer(str, Enum):
+    """Layer a node lives in. Values are the top-level YAML keys."""
+
+    PRIMITIVES = "primitives"
+    CONCEPTS = "concepts"
+    APPLICATIONS = "applications"
+
+
+class EdgeType(str, Enum):
+    """Optional semantics for a dependency edge. Unannotated edges are DEPENDS_ON."""
+
+    DEPENDS_ON = "depends_on"
+    DATA_FLOW = "data_flow"
+    PREREQUISITE = "prerequisite"
+    CONSTRAINT = "constraint"
+    INHERITANCE = "inheritance"
+
+
+class Node(BaseModel):
+    """A graph node. `deps` lists the ids it depends on, i.e. its incoming edges."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    id: str = Field(min_length=1)
+    label: str | None = None
+    deps: list[str] = Field(default_factory=list)
+    edge_types: dict[str, EdgeType] = Field(default_factory=dict)  # dep id -> edge type
+    meta: dict[str, Any] = Field(default_factory=dict)  # domain payload, opaque to the core
+
+    @model_validator(mode="after")
+    def _typed_edges_must_be_deps(self) -> Node:
+        stray = sorted(set(self.edge_types) - set(self.deps))
+        if stray:
+            raise ValueError(f"edge_types given for non-dependencies: {stray}")
+        return self
+
+
+class Graph(BaseModel):
+    """A whole graph.yaml document. Unknown top-level keys are rejected to catch typos."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    version: str = "1.0"
+    imports: list[str] = Field(default_factory=list)  # relative paths, resolved by io.load_graph
+    primitives: list[Node] = Field(default_factory=list)
+    concepts: list[Node] = Field(default_factory=list)
+    applications: list[Node] = Field(default_factory=list)
+
+    def layered_nodes(self) -> Iterator[tuple[Layer, Node]]:
+        """Yield (layer, node) pairs in layer order, then file order."""
+        for layer in Layer:
+            for node in getattr(self, layer.value):
+                yield layer, node
+
+    def nodes(self) -> list[Node]:
+        return [node for _, node in self.layered_nodes()]
+
+    def index(self) -> dict[str, tuple[Layer, Node]]:
+        """Map node id -> (layer, node). Raises ValueError on duplicate ids."""
+        index: dict[str, tuple[Layer, Node]] = {}
+        for layer, node in self.layered_nodes():
+            if node.id in index:
+                raise ValueError(f"duplicate node id: {node.id!r}")
+            index[node.id] = (layer, node)
+        return index

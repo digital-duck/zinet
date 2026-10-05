@@ -1,0 +1,13 @@
+version: "1.0"
+primitives:
+  - id: concept_function
+  - id: concept_limit
+concepts:
+  - id: concept_derivative
+    deps: [concept_function, concept_limit]
+    edge_types: {concept_function: prerequisite, concept_limit: prerequisite}
+applications:
+  - id: capstone_chain_rule
+    deps: [concept_derivative]
+    edge_types: {concept_derivative: prerequisite}
+    meta: {worked_examples: 3}
