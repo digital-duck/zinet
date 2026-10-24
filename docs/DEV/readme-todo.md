@@ -93,7 +93,7 @@ Design requirements that come from the three apps we are adopting first:
 2. [x] **Algorithms and validator** (done, `src/zinet/algorithms.py`): plain `nx.DiGraph`, `to_networkx`, options that reproduce graph-code and both ConceptBook variants (`tests/test_algorithms_characterization.py`), one `CycleError` / `UnknownNodeError`. Optional validator checks `not_reducible` and `disconnected` (`zinet validate --check` / `--strict`), off by default so existing graphs stay valid.
 3. [x] **`zinet.vis`** (done, `src/zinet/vis/`): `Style`, engines cytoscape / graphviz / mermaid / ascii in the core install and pyvis / graphify as extras, and `select`, based on GraphLang's `grafv` and work-graph's `viz.select`; output matches the golden files (`tests/test_vis_characterization.py`). `zinet render` gains `--format html` and `ascii`.
 4. [x] **`zinet.roundtrip`** (done, `src/zinet/roundtrip.py`): work-graph's harvest / attach generalised over a `Layout` (its own `nodes`/`edges` layout reproduces its frozen output exactly), the SQLite comment store (stdlib `sqlite3`), `zinet convert` (YAML <-> JSON), and `prettify --write` keeps comments. No new dependency: the logic is text-based, so `ruamel.yaml` is not needed.
-5. [ ] **Format recognition**: the zinet side of "say what a GraphLang file is" (cross-tool follow-ups below).
+5. [x] **Format recognition** (done, `src/zinet/formats.py`): `load_graph` says what a GraphLang workflow or a ConceptBook / graph-code graph is, with the command to use, instead of a schema error. Every `zinet` command reports it with exit 2.
 
 **Phase B: adoption, one app at a time (each keeps its own tests green)**
 
@@ -122,9 +122,9 @@ Design requirements that come from the three apps we are adopting first:
 
 ### Cross-tool follow-ups (zinet and GraphLang)
 
-- [ ] **zinet side: say what a GraphLang file is.** Today `zinet validate` on a GraphLang workflow fails with `unsupported graph version '1.0-graph'`. Detect `workflow:` / `nodes:` + `edges:` in `io._read` and say "this is a GraphLang workflow; use `graf validate|vis|run FILE`". Add a test.
+- [x] **zinet side: say what a GraphLang file is** (done). Today `zinet validate` on a GraphLang workflow fails with `unsupported graph version '1.0-graph'`. Detect `workflow:` / `nodes:` + `edges:` in `io._read` and say "this is a GraphLang workflow; use `graf validate|vis|run FILE`". Add a test.
 - [x] **GraphLang side (done in graflang, not yet committed).** `graphlang/formats.py` detects a zinet file by content, and `graf run|validate|info|compile|check|vis` explain it instead of failing on a schema error. A GraphLang workflow named plain `graph.yaml` works.
-- [ ] **README section "Two graph formats, one family"** in both repos: zinet is the static knowledge and dependency IR; GraphLang is the executable workflow IR; `spl3` is the bridge. Include the file-name rule above.
+- [x] **README section "Two graph formats, one family"** in both repos (done): zinet is the static knowledge and dependency IR; GraphLang is the executable workflow IR; `spl3` is the bridge. Include the file-name rule above.
 - [ ] **Optional: `graf vis` for zinet files.** Convert a zinet graph into GraphLang's neutral model (coloured by layer) so GraphLang's engines draw it. Only worth doing if `zinet[vis]` does not land first; if it does, GraphLang should use the shared engines instead.
 
 ### Open questions (answered by WEN on 2026-10-24; the resulting decisions are above)

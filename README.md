@@ -31,6 +31,16 @@ applications:                    # capstones: nothing may depend on these
   `prerequisite`, `constraint`, `inheritance`.
 - `meta` is an opaque domain payload that the core never interprets.
 
+### Two graph formats, one family
+
+zinet stores a *static* knowledge or dependency graph. Its sibling [GraphLang](https://github.com/digital-duck/graflang) (`graf`)
+stores an *executable* workflow (typed nodes with ports, control and data edges, loops) in `*.graph.yaml`. Both are plain YAML
+that persists a graph, and the file name is only a convention (a plain `graph.yaml` may hold either), so each tool tells the files
+apart by content: `workflow:` with `nodes:` and `edges:` is GraphLang; `primitives:`, `concepts:` or `applications:` as lists of
+nodes is zinet. Given the other kind, each tool says what the file is and which command to use, instead of a schema error.
+ConceptBook and graph-code write the same three layers as mappings with `composed_of` / `needs`; zinet does not read that dialect
+yet, but its algorithms and drawing work on any `networkx` graph (see below). More in [docs/DEV/readme-ecosystem.md](docs/DEV/readme-ecosystem.md).
+
 ## Install
 
 From PyPI:

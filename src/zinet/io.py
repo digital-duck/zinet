@@ -7,6 +7,7 @@ from pathlib import Path
 import yaml
 from pydantic import ValidationError
 
+from .formats import explain_foreign
 from .schema import Graph, Layer
 
 
@@ -48,6 +49,9 @@ def _read(path: Path) -> Graph:
     data = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
     if not isinstance(data, dict):
         raise ValueError(f"{path}: top level must be a mapping")
+    foreign = explain_foreign(data)
+    if foreign:
+        raise ValueError(f"{path}: {foreign}")
     if str(data.get("version", "1.0")) not in SUPPORTED_VERSIONS:
         raise ValueError(f"{path}: unsupported graph version {data['version']!r}; supported: {', '.join(SUPPORTED_VERSIONS)}")
     try:
