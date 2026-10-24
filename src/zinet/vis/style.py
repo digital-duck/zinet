@@ -44,6 +44,11 @@ class Style:
     # `node_size` set, nodes are drawn as sized shapes with the label below them (bigger = more connected, for example).
     arrangement: Literal["flow", "force"] = "flow"
     node_size: SizeFn | None = None
+    # The interactive page. `secondary_hidden`: dashed edges (the data wiring, the typed or inferred edges) start hidden behind a
+    # checkbox, so the first view is the main flow; they always show for the node you hover or select. `groups_collapsed`: a group
+    # (a LOOP) starts as one box; click it to expand, double-click an expanded group to collapse it.
+    secondary_hidden: bool = False
+    groups_collapsed: bool = False
 
     def legend(self, G) -> list[tuple[str, str]]:
         """(kind, colour) for every kind present, in kind order."""

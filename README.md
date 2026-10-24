@@ -150,6 +150,12 @@ top-to-bottom shape that fits the screen). `graphviz` writes svg, png or pdf by 
 (`-o FILE.md` wraps it in a fenced block). `pyvis` and `graphify` need `pip install zinet[pyvis]` / `zinet[graphify]`.
 GraphLang's and work-graph's output through these engines is checked against golden files in `tests/characterization/`.
 
+On the interactive page, hovering a node fades everything but its connections (and shows its dashed edges), and clicking it opens its
+details. Two options of the `Style` make the first view the main flow of a big graph: `secondary_hidden=True` starts the dashed edges
+(the data wiring) behind a "show ... edges" checkbox, and `groups_collapsed=True` starts every group (a LOOP) as one box (click it to
+open it, double-click an open group to close it; "Collapse groups" / "Expand groups" do all of them). Graphviz lays out both the open
+and the collapsed arrangement, so the collapsed view is compact. GraphLang turns both on; they are off by default.
+
 ## Checks
 
 | Code | Severity | Meaning |

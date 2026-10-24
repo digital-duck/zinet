@@ -105,6 +105,19 @@ Design requirements that come from the three apps we are adopting first:
 
 9. [ ] **Aliased imports and the v2.1 mapping** (graph-code section).
 
+### Planned: a visual IDE for authoring workflows
+
+GraphLang's graph view is becoming the way a workflow is *read* (no separate Mermaid step). The next step is to *write* it there. The
+interactive page (`zinet.vis`, shared with work-graph) is the base, so the work belongs here and in GraphLang together. Not started.
+
+- [ ] **Edit in the view.** Add, rename and delete nodes; draw an edge from a port to a port; edit a node's `config` (prompt, condition, model) in the side panel; every change is written back to the `*.graph.yaml` with its comments kept (`zinet.roundtrip`).
+- [ ] **Validate while editing.** Run `graf validate` (and zinet's checks) on each change and mark the offending node or edge in place, instead of at the next run.
+- [ ] **Ports as first-class in the picture.** Draw a node's ports so an edge can be dragged from `out_x` to `in_y`; today only the port names are in the labels.
+- [ ] **Round trip with the file on disk.** Watch the file so the view follows edits made in a text editor, and the other way round, without losing comments or key order.
+- [ ] **Run from the view.** Execute the workflow with `--adapter mock` (or a real one) and light up the nodes as they fire, using the run log events (`node.fire`, `node.done`).
+- [ ] **Where it runs.** Decide between a local web app served by `graf` (for example `graf ide FILE`), a Streamlit tab like work-graph's Map tab, or a VS Code extension. A local page that reuses the existing HTML is the cheapest start.
+- [ ] **What the engine must expose first.** Events from the page (node and edge selected, moved, created) as a small, documented contract, and a stable id for every node and edge so a change maps back to the YAML.
+
 ### On hold (ConceptBook: to be revisited in future)
 
 - **`concept-book-press`**: swap `pipeline/validate/checker.py` for zinet's `validate`, then `publish/registry.py`. Future ingestion pipelines would benefit from the consolidated graph functions.

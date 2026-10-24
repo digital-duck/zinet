@@ -23,7 +23,7 @@ def sample() -> nx.DiGraph:
 
 
 def page_data(page: str) -> list[dict]:
-    return json.loads(re.search(r"const data = (\[.*?\]);\nconst dark", page, re.S).group(1).replace("<\\/", "</"))
+    return json.loads(re.search(r"const data = (\[.*?\]);\nconst OPTS", page, re.S).group(1).replace("<\\/", "</"))
 
 
 def test_the_default_style_reads_what_to_networkx_writes():
