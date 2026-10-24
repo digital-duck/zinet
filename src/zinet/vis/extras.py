@@ -34,7 +34,7 @@ def to_pyvis(G: nx.Graph, out: Path, style: Style, note: str = "") -> None:
     for n, d in G.nodes(data=True):
         group, kind = style.group(n, d), style.kind(n, d)
         color = style.color(n, d)
-        label = f"{style.label(n, d)}\n{kind}" if kind else style.label(n, d)
+        label = f"{style.label(n, d)}\n{kind}" if kind and style.show_kind else style.label(n, d)
         shape = style.shape(n, d)
         if style.node_size is not None:                # circles sized by the style, the label below (a force-layout graph)
             net.add_node(n, label=style.label(n, d), title=style.info(n, d), color=color,

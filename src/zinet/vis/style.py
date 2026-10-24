@@ -47,6 +47,7 @@ class Style:
     # The interactive page. `secondary_hidden`: dashed edges (the data wiring, the typed or inferred edges) start hidden behind a
     # checkbox, so the first view is the main flow; they always show for the node you hover or select. `groups_collapsed`: a group
     # (a LOOP) starts as one box; click it to expand, double-click an expanded group to collapse it.
+    show_kind: bool = True      # False: nodes show only their label (the colour and the legend already say the kind)
     secondary_hidden: bool = False
     groups_collapsed: bool = False
 

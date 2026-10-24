@@ -29,7 +29,7 @@ def to_mermaid_text(G: nx.Graph, style: Style) -> str:
             else:
                 left, right = MERMAID_SHAPES[style.shape(n, d)]
                 kind = style.kind(n, d)
-                text = f"{q(style.label(n, d))}<br/>{kind}" if kind else q(style.label(n, d))
+                text = f"{q(style.label(n, d))}<br/>{kind}" if kind and style.show_kind else q(style.label(n, d))
                 lines.append(f'{pad}{ids[n]}{left}"{text}"{right}')
 
     emit(None, "  ")

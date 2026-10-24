@@ -41,7 +41,7 @@ def to_dot(G: nx.Graph, style: Style, fixed_size: bool = False) -> str:
         node_style = "rounded,filled" if shape == "box" else "filled"
         color = style.color(n, d)
         kind = style.kind(n, d)
-        label = f'{esc(style.label(n, d))}\\n{kind}' if kind else esc(style.label(n, d))
+        label = f'{esc(style.label(n, d))}\\n{kind}' if kind and style.show_kind else esc(style.label(n, d))
         size = ""
         if fixed_size:
             w, h = (150, 70) if shape == "diamond" else (130, 48)

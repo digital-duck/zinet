@@ -43,7 +43,7 @@ const esc = s => String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'
 const cy = cytoscape({container: document.getElementById('cy'), elements: data, layout: {name: 'preset'}, wheelSensitivity: 0.08, minZoom: 0.05, maxZoom: 4,
   style: [
     {selector:'node', style:{'background-color':'data(color)', 'background-opacity':0.85, shape:'data(shape)', label:'data(text)',
-      'text-wrap':'wrap', 'font-size':13, 'min-zoomed-font-size':5, width:130, height:48, color:'#111',
+      'text-wrap':'wrap', 'text-max-width':118, 'font-size':13, 'min-zoomed-font-size':5, width:130, height:48, color:'#111',
       'text-valign':'center', 'text-halign':'center', 'border-width':1, 'border-color':'data(color)'}},
     {selector:'node[shape="diamond"]', style:{width:150, height:70}},
     {selector:'node[?sized]', style:{width:'data(size)', height:'data(size)', 'background-opacity':1, 'border-width':0,
@@ -205,7 +205,7 @@ def elements(G: nx.Graph, style: Style, positions: dict | None = None, mark: set
     for n, d in G.nodes(data=True):
         label, kind = style.label(n, d), style.kind(n, d)
         sized = style.node_size is not None
-        data = {"id": n, "label": label, "text": label if (sized or n in members or not kind) else f"{label}\n{kind}",
+        data = {"id": n, "label": label, "text": label if (sized or n in members or not kind or not style.show_kind) else f"{label}\n{kind}",
                 "color": style.color(n, d), "info": style.info(n, d), "shape": style.shape(n, d)}
         if sized:
             data["sized"], data["size"] = True, style.node_size(G, n, d)

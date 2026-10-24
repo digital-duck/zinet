@@ -193,3 +193,14 @@ def test_pyvis_uses_a_force_layout_for_force_styles(tmp_path):
     # the page inlines the whole vis-network library, so look for the options this engine writes, not for a word
     assert '"direction": "LR"' in flow and '"springLength": 140' not in flow
     assert '"direction": "LR"' not in force and '"springLength": 140' in force
+
+
+def test_show_kind_false_leaves_only_the_label_on_nodes_in_every_engine(tmp_path):
+    G = sample()
+    on, off = zinet_style(), zinet_style()
+    off.show_kind = False
+    text = lambda s: {e["data"]["id"]: e["data"]["text"] for e in elements(G, s) if "source" not in e["data"]}  # noqa: E731
+    assert text(on)["app"] == "The app\napplication" and text(off)["app"] == "The app"
+    assert "application" in to_mermaid_text(G, on).split("classDef")[0] and "<br/>" not in to_mermaid_text(G, off)
+    assert "\\napplication" in to_dot(G, on) and "\\napplication" not in to_dot(G, off)
+    assert off.legend(G) == on.legend(G)                                     # the legend still names the kinds
