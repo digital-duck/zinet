@@ -264,7 +264,7 @@ Four independent domains converge on the same two-element basis:
 
 **Biology.** Structure determines function and function constrains structure: a protein's fold fixes what it binds, and the need to bind shaped the fold. Anatomy and physiology are two ways of describing the same organism, as nodes and edges are two ways of describing the same graph.
 
-**Abstract and philosophical.** The oldest statement of the pair is form and function: what a thing *is* and what it *does* (Aristotle's form and its activity; "form follows function" in design). Forms are bounded and identifiable, while functions compose and chain freely.
+**Abstract and philosophical.** The oldest statement of the pair is Aristotle's hylomorphism: a thing is matter organised by a *form*, and for a living thing the soul is the form of the body, its "first actuality" (*De Anima* II.1), what makes the body the kind of thing it is and lets it do what it does. In design the same pair became a slogan: Louis Sullivan wrote "form ever follows function" in "The Tall Office Building Artistically Considered" (1896), and the idea is traced further back to Horatio Greenough and, by Sullivan himself, to Vitruvius. Forms are bounded and identifiable, while functions compose and chain freely.
 
 The four converge on one asymmetry: a stable, countable *something* (fermion, node, structure, form) and a relational, composable *doing* (boson, edge, function, function). The mapping runs deeper than analogy, and it is evidence rather than a design choice: when the ZiNets graph-first IR reached the same two-element basis from a completely different direction (Chinese character decomposition, then node and edge, then `graph.yaml`), it was not looking for it.
 
@@ -316,6 +316,8 @@ to a new domain.
   - `solver/SPL-solver-recipes.md` — concrete SPL recipes for LP/ILP/scheduling/routing
   - `solver/solver-guide.md` — practitioner's guide to Solver Advisor
   - `solver/Solver-Box.md` — full Solver Advisor design document
+- **Aristotle.** *De Anima* II.1 (soul as the form of a natural body, its first actuality); see the Stanford Encyclopedia of Philosophy, [Aristotle's Psychology](https://plato.stanford.edu/entries/aristotle-psychology/).
+- **Sullivan, L. H. (1896).** The Tall Office Building Artistically Considered. *Lippincott's Magazine.* — "form ever follows function"; the earlier attribution to Greenough is disputed (see [Form follows function](https://en.wikipedia.org/wiki/Form_follows_function)).
 - **Lafont, Y. (1990).** Interaction nets. *Proceedings of the 17th ACM SIGPLAN-SIGACT Symposium on Principles of Programming Languages (POPL).* — the graph-rewriting model GraphLang is grounded in: agents with ports, local rewrite rules, confluence.
 - `~/projects/digital-duck/graflang/` — GraphLang (`graf`): executable workflow graphs; `docs/DEV/readme-design.md` has the exact semantics and the gap table.
 - [README-LLVM.md](README-LLVM.md) — LLVM tutorial: IR architecture, SSA form, optimization passes, and the graph.yaml parallel
