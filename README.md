@@ -62,8 +62,8 @@ zinet prettify graph.yaml --write                    # rewrite in place (refuses
 zinet schema -o schemas/graph.schema.json            # JSON Schema for editors and other tools
 ```
 
-`render` supports `svg`, `png`, `pdf`, `mermaid`, `html` and `ascii`. Mermaid, html and ascii need nothing installed. The
-`svg`, `png` and `pdf` need Graphviz's `dot` on PATH (`apt install graphviz`).
+`render` supports `svg`, `png`, `pdf`, `mermaid`, `html` and `ascii`. Mermaid, html and ascii need nothing installed. The `svg`,
+`png` and `pdf` formats need Graphviz's `dot` on PATH (`apt install graphviz`).
 
 Exit code 2 means a usage, load, or render error. `prettify` exits 1 when a file is not in
 canonical form, so it can run in CI.
