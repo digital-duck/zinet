@@ -99,7 +99,7 @@ Design requirements that come from the three apps we are adopting first:
 
 6. [x] **GraphLang first** (done; graflang `ee98e66`). `grafv/engines.py` (355 lines) is replaced by `zinet.vis`: now a GraphLang `Style` and a `render` wrapper (about 60 lines), the bundled Cytoscape.js moved to zinet, `formats.py` reuses `zinet.formats`, output unchanged, and `graf vis` gained the `ascii` engine. `grafv/model.py` (workflow to graph) and `graf vis` stay. Smallest change: the engines already match, and it proves the style-function design.
 7. [x] **work-graph second** (done; work-graph `8922b4c`, `95956c7`). `viz.py` 287 -> 96 lines (a `Style` with circles sized by connections, a force layout, layer colours and dashed `INFERRED` edges, plus `select` predicates) and `convert.py` 204 -> 92 lines (zinet's comment harvest / attach with work-graph's `nodes` / `edges` layout; its canonical dump and SQLite store stay). To make this possible `Style` gained `node_size`, `arrangement` ("flow" or "force") and `mark`. Keeps `layers.py`, `refs.py`, search and embeddings. Its page data is checked against `golden/workgraph_viz.json`.
-8. [ ] **graph-code third.** `acyclic` (today `nx.simple_cycles`, which can be exponential), `build_order`, `learning_path`, `gap`, `productivity_order` and `reducible` use zinet. Events, transitions, call contracts, drift and clustering stay. Largest semantic risk, so it goes last and relies on its existing tests.
+8. [x] **graph-code third** (done; graph-code `37b551d`: `acyclic`, `reducible`, `productivity_order`, `learning_path`, `gap` and `build_order` run on zinet through a small adapter; errors are still `ToolFailed`; the old `acyclic` no longer enumerates every cycle). Original plan: `acyclic` (today `nx.simple_cycles`, which can be exponential), `build_order`, `learning_path`, `gap`, `productivity_order` and `reducible` use zinet. Events, transitions, call contracts, drift and clustering stay. Largest semantic risk, so it goes last and relies on its existing tests.
 
 **Later (decided separately)**
 
@@ -163,13 +163,13 @@ Feedback:  see my comments above tagged by "[WEN]"
 
 Repo: `~/projects/digital-duck/graph-code` (module `src/graph_code/`).
 
-- [ ] **Replace `acyclic` with zinet cycle detection.** `graph_lib.py:83` calls `nx.simple_cycles`,
+- [x] **Replace `acyclic` with zinet cycle detection** (done). `graph_lib.py:83` calls `nx.simple_cycles`,
   which enumerates every cycle and can be exponential. Use `zinet.topological_order` and its
   `CycleError.members`. Keep the same `ToolFailed` message.
-- [ ] **Replace `build_order` with `zinet.topological_order`.** `graph_lib.py:214`. Confirm that
+- [x] **Replace `build_order`** (done, with `zinet.build_order`, which keeps graph-code's networkx order, not the alphabetical tie-break, so `grafcode order` output is unchanged). `graph_lib.py:214`. Confirm that
   the tie-break order (zinet sorts ties alphabetically) is acceptable for `grafcode order`
   output and for `build_component.spl`, which consumes it.
-- [ ] **Express `learning_path` and `gap` on top of `zinet.ancestors`.** `graph_lib.py:164`.
+- [x] **Express `learning_path` and `gap` on zinet** (done, `zinet.learning_path` / `zinet.gap`). `graph_lib.py:164`.
   Keep graph-code's own logic for the known set and primitive exclusion. Only the transitive
   closure is shared.
 - [ ] **Share the core structural checks.** `validate_full` (`graph_lib.py:563`) overlaps with
