@@ -53,6 +53,7 @@ include = [
     "schemas/",
     "docs/SPECIFICATION.md",
     "README.md",
+    "CHANGELOG.md",
     "LICENSE",
     "pyproject.toml",
 ]
