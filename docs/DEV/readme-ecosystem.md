@@ -6,7 +6,7 @@ persists a graph in plain YAML, and it does not run anything. The apps below are
 same sense (the graph is the main artifact, not a by-product), but each has its own graph model and
 its own job. This page says what each one is and how it relates to zinet.
 
-For the wider design, see [README-graph-vision.md](README-graph-vision.md) (the five-CLI ecosystem
+For the wider design, see [README-graph-vision.md](README-graph-vision.md) (the six-CLI ecosystem
 and the layered design). For the shared-code plan, see [readme-todo.md](readme-todo.md).
 
 Last reviewed: 2026-10-24.

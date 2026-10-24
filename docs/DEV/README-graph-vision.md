@@ -29,15 +29,16 @@ This three-layer DAG maps naturally to every domain in the ecosystem:
 | ConceptBook | concept, atomic facts, definitions | composed ideas, theorems | capstone insights, worked examples |
 | Graph-Code | leaf components, APIs | composed modules, services | deployable apps, systems |
 | Solver | decision variables, parameters | constraints, derived quantities | objectives, solution targets |
+| GraphLang | node types (`GENERATE`, `EVALUATE`, `GUARD`, ...) | composed workflows (a `LOOP` body, a procedure) | runnable workflows (e.g. `code_pipeline`) |
 | **Education** | primitive concepts (irreducible knowledge units) | prerequisite-ordered compositions | capstone mastery — the target concept the learner navigates toward |
 
-The same `graph.yaml` validator, the same navigator (`graph.html`), and the same diff semantics work across all six domains. That is the leverage.
+The same `graph.yaml` validator, the same navigator (`graph.html`), and the same diff semantics work across all six knowledge domains above. That is the leverage. (GraphLang's own file is a different graph, an executable workflow; this row shows the same three levels of composition, not the same file format. See "Two graphs, one family".)
 
 ---
 
-## The five-CLI ecosystem
+## The six-CLI ecosystem
 
-As of 2026-09-27 the ZiNets toolchain has matured to five CLIs, all sharing `graph.yaml` as their common exchange format:
+As of 2026-09-27 the ZiNets toolchain has matured to five CLIs sharing `graph.yaml` as their common exchange format, and a sixth, `graf` (GraphLang, 2026-10), that applies the same graph-first idea to execution:
 
 | CLI | Stack | Role | Purpose |
 |---|---|---|---|
@@ -46,8 +47,9 @@ As of 2026-09-27 the ZiNets toolchain has matured to five CLIs, all sharing `gra
 | `cba` | ConceptBook App | `graph.yaml` → interactive educational concept books | learning and knowledge management |
 | `gfc` | Graph-Code | `graph.yaml` → software blueprints and scaffolded apps | app builder |
 | `solver` | Solver Box | `graph.yaml` → deterministic solver for real-world optimization | solution |
+| `graf` | GraphLang | `*.graph.yaml` workflow graph → run, validate, draw (`graf vis`), compile; the successor to SPL scripts | executable workflows |
 
-Each CLI is independently installable and operable, yet they compose naturally: `spl3` generates `graph.yaml`; `gfc` and `cba` consume it; `solver` uses the same format to formulate (problem, solution) pair.
+Each CLI is independently installable and operable, yet they compose naturally: `spl3` generates `graph.yaml`; `gfc` and `cba` consume it; `solver` uses the same format to formulate (problem, solution) pair; `graf` runs workflows whose graph is the program, and is replacing `spl3` as the way workflows are written. All six share the code in zinet (algorithms, drawing, comment-preserving YAML).
 
 ---
 
@@ -85,7 +87,7 @@ This closes the loop between authoring SPL scripts and explaining them — the s
 
 ## Education as a graph surface — ConceptBook + Novak & Gowin
 
-ConceptBook (`cba`) is already in the five-CLI ecosystem.  What the paper [Gong (2026), *ConceptBook: A Graph-First Framework for AI-Generated Curricula*] adds is a deeper grounding: the graph-first approach to knowledge representation is not only computationally convenient — it may be *cognitively correct*.
+ConceptBook (`cba`) is already in the CLI ecosystem.  What the paper [Gong (2026), *ConceptBook: A Graph-First Framework for AI-Generated Curricula*] adds is a deeper grounding: the graph-first approach to knowledge representation is not only computationally convenient — it may be *cognitively correct*.
 
 ### The independent convergence
 
@@ -228,7 +230,7 @@ The four converge on one asymmetry: a stable, countable *something* (fermion, no
 
 The basis is not something we chose; every domain above arrives at it independently, and the physics case shows it does not reduce further. That is why `graph.yaml` can be a *minimal* structure rather than a convenient one, and why GraphLang can take the same pair (agents and the connections between their ports) as the whole of a program.
 
-### Consequence for the five surfaces
+### Consequence for the surfaces
 
 If every domain decomposes into nodes (identities with state) and edges (relations with flow), then `graph.yaml` is the right IR not by convention but by necessity — it is the minimal structure capable of representing anything:
 
@@ -237,6 +239,7 @@ If every domain decomposes into nodes (identities with state) and edges (relatio
 - **ConceptBook**: concepts are nodes, logical dependencies are edges, worked examples are paths.
 - **Graph-Code**: components are nodes, APIs and imports are edges, deployable apps are entry paths.
 - **Solver**: decision variables are nodes, constraints are edges, the objective is the target path.
+- **GraphLang**: agents (`GENERATE`, `EVALUATE`, ...) are nodes, `triggers` and `binds` between their ports are edges, a runnable workflow is the whole graph; the model changes the topology instead of writing code.
 - **Education**: primitive knowledge units are nodes, prerequisite relations are edges, the target mastery concept is the capstone path — grounded in Novak & Gowin's (1984) concept maps, which independently arrived at the same representation from cognitive science rather than from physics or graph theory.  If validated against neuroscience (semantic networks, schema theory, cognitive load), this surface carries the deepest claim: the graph-first IR reflects not just a useful abstraction but actual memory architecture.
 
 The `primitives → concepts → applications` three-layer schema is the same fermion/boson duality applied recursively: primitives are pure form (leaves, no decomposition), edges between them are pure function (relations, no identity of their own), and applications are where form and function crystallize into a usable whole.
