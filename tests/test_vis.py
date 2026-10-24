@@ -190,4 +190,6 @@ def test_pyvis_uses_a_force_layout_for_force_styles(tmp_path):
     G = nx.DiGraph([("a", "b"), ("b", "c")])
     flow = render(G, tmp_path / "flow.html", "pyvis", Style()).read_text(encoding="utf-8")
     force = render(G, tmp_path / "force.html", "pyvis", Style(node_size=lambda g, n, d: 20, arrangement="force")).read_text(encoding="utf-8")
-    assert "hierarchical" in flow and "hierarchical" not in force and "barnesHut" in force
+    # the page inlines the whole vis-network library, so look for the options this engine writes, not for a word
+    assert '"direction": "LR"' in flow and '"springLength": 140' not in flow
+    assert '"direction": "LR"' not in force and '"springLength": 140' in force
