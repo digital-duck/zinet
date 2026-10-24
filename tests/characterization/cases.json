@@ -1,0 +1,516 @@
+[
+ {
+  "name": "chain",
+  "primitives": [
+   "p"
+  ],
+  "nodes": [
+   {
+    "id": "a",
+    "deps": [
+     "p"
+    ]
+   },
+   {
+    "id": "b",
+    "deps": [
+     "a"
+    ]
+   },
+   {
+    "id": "c",
+    "deps": [
+     "b"
+    ]
+   },
+   {
+    "id": "z",
+    "kind": "application",
+    "deps": [
+     "c"
+    ]
+   }
+  ],
+  "queries": [
+   {
+    "known": [],
+    "target": "z"
+   },
+   {
+    "known": [
+     "a"
+    ],
+    "target": "z"
+   },
+   {
+    "known": [
+     "a",
+     "b",
+     "c"
+    ],
+    "target": "z"
+   },
+   {
+    "known": [],
+    "target": "a"
+   },
+   {
+    "known": [
+     "p"
+    ],
+    "target": "b"
+   }
+  ]
+ },
+ {
+  "name": "diamond",
+  "primitives": [
+   "p1",
+   "p2"
+  ],
+  "nodes": [
+   {
+    "id": "a",
+    "deps": [
+     "p1",
+     "p2"
+    ]
+   },
+   {
+    "id": "b",
+    "deps": [
+     "a"
+    ]
+   },
+   {
+    "id": "c",
+    "deps": [
+     "a"
+    ]
+   },
+   {
+    "id": "d",
+    "deps": [
+     "b",
+     "c"
+    ]
+   }
+  ],
+  "queries": [
+   {
+    "known": [],
+    "target": "d"
+   },
+   {
+    "known": [
+     "b"
+    ],
+    "target": "d"
+   }
+  ]
+ },
+ {
+  "name": "ties_unsorted",
+  "primitives": [
+   "zp",
+   "ap"
+  ],
+  "nodes": [
+   {
+    "id": "zeta",
+    "deps": [
+     "zp"
+    ]
+   },
+   {
+    "id": "alpha",
+    "deps": [
+     "ap"
+    ]
+   },
+   {
+    "id": "mid",
+    "deps": [
+     "zp"
+    ]
+   },
+   {
+    "id": "beta",
+    "deps": [
+     "ap"
+    ]
+   },
+   {
+    "id": "omega",
+    "kind": "application",
+    "deps": [
+     "zeta",
+     "alpha"
+    ]
+   },
+   {
+    "id": "theta",
+    "kind": "application",
+    "deps": [
+     "mid",
+     "beta"
+    ]
+   }
+  ],
+  "queries": [
+   {
+    "known": [],
+    "target": "omega"
+   },
+   {
+    "known": [],
+    "target": "theta"
+   }
+  ]
+ },
+ {
+  "name": "reach_weighting",
+  "primitives": [
+   "p"
+  ],
+  "nodes": [
+   {
+    "id": "a",
+    "deps": [
+     "p"
+    ]
+   },
+   {
+    "id": "b",
+    "deps": [
+     "a"
+    ]
+   },
+   {
+    "id": "c",
+    "deps": [
+     "a"
+    ]
+   },
+   {
+    "id": "d",
+    "deps": [
+     "a"
+    ]
+   },
+   {
+    "id": "e",
+    "deps": [
+     "p"
+    ]
+   },
+   {
+    "id": "x",
+    "kind": "application",
+    "deps": [
+     "b"
+    ]
+   },
+   {
+    "id": "y",
+    "kind": "application",
+    "deps": [
+     "c",
+     "e"
+    ]
+   }
+  ],
+  "queries": [
+   {
+    "known": [],
+    "target": "y"
+   },
+   {
+    "known": [
+     "a"
+    ],
+    "target": "x"
+   }
+  ]
+ },
+ {
+  "name": "dangling",
+  "primitives": [
+   "p"
+  ],
+  "nodes": [
+   {
+    "id": "a",
+    "deps": [
+     "p",
+     "ghost"
+    ]
+   },
+   {
+    "id": "b",
+    "deps": [
+     "a"
+    ]
+   }
+  ],
+  "queries": [
+   {
+    "known": [],
+    "target": "b"
+   }
+  ]
+ },
+ {
+  "name": "listed_primitive",
+  "sources": [
+   "conceptbook"
+  ],
+  "primitives": [
+   "p"
+  ],
+  "listed_only": [
+   "q"
+  ],
+  "nodes": [
+   {
+    "id": "a",
+    "deps": [
+     "p",
+     "q"
+    ]
+   }
+  ],
+  "queries": [
+   {
+    "known": [],
+    "target": "a"
+   }
+  ]
+ },
+ {
+  "name": "foundation_concept",
+  "primitives": [
+   "p"
+  ],
+  "nodes": [
+   {
+    "id": "root",
+    "deps": []
+   },
+   {
+    "id": "a",
+    "deps": [
+     "root"
+    ]
+   },
+   {
+    "id": "b",
+    "deps": [
+     "a",
+     "p"
+    ]
+   }
+  ],
+  "queries": [
+   {
+    "known": [],
+    "target": "b"
+   }
+  ]
+ },
+ {
+  "name": "cycle",
+  "primitives": [
+   "p"
+  ],
+  "nodes": [
+   {
+    "id": "a",
+    "deps": [
+     "p",
+     "c"
+    ]
+   },
+   {
+    "id": "b",
+    "deps": [
+     "a"
+    ]
+   },
+   {
+    "id": "c",
+    "deps": [
+     "b"
+    ]
+   }
+  ],
+  "queries": [
+   {
+    "known": [],
+    "target": "c"
+   }
+  ]
+ },
+ {
+  "name": "optional_edges",
+  "sources": [
+   "graph_code"
+  ],
+  "primitives": [
+   "p"
+  ],
+  "nodes": [
+   {
+    "id": "a",
+    "deps": [
+     "p"
+    ]
+   },
+   {
+    "id": "e",
+    "deps": [
+     "p"
+    ]
+   },
+   {
+    "id": "b",
+    "deps": [
+     "a"
+    ],
+    "optional": [
+     "e"
+    ]
+   }
+  ],
+  "queries": [
+   {
+    "known": [],
+    "target": "b"
+   }
+  ]
+ },
+ {
+  "name": "first_radical",
+  "sources": [
+   "graph_code"
+  ],
+  "primitives": [
+   "x",
+   "t",
+   "m"
+  ],
+  "first_radical": [
+   "x",
+   "t"
+  ],
+  "nodes": [
+   {
+    "id": "v",
+    "deps": [
+     "x",
+     "t"
+    ]
+   },
+   {
+    "id": "a",
+    "deps": [
+     "v",
+     "t"
+    ]
+   },
+   {
+    "id": "p",
+    "deps": [
+     "m",
+     "v"
+    ]
+   }
+  ],
+  "queries": [
+   {
+    "known": [],
+    "target": "p"
+   },
+   {
+    "known": [
+     "v"
+    ],
+    "target": "a"
+   }
+  ]
+ },
+ {
+  "name": "isolated",
+  "primitives": [
+   "p"
+  ],
+  "nodes": [
+   {
+    "id": "a",
+    "deps": [
+     "p"
+    ]
+   },
+   {
+    "id": "lonely",
+    "deps": []
+   },
+   {
+    "id": "z",
+    "kind": "application",
+    "deps": [
+     "a"
+    ]
+   }
+  ],
+  "queries": [
+   {
+    "known": [],
+    "target": "z"
+   }
+  ]
+ },
+ {
+  "name": "query_edges",
+  "primitives": [
+   "p"
+  ],
+  "nodes": [
+   {
+    "id": "a",
+    "deps": [
+     "p"
+    ]
+   },
+   {
+    "id": "b",
+    "deps": [
+     "a"
+    ]
+   }
+  ],
+  "queries": [
+   {
+    "known": [],
+    "target": "p"
+   },
+   {
+    "known": [],
+    "target": "nope"
+   },
+   {
+    "known": [
+     "b"
+    ],
+    "target": "b"
+   },
+   {
+    "known": [
+     "a",
+     "b"
+    ],
+    "target": "b"
+   }
+  ]
+ }
+]

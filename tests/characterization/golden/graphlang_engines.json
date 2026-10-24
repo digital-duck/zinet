@@ -1,0 +1,1015 @@
+{
+ "_source": "graflang@a4e70b6",
+ "cases": {
+  "build_concept_book": {
+   "cytoscape_elements": [
+    {
+     "data": {
+      "color": "#8a8f98",
+      "id": "wf_entry",
+      "info": "type: INPUT\nports: entry, out_subject, out_target_audience, out_num_chapters",
+      "label": "wf_entry",
+      "shape": "round-rectangle",
+      "text": "wf_entry\nINPUT"
+     }
+    },
+    {
+     "data": {
+      "color": "#4f8ef7",
+      "id": "generate_outline",
+      "info": "type: GENERATE\nprompt_ref: prompts.outline\nmodel: ollama/gemma3\nports: trigger, complete, in_subject, in_num_chapters, out_outline",
+      "label": "generate_outline",
+      "shape": "rectangle",
+      "text": "generate_outline\nGENERATE"
+     }
+    },
+    {
+     "data": {
+      "color": "#9b59b6",
+      "id": "chapter_loop",
+      "info": "type: LOOP\ncondition: @chapter_index < @in_num_chapters\nports: trigger, loop, exit, in_outline, in_subject, in_num_chapters, out_chapters",
+      "label": "chapter_loop",
+      "shape": "rectangle",
+      "text": "chapter_loop"
+     }
+    },
+    {
+     "data": {
+      "color": "#4f8ef7",
+      "id": "compile_book",
+      "info": "type: GENERATE\nprompt_ref: prompts.compile\nmodel: ollama/gemma3\nports: trigger, complete, in_outline, in_chapters, in_subject, out_book",
+      "label": "compile_book",
+      "shape": "rectangle",
+      "text": "compile_book\nGENERATE"
+     }
+    },
+    {
+     "data": {
+      "color": "#8a8f98",
+      "id": "wf_exit",
+      "info": "type: OUTPUT\nports: trigger, exit, in_result",
+      "label": "wf_exit",
+      "shape": "round-rectangle",
+      "text": "wf_exit\nOUTPUT"
+     }
+    },
+    {
+     "data": {
+      "color": "#4f8ef7",
+      "id": "chapter_loop/write_chapter",
+      "info": "type: GENERATE\nprompt_ref: prompts.chapter\nmodel: ollama/gemma3\nports: trigger, complete, in_outline, in_chapter_index, in_subject, out_chapter",
+      "label": "write_chapter",
+      "parent": "chapter_loop",
+      "shape": "rectangle",
+      "text": "write_chapter\nGENERATE"
+     }
+    },
+    {
+     "data": {
+      "color": "#4f8ef7",
+      "id": "chapter_loop/review_chapter",
+      "info": "type: GENERATE\nprompt_ref: prompts.review\nmodel: ollama/gemma3\nports: trigger, complete, in_chapter, out_approved",
+      "label": "review_chapter",
+      "parent": "chapter_loop",
+      "shape": "rectangle",
+      "text": "review_chapter\nGENERATE"
+     }
+    },
+    {
+     "data": {
+      "id": "e0",
+      "label": "",
+      "relation": "triggers",
+      "source": "wf_entry",
+      "sport": "entry",
+      "target": "generate_outline",
+      "tport": "trigger"
+     }
+    },
+    {
+     "data": {
+      "id": "e1",
+      "label": "subject",
+      "relation": "binds",
+      "source": "wf_entry",
+      "sport": "out_subject",
+      "target": "generate_outline",
+      "tport": "in_subject"
+     }
+    },
+    {
+     "data": {
+      "id": "e2",
+      "label": "num_chapters",
+      "relation": "binds",
+      "source": "wf_entry",
+      "sport": "out_num_chapters",
+      "target": "generate_outline",
+      "tport": "in_num_chapters"
+     }
+    },
+    {
+     "data": {
+      "id": "e3",
+      "label": "subject",
+      "relation": "binds",
+      "source": "wf_entry",
+      "sport": "out_subject",
+      "target": "chapter_loop",
+      "tport": "in_subject"
+     }
+    },
+    {
+     "data": {
+      "id": "e4",
+      "label": "num_chapters",
+      "relation": "binds",
+      "source": "wf_entry",
+      "sport": "out_num_chapters",
+      "target": "chapter_loop",
+      "tport": "in_num_chapters"
+     }
+    },
+    {
+     "data": {
+      "id": "e5",
+      "label": "subject",
+      "relation": "binds",
+      "source": "wf_entry",
+      "sport": "out_subject",
+      "target": "compile_book",
+      "tport": "in_subject"
+     }
+    },
+    {
+     "data": {
+      "id": "e6",
+      "label": "",
+      "relation": "triggers",
+      "source": "generate_outline",
+      "sport": "complete",
+      "target": "chapter_loop",
+      "tport": "trigger"
+     }
+    },
+    {
+     "data": {
+      "id": "e7",
+      "label": "outline",
+      "relation": "binds",
+      "source": "generate_outline",
+      "sport": "out_outline",
+      "target": "chapter_loop",
+      "tport": "in_outline"
+     }
+    },
+    {
+     "data": {
+      "id": "e8",
+      "label": "outline",
+      "relation": "binds",
+      "source": "generate_outline",
+      "sport": "out_outline",
+      "target": "compile_book",
+      "tport": "in_outline"
+     }
+    },
+    {
+     "data": {
+      "id": "e9",
+      "label": "exit",
+      "relation": "triggers",
+      "source": "chapter_loop",
+      "sport": "exit",
+      "target": "compile_book",
+      "tport": "trigger"
+     }
+    },
+    {
+     "data": {
+      "id": "e10",
+      "label": "chapters",
+      "relation": "binds",
+      "source": "chapter_loop",
+      "sport": "out_chapters",
+      "target": "compile_book",
+      "tport": "in_chapters"
+     }
+    },
+    {
+     "data": {
+      "id": "e11",
+      "label": "",
+      "relation": "triggers",
+      "source": "compile_book",
+      "sport": "complete",
+      "target": "wf_exit",
+      "tport": "trigger"
+     }
+    },
+    {
+     "data": {
+      "id": "e12",
+      "label": "book",
+      "relation": "binds",
+      "source": "compile_book",
+      "sport": "out_book",
+      "target": "wf_exit",
+      "tport": "in_result"
+     }
+    },
+    {
+     "data": {
+      "id": "e13",
+      "label": "",
+      "relation": "triggers",
+      "source": "chapter_loop/write_chapter",
+      "sport": "complete",
+      "target": "chapter_loop/review_chapter",
+      "tport": "trigger"
+     }
+    },
+    {
+     "data": {
+      "id": "e14",
+      "label": "chapter",
+      "relation": "binds",
+      "source": "chapter_loop/write_chapter",
+      "sport": "out_chapter",
+      "target": "chapter_loop/review_chapter",
+      "tport": "in_chapter"
+     }
+    }
+   ],
+   "dot": "digraph G {\n  rankdir=LR; compound=true; fontsize=11;\n  node [fontsize=11, fontcolor=\"#222\"];\n  \"wf_entry\" [label=\"wf_entry\\nINPUT\", shape=box, style=\"rounded,filled\", fillcolor=\"#8a8f9855\", color=\"#8a8f98\"];\n  \"generate_outline\" [label=\"generate_outline\\nGENERATE\", shape=box, style=\"rounded,filled\", fillcolor=\"#4f8ef755\", color=\"#4f8ef7\"];\n  subgraph \"cluster_chapter_loop\" {\n    label=\"chapter_loop\"; style=\"dashed,rounded\"; color=\"#9b59b6\";\n    \"chapter_loop\" [label=\"chapter_loop\\nLOOP\", shape=box, style=\"rounded,filled\", fillcolor=\"#9b59b655\", color=\"#9b59b6\"];\n    \"chapter_loop/write_chapter\" [label=\"write_chapter\\nGENERATE\", shape=box, style=\"rounded,filled\", fillcolor=\"#4f8ef755\", color=\"#4f8ef7\"];\n    \"chapter_loop/review_chapter\" [label=\"review_chapter\\nGENERATE\", shape=box, style=\"rounded,filled\", fillcolor=\"#4f8ef755\", color=\"#4f8ef7\"];\n  }\n  \"compile_book\" [label=\"compile_book\\nGENERATE\", shape=box, style=\"rounded,filled\", fillcolor=\"#4f8ef755\", color=\"#4f8ef7\"];\n  \"wf_exit\" [label=\"wf_exit\\nOUTPUT\", shape=box, style=\"rounded,filled\", fillcolor=\"#8a8f9855\", color=\"#8a8f98\"];\n  \"wf_entry\" -> \"generate_outline\" [label=\"\", fontsize=9, color=\"#6b7280\", fontcolor=\"#6b7280\"];\n  \"wf_entry\" -> \"generate_outline\" [label=\"subject\", fontsize=9, color=\"#4f8ef7\", fontcolor=\"#4f8ef7\", style=dashed, constraint=false];\n  \"wf_entry\" -> \"generate_outline\" [label=\"num_chapters\", fontsize=9, color=\"#4f8ef7\", fontcolor=\"#4f8ef7\", style=dashed, constraint=false];\n  \"wf_entry\" -> \"chapter_loop\" [label=\"subject\", fontsize=9, color=\"#4f8ef7\", fontcolor=\"#4f8ef7\", style=dashed, constraint=false];\n  \"wf_entry\" -> \"chapter_loop\" [label=\"num_chapters\", fontsize=9, color=\"#4f8ef7\", fontcolor=\"#4f8ef7\", style=dashed, constraint=false];\n  \"wf_entry\" -> \"compile_book\" [label=\"subject\", fontsize=9, color=\"#4f8ef7\", fontcolor=\"#4f8ef7\", style=dashed, constraint=false];\n  \"generate_outline\" -> \"chapter_loop\" [label=\"\", fontsize=9, color=\"#6b7280\", fontcolor=\"#6b7280\"];\n  \"generate_outline\" -> \"chapter_loop\" [label=\"outline\", fontsize=9, color=\"#4f8ef7\", fontcolor=\"#4f8ef7\", style=dashed, constraint=false];\n  \"generate_outline\" -> \"compile_book\" [label=\"outline\", fontsize=9, color=\"#4f8ef7\", fontcolor=\"#4f8ef7\", style=dashed, constraint=false];\n  \"chapter_loop\" -> \"compile_book\" [label=\"exit\", fontsize=9, color=\"#6b7280\", fontcolor=\"#6b7280\"];\n  \"chapter_loop\" -> \"compile_book\" [label=\"chapters\", fontsize=9, color=\"#4f8ef7\", fontcolor=\"#4f8ef7\", style=dashed, constraint=false];\n  \"compile_book\" -> \"wf_exit\" [label=\"\", fontsize=9, color=\"#6b7280\", fontcolor=\"#6b7280\"];\n  \"compile_book\" -> \"wf_exit\" [label=\"book\", fontsize=9, color=\"#4f8ef7\", fontcolor=\"#4f8ef7\", style=dashed, constraint=false];\n  \"chapter_loop/write_chapter\" -> \"chapter_loop/review_chapter\" [label=\"\", fontsize=9, color=\"#6b7280\", fontcolor=\"#6b7280\"];\n  \"chapter_loop/write_chapter\" -> \"chapter_loop/review_chapter\" [label=\"chapter\", fontsize=9, color=\"#4f8ef7\", fontcolor=\"#4f8ef7\", style=dashed, constraint=false];\n}",
+   "dot_fixed_size": "digraph G {\n  rankdir=LR; compound=true; fontsize=11;\n  node [fontsize=11, fontcolor=\"#222\"];\n  \"wf_entry\" [label=\"wf_entry\\nINPUT\", shape=box, style=\"rounded,filled\", fillcolor=\"#8a8f9855\", color=\"#8a8f98\", fixedsize=true, width=1.806, height=0.667];\n  \"generate_outline\" [label=\"generate_outline\\nGENERATE\", shape=box, style=\"rounded,filled\", fillcolor=\"#4f8ef755\", color=\"#4f8ef7\", fixedsize=true, width=1.806, height=0.667];\n  subgraph \"cluster_chapter_loop\" {\n    label=\"chapter_loop\"; style=\"dashed,rounded\"; color=\"#9b59b6\";\n    \"chapter_loop\" [label=\"chapter_loop\\nLOOP\", shape=box, style=\"rounded,filled\", fillcolor=\"#9b59b655\", color=\"#9b59b6\", fixedsize=true, width=1.806, height=0.667];\n    \"chapter_loop/write_chapter\" [label=\"write_chapter\\nGENERATE\", shape=box, style=\"rounded,filled\", fillcolor=\"#4f8ef755\", color=\"#4f8ef7\", fixedsize=true, width=1.806, height=0.667];\n    \"chapter_loop/review_chapter\" [label=\"review_chapter\\nGENERATE\", shape=box, style=\"rounded,filled\", fillcolor=\"#4f8ef755\", color=\"#4f8ef7\", fixedsize=true, width=1.806, height=0.667];\n  }\n  \"compile_book\" [label=\"compile_book\\nGENERATE\", shape=box, style=\"rounded,filled\", fillcolor=\"#4f8ef755\", color=\"#4f8ef7\", fixedsize=true, width=1.806, height=0.667];\n  \"wf_exit\" [label=\"wf_exit\\nOUTPUT\", shape=box, style=\"rounded,filled\", fillcolor=\"#8a8f9855\", color=\"#8a8f98\", fixedsize=true, width=1.806, height=0.667];\n  \"wf_entry\" -> \"generate_outline\" [label=\"\", fontsize=9, color=\"#6b7280\", fontcolor=\"#6b7280\"];\n  \"wf_entry\" -> \"generate_outline\" [label=\"subject\", fontsize=9, color=\"#4f8ef7\", fontcolor=\"#4f8ef7\", style=dashed, constraint=false];\n  \"wf_entry\" -> \"generate_outline\" [label=\"num_chapters\", fontsize=9, color=\"#4f8ef7\", fontcolor=\"#4f8ef7\", style=dashed, constraint=false];\n  \"wf_entry\" -> \"chapter_loop\" [label=\"subject\", fontsize=9, color=\"#4f8ef7\", fontcolor=\"#4f8ef7\", style=dashed, constraint=false];\n  \"wf_entry\" -> \"chapter_loop\" [label=\"num_chapters\", fontsize=9, color=\"#4f8ef7\", fontcolor=\"#4f8ef7\", style=dashed, constraint=false];\n  \"wf_entry\" -> \"compile_book\" [label=\"subject\", fontsize=9, color=\"#4f8ef7\", fontcolor=\"#4f8ef7\", style=dashed, constraint=false];\n  \"generate_outline\" -> \"chapter_loop\" [label=\"\", fontsize=9, color=\"#6b7280\", fontcolor=\"#6b7280\"];\n  \"generate_outline\" -> \"chapter_loop\" [label=\"outline\", fontsize=9, color=\"#4f8ef7\", fontcolor=\"#4f8ef7\", style=dashed, constraint=false];\n  \"generate_outline\" -> \"compile_book\" [label=\"outline\", fontsize=9, color=\"#4f8ef7\", fontcolor=\"#4f8ef7\", style=dashed, constraint=false];\n  \"chapter_loop\" -> \"compile_book\" [label=\"exit\", fontsize=9, color=\"#6b7280\", fontcolor=\"#6b7280\"];\n  \"chapter_loop\" -> \"compile_book\" [label=\"chapters\", fontsize=9, color=\"#4f8ef7\", fontcolor=\"#4f8ef7\", style=dashed, constraint=false];\n  \"compile_book\" -> \"wf_exit\" [label=\"\", fontsize=9, color=\"#6b7280\", fontcolor=\"#6b7280\"];\n  \"compile_book\" -> \"wf_exit\" [label=\"book\", fontsize=9, color=\"#4f8ef7\", fontcolor=\"#4f8ef7\", style=dashed, constraint=false];\n  \"chapter_loop/write_chapter\" -> \"chapter_loop/review_chapter\" [label=\"\", fontsize=9, color=\"#6b7280\", fontcolor=\"#6b7280\"];\n  \"chapter_loop/write_chapter\" -> \"chapter_loop/review_chapter\" [label=\"chapter\", fontsize=9, color=\"#4f8ef7\", fontcolor=\"#4f8ef7\", style=dashed, constraint=false];\n}",
+   "edges": 15,
+   "mermaid": "flowchart LR\n  n0([\"wf_entry<br/>INPUT\"])\n  n1[\"generate_outline<br/>GENERATE\"]\n  subgraph n2[\"chapter_loop (LOOP)\"]\n    n5[\"write_chapter<br/>GENERATE\"]\n    n6[\"review_chapter<br/>GENERATE\"]\n  end\n  n3[\"compile_book<br/>GENERATE\"]\n  n4([\"wf_exit<br/>OUTPUT\"])\n  n0 --> n1\n  n0 -.->|\"subject\"| n1\n  n0 -.->|\"num_chapters\"| n1\n  n0 -.->|\"subject\"| n2\n  n0 -.->|\"num_chapters\"| n2\n  n0 -.->|\"subject\"| n3\n  n1 --> n2\n  n1 -.->|\"outline\"| n2\n  n1 -.->|\"outline\"| n3\n  n2 -->|\"exit\"| n3\n  n2 -.->|\"chapters\"| n3\n  n3 --> n4\n  n3 -.->|\"book\"| n4\n  n5 --> n6\n  n5 -.->|\"chapter\"| n6\n  classDef GENERATE fill:#4f8ef755,stroke:#4f8ef7,color:#222;\n  class n1,n3,n5,n6 GENERATE;\n  classDef INPUT fill:#8a8f9855,stroke:#8a8f98,color:#222;\n  class n0 INPUT;\n  classDef OUTPUT fill:#8a8f9855,stroke:#8a8f98,color:#222;\n  class n4 OUTPUT;\n",
+   "nodes": 7,
+   "note": ""
+  },
+  "code_pipeline": {
+   "cytoscape_elements": [
+    {
+     "data": {
+      "color": "#8a8f98",
+      "id": "wf_entry",
+      "info": "type: INPUT\nports: entry, out_spec, out_lang, out_max_cycles, out_check_closure",
+      "label": "wf_entry",
+      "shape": "round-rectangle",
+      "text": "wf_entry\nINPUT"
+     }
+    },
+    {
+     "data": {
+      "color": "#4f8ef7",
+      "id": "analyze",
+      "info": "type: GENERATE\nprocedure_ref: procedures.analyze_spec\nmodel: ollama/gemma3\nports: trigger, complete, in_spec, out_analysis",
+      "label": "analyze",
+      "shape": "rectangle",
+      "text": "analyze\nGENERATE"
+     }
+    },
+    {
+     "data": {
+      "color": "#e0a21e",
+      "id": "spec_gate",
+      "info": "type: EVALUATE\ncondition: contains(@in_analysis, '[READY]')\nports: trigger, pass, fail, in_analysis",
+      "label": "spec_gate",
+      "shape": "diamond",
+      "text": "spec_gate\nEVALUATE"
+     }
+    },
+    {
+     "data": {
+      "color": "#e5484d",
+      "id": "abort_vague",
+      "info": "type: RECOVER\nports: trigger, halt, in_message, out_error",
+      "label": "abort_vague",
+      "shape": "rectangle",
+      "text": "abort_vague\nRECOVER"
+     }
+    },
+    {
+     "data": {
+      "color": "#9b59b6",
+      "id": "test_gated_loop",
+      "info": "type: LOOP\ncondition: NOT @test_passed AND NOT @denied AND @cycle < @in_max_cycles\nports: trigger, loop, exit, in_spec, in_lang, in_max_cycles, out_final_code, out_test_passed, out_denied",
+      "label": "test_gated_loop",
+      "shape": "rectangle",
+      "text": "test_gated_loop"
+     }
+    },
+    {
+     "data": {
+      "color": "#4f8ef7",
+      "id": "document",
+      "info": "type: GENERATE\nprocedure_ref: procedures.document_code\nports: trigger, complete, in_code, in_spec, out_docs",
+      "label": "document",
+      "shape": "rectangle",
+      "text": "document\nGENERATE"
+     }
+    },
+    {
+     "data": {
+      "color": "#4f8ef7",
+      "id": "extract",
+      "info": "type: GENERATE\nprocedure_ref: procedures.extract_spec\nports: trigger, complete, in_code, out_extracted_spec",
+      "label": "extract",
+      "shape": "rectangle",
+      "text": "extract\nGENERATE"
+     }
+    },
+    {
+     "data": {
+      "color": "#e0a21e",
+      "id": "closure_gate",
+      "info": "type: EVALUATE\ncondition: @in_check_closure == TRUE\nports: trigger, pass, fail, in_check_closure",
+      "label": "closure_gate",
+      "shape": "diamond",
+      "text": "closure_gate\nEVALUATE"
+     }
+    },
+    {
+     "data": {
+      "color": "#4f8ef7",
+      "id": "judge",
+      "info": "type: GENERATE\nprocedure_ref: procedures.spec_judge\nports: trigger, complete, in_orig_spec, in_derived_spec, out_closure_report",
+      "label": "judge",
+      "shape": "rectangle",
+      "text": "judge\nGENERATE"
+     }
+    },
+    {
+     "data": {
+      "color": "#2fa84f",
+      "id": "merge_docs",
+      "info": "type: CONTEXT\nports: trigger, complete, in_base, in_appendage, out_merged",
+      "label": "merge_docs",
+      "shape": "rectangle",
+      "text": "merge_docs\nCONTEXT"
+     }
+    },
+    {
+     "data": {
+      "color": "#8a8f98",
+      "id": "wf_exit",
+      "info": "type: OUTPUT\nports: trigger, exit, in_result",
+      "label": "wf_exit",
+      "shape": "round-rectangle",
+      "text": "wf_exit\nOUTPUT"
+     }
+    },
+    {
+     "data": {
+      "color": "#4f8ef7",
+      "id": "test_gated_loop/loop_gen",
+      "info": "type: GENERATE\nprocedure_ref: procedures.generate_code\nports: trigger, complete, in_spec, in_lang, out_code",
+      "label": "loop_gen",
+      "parent": "test_gated_loop",
+      "shape": "rectangle",
+      "text": "loop_gen\nGENERATE"
+     }
+    },
+    {
+     "data": {
+      "color": "#4f8ef7",
+      "id": "test_gated_loop/loop_rev",
+      "info": "type: GENERATE\nprocedure_ref: procedures.review_code\nports: trigger, complete, in_code, in_lang, out_feedback",
+      "label": "loop_rev",
+      "parent": "test_gated_loop",
+      "shape": "rectangle",
+      "text": "loop_rev\nGENERATE"
+     }
+    },
+    {
+     "data": {
+      "color": "#4f8ef7",
+      "id": "test_gated_loop/loop_imp",
+      "info": "type: GENERATE\nprocedure_ref: procedures.improve_code\nports: trigger, complete, in_code, in_feedback, out_improved_code",
+      "label": "loop_imp",
+      "parent": "test_gated_loop",
+      "shape": "rectangle",
+      "text": "loop_imp\nGENERATE"
+     }
+    },
+    {
+     "data": {
+      "color": "#2fa84f",
+      "id": "test_gated_loop/loop_test",
+      "info": "type: SOLVE\nprocedure_ref: procedures.test_code\nports: trigger, complete, in_code, in_spec, out_result",
+      "label": "loop_test",
+      "parent": "test_gated_loop",
+      "shape": "rectangle",
+      "text": "loop_test\nSOLVE"
+     }
+    },
+    {
+     "data": {
+      "color": "#e0a21e",
+      "id": "test_gated_loop/loop_eval",
+      "info": "type: EVALUATE\ncondition: contains(@in_result, '[PASSED]')\nports: trigger, pass, fail, in_result",
+      "label": "loop_eval",
+      "parent": "test_gated_loop",
+      "shape": "diamond",
+      "text": "loop_eval\nEVALUATE"
+     }
+    },
+    {
+     "data": {
+      "color": "#e5484d",
+      "id": "test_gated_loop/loop_guard",
+      "info": "type: GUARD\npolicy_ref: policies.mutation_safety\nports: trigger, allow, deny, in_cycle, in_max_cycles",
+      "label": "loop_guard",
+      "parent": "test_gated_loop",
+      "shape": "diamond",
+      "text": "loop_guard\nGUARD"
+     }
+    },
+    {
+     "data": {
+      "id": "e0",
+      "label": "",
+      "relation": "triggers",
+      "source": "wf_entry",
+      "sport": "entry",
+      "target": "analyze",
+      "tport": "trigger"
+     }
+    },
+    {
+     "data": {
+      "id": "e1",
+      "label": "spec",
+      "relation": "binds",
+      "source": "wf_entry",
+      "sport": "out_spec",
+      "target": "analyze",
+      "tport": "in_spec"
+     }
+    },
+    {
+     "data": {
+      "id": "e2",
+      "label": "spec",
+      "relation": "binds",
+      "source": "wf_entry",
+      "sport": "out_spec",
+      "target": "document",
+      "tport": "in_spec"
+     }
+    },
+    {
+     "data": {
+      "id": "e3",
+      "label": "spec",
+      "relation": "binds",
+      "source": "wf_entry",
+      "sport": "out_spec",
+      "target": "test_gated_loop",
+      "tport": "in_spec"
+     }
+    },
+    {
+     "data": {
+      "id": "e4",
+      "label": "lang",
+      "relation": "binds",
+      "source": "wf_entry",
+      "sport": "out_lang",
+      "target": "test_gated_loop",
+      "tport": "in_lang"
+     }
+    },
+    {
+     "data": {
+      "id": "e5",
+      "label": "max_cycles",
+      "relation": "binds",
+      "source": "wf_entry",
+      "sport": "out_max_cycles",
+      "target": "test_gated_loop",
+      "tport": "in_max_cycles"
+     }
+    },
+    {
+     "data": {
+      "id": "e6",
+      "label": "check_closure",
+      "relation": "binds",
+      "source": "wf_entry",
+      "sport": "out_check_closure",
+      "target": "closure_gate",
+      "tport": "in_check_closure"
+     }
+    },
+    {
+     "data": {
+      "id": "e7",
+      "label": "spec",
+      "relation": "binds",
+      "source": "wf_entry",
+      "sport": "out_spec",
+      "target": "judge",
+      "tport": "in_orig_spec"
+     }
+    },
+    {
+     "data": {
+      "id": "e8",
+      "label": "",
+      "relation": "triggers",
+      "source": "analyze",
+      "sport": "complete",
+      "target": "spec_gate",
+      "tport": "trigger"
+     }
+    },
+    {
+     "data": {
+      "id": "e9",
+      "label": "analysis",
+      "relation": "binds",
+      "source": "analyze",
+      "sport": "out_analysis",
+      "target": "spec_gate",
+      "tport": "in_analysis"
+     }
+    },
+    {
+     "data": {
+      "id": "e10",
+      "label": "analysis",
+      "relation": "binds",
+      "source": "analyze",
+      "sport": "out_analysis",
+      "target": "abort_vague",
+      "tport": "in_message"
+     }
+    },
+    {
+     "data": {
+      "id": "e11",
+      "label": "pass",
+      "relation": "triggers",
+      "source": "spec_gate",
+      "sport": "pass",
+      "target": "test_gated_loop",
+      "tport": "trigger"
+     }
+    },
+    {
+     "data": {
+      "id": "e12",
+      "label": "fail",
+      "relation": "triggers",
+      "source": "spec_gate",
+      "sport": "fail",
+      "target": "abort_vague",
+      "tport": "trigger"
+     }
+    },
+    {
+     "data": {
+      "id": "e13",
+      "label": "exit",
+      "relation": "triggers",
+      "source": "test_gated_loop",
+      "sport": "exit",
+      "target": "document",
+      "tport": "trigger"
+     }
+    },
+    {
+     "data": {
+      "id": "e14",
+      "label": "final_code",
+      "relation": "binds",
+      "source": "test_gated_loop",
+      "sport": "out_final_code",
+      "target": "document",
+      "tport": "in_code"
+     }
+    },
+    {
+     "data": {
+      "id": "e15",
+      "label": "final_code",
+      "relation": "binds",
+      "source": "test_gated_loop",
+      "sport": "out_final_code",
+      "target": "extract",
+      "tport": "in_code"
+     }
+    },
+    {
+     "data": {
+      "id": "e16",
+      "label": "",
+      "relation": "triggers",
+      "source": "document",
+      "sport": "complete",
+      "target": "extract",
+      "tport": "trigger"
+     }
+    },
+    {
+     "data": {
+      "id": "e17",
+      "label": "docs",
+      "relation": "binds",
+      "source": "document",
+      "sport": "out_docs",
+      "target": "merge_docs",
+      "tport": "in_base"
+     }
+    },
+    {
+     "data": {
+      "id": "e18",
+      "label": "docs",
+      "relation": "binds",
+      "source": "document",
+      "sport": "out_docs",
+      "target": "wf_exit",
+      "tport": "in_result"
+     }
+    },
+    {
+     "data": {
+      "id": "e19",
+      "label": "",
+      "relation": "triggers",
+      "source": "extract",
+      "sport": "complete",
+      "target": "closure_gate",
+      "tport": "trigger"
+     }
+    },
+    {
+     "data": {
+      "id": "e20",
+      "label": "extracted_spec",
+      "relation": "binds",
+      "source": "extract",
+      "sport": "out_extracted_spec",
+      "target": "judge",
+      "tport": "in_derived_spec"
+     }
+    },
+    {
+     "data": {
+      "id": "e21",
+      "label": "pass",
+      "relation": "triggers",
+      "source": "closure_gate",
+      "sport": "pass",
+      "target": "judge",
+      "tport": "trigger"
+     }
+    },
+    {
+     "data": {
+      "id": "e22",
+      "label": "fail",
+      "relation": "triggers",
+      "source": "closure_gate",
+      "sport": "fail",
+      "target": "wf_exit",
+      "tport": "trigger"
+     }
+    },
+    {
+     "data": {
+      "id": "e23",
+      "label": "",
+      "relation": "triggers",
+      "source": "judge",
+      "sport": "complete",
+      "target": "merge_docs",
+      "tport": "trigger"
+     }
+    },
+    {
+     "data": {
+      "id": "e24",
+      "label": "closure_report",
+      "relation": "binds",
+      "source": "judge",
+      "sport": "out_closure_report",
+      "target": "merge_docs",
+      "tport": "in_appendage"
+     }
+    },
+    {
+     "data": {
+      "id": "e25",
+      "label": "",
+      "relation": "triggers",
+      "source": "merge_docs",
+      "sport": "complete",
+      "target": "wf_exit",
+      "tport": "trigger"
+     }
+    },
+    {
+     "data": {
+      "id": "e26",
+      "label": "merged",
+      "relation": "binds",
+      "source": "merge_docs",
+      "sport": "out_merged",
+      "target": "wf_exit",
+      "tport": "in_result"
+     }
+    },
+    {
+     "data": {
+      "id": "e27",
+      "label": "merged",
+      "relation": "binds",
+      "source": "merge_docs",
+      "sport": "out_merged",
+      "target": "wf_exit",
+      "tport": "in_result"
+     }
+    },
+    {
+     "data": {
+      "id": "e28",
+      "label": "",
+      "relation": "triggers",
+      "source": "test_gated_loop/loop_gen",
+      "sport": "complete",
+      "target": "test_gated_loop/loop_rev",
+      "tport": "trigger"
+     }
+    },
+    {
+     "data": {
+      "id": "e29",
+      "label": "code",
+      "relation": "binds",
+      "source": "test_gated_loop/loop_gen",
+      "sport": "out_code",
+      "target": "test_gated_loop/loop_rev",
+      "tport": "in_code"
+     }
+    },
+    {
+     "data": {
+      "id": "e30",
+      "label": "code",
+      "relation": "binds",
+      "source": "test_gated_loop/loop_gen",
+      "sport": "out_code",
+      "target": "test_gated_loop/loop_imp",
+      "tport": "in_code"
+     }
+    },
+    {
+     "data": {
+      "id": "e31",
+      "label": "",
+      "relation": "triggers",
+      "source": "test_gated_loop/loop_rev",
+      "sport": "complete",
+      "target": "test_gated_loop/loop_imp",
+      "tport": "trigger"
+     }
+    },
+    {
+     "data": {
+      "id": "e32",
+      "label": "feedback",
+      "relation": "binds",
+      "source": "test_gated_loop/loop_rev",
+      "sport": "out_feedback",
+      "target": "test_gated_loop/loop_imp",
+      "tport": "in_feedback"
+     }
+    },
+    {
+     "data": {
+      "id": "e33",
+      "label": "",
+      "relation": "triggers",
+      "source": "test_gated_loop/loop_imp",
+      "sport": "complete",
+      "target": "test_gated_loop/loop_test",
+      "tport": "trigger"
+     }
+    },
+    {
+     "data": {
+      "id": "e34",
+      "label": "improved_code",
+      "relation": "binds",
+      "source": "test_gated_loop/loop_imp",
+      "sport": "out_improved_code",
+      "target": "test_gated_loop/loop_test",
+      "tport": "in_code"
+     }
+    },
+    {
+     "data": {
+      "id": "e35",
+      "label": "",
+      "relation": "triggers",
+      "source": "test_gated_loop/loop_test",
+      "sport": "complete",
+      "target": "test_gated_loop/loop_eval",
+      "tport": "trigger"
+     }
+    },
+    {
+     "data": {
+      "id": "e36",
+      "label": "result",
+      "relation": "binds",
+      "source": "test_gated_loop/loop_test",
+      "sport": "out_result",
+      "target": "test_gated_loop/loop_eval",
+      "tport": "in_result"
+     }
+    },
+    {
+     "data": {
+      "id": "e37",
+      "label": "fail",
+      "relation": "triggers",
+      "source": "test_gated_loop/loop_eval",
+      "sport": "fail",
+      "target": "test_gated_loop/loop_guard",
+      "tport": "trigger"
+     }
+    }
+   ],
+   "dot": "digraph G {\n  rankdir=LR; compound=true; fontsize=11;\n  node [fontsize=11, fontcolor=\"#222\"];\n  \"wf_entry\" [label=\"wf_entry\\nINPUT\", shape=box, style=\"rounded,filled\", fillcolor=\"#8a8f9855\", color=\"#8a8f98\"];\n  \"analyze\" [label=\"analyze\\nGENERATE\", shape=box, style=\"rounded,filled\", fillcolor=\"#4f8ef755\", color=\"#4f8ef7\"];\n  \"spec_gate\" [label=\"spec_gate\\nEVALUATE\", shape=diamond, style=\"filled\", fillcolor=\"#e0a21e55\", color=\"#e0a21e\"];\n  \"abort_vague\" [label=\"abort_vague\\nRECOVER\", shape=box, style=\"rounded,filled\", fillcolor=\"#e5484d55\", color=\"#e5484d\"];\n  subgraph \"cluster_test_gated_loop\" {\n    label=\"test_gated_loop\"; style=\"dashed,rounded\"; color=\"#9b59b6\";\n    \"test_gated_loop\" [label=\"test_gated_loop\\nLOOP\", shape=box, style=\"rounded,filled\", fillcolor=\"#9b59b655\", color=\"#9b59b6\"];\n    \"test_gated_loop/loop_gen\" [label=\"loop_gen\\nGENERATE\", shape=box, style=\"rounded,filled\", fillcolor=\"#4f8ef755\", color=\"#4f8ef7\"];\n    \"test_gated_loop/loop_rev\" [label=\"loop_rev\\nGENERATE\", shape=box, style=\"rounded,filled\", fillcolor=\"#4f8ef755\", color=\"#4f8ef7\"];\n    \"test_gated_loop/loop_imp\" [label=\"loop_imp\\nGENERATE\", shape=box, style=\"rounded,filled\", fillcolor=\"#4f8ef755\", color=\"#4f8ef7\"];\n    \"test_gated_loop/loop_test\" [label=\"loop_test\\nSOLVE\", shape=box, style=\"rounded,filled\", fillcolor=\"#2fa84f55\", color=\"#2fa84f\"];\n    \"test_gated_loop/loop_eval\" [label=\"loop_eval\\nEVALUATE\", shape=diamond, style=\"filled\", fillcolor=\"#e0a21e55\", color=\"#e0a21e\"];\n    \"test_gated_loop/loop_guard\" [label=\"loop_guard\\nGUARD\", shape=diamond, style=\"filled\", fillcolor=\"#e5484d55\", color=\"#e5484d\"];\n  }\n  \"document\" [label=\"document\\nGENERATE\", shape=box, style=\"rounded,filled\", fillcolor=\"#4f8ef755\", color=\"#4f8ef7\"];\n  \"extract\" [label=\"extract\\nGENERATE\", shape=box, style=\"rounded,filled\", fillcolor=\"#4f8ef755\", color=\"#4f8ef7\"];\n  \"closure_gate\" [label=\"closure_gate\\nEVALUATE\", shape=diamond, style=\"filled\", fillcolor=\"#e0a21e55\", color=\"#e0a21e\"];\n  \"judge\" [label=\"judge\\nGENERATE\", shape=box, style=\"rounded,filled\", fillcolor=\"#4f8ef755\", color=\"#4f8ef7\"];\n  \"merge_docs\" [label=\"merge_docs\\nCONTEXT\", shape=box, style=\"rounded,filled\", fillcolor=\"#2fa84f55\", color=\"#2fa84f\"];\n  \"wf_exit\" [label=\"wf_exit\\nOUTPUT\", shape=box, style=\"rounded,filled\", fillcolor=\"#8a8f9855\", color=\"#8a8f98\"];\n  \"wf_entry\" -> \"analyze\" [label=\"\", fontsize=9, color=\"#6b7280\", fontcolor=\"#6b7280\"];\n  \"wf_entry\" -> \"analyze\" [label=\"spec\", fontsize=9, color=\"#4f8ef7\", fontcolor=\"#4f8ef7\", style=dashed, constraint=false];\n  \"wf_entry\" -> \"document\" [label=\"spec\", fontsize=9, color=\"#4f8ef7\", fontcolor=\"#4f8ef7\", style=dashed, constraint=false];\n  \"wf_entry\" -> \"test_gated_loop\" [label=\"spec\", fontsize=9, color=\"#4f8ef7\", fontcolor=\"#4f8ef7\", style=dashed, constraint=false];\n  \"wf_entry\" -> \"test_gated_loop\" [label=\"lang\", fontsize=9, color=\"#4f8ef7\", fontcolor=\"#4f8ef7\", style=dashed, constraint=false];\n  \"wf_entry\" -> \"test_gated_loop\" [label=\"max_cycles\", fontsize=9, color=\"#4f8ef7\", fontcolor=\"#4f8ef7\", style=dashed, constraint=false];\n  \"wf_entry\" -> \"closure_gate\" [label=\"check_closure\", fontsize=9, color=\"#4f8ef7\", fontcolor=\"#4f8ef7\", style=dashed, constraint=false];\n  \"wf_entry\" -> \"judge\" [label=\"spec\", fontsize=9, color=\"#4f8ef7\", fontcolor=\"#4f8ef7\", style=dashed, constraint=false];\n  \"analyze\" -> \"spec_gate\" [label=\"\", fontsize=9, color=\"#6b7280\", fontcolor=\"#6b7280\"];\n  \"analyze\" -> \"spec_gate\" [label=\"analysis\", fontsize=9, color=\"#4f8ef7\", fontcolor=\"#4f8ef7\", style=dashed, constraint=false];\n  \"analyze\" -> \"abort_vague\" [label=\"analysis\", fontsize=9, color=\"#4f8ef7\", fontcolor=\"#4f8ef7\", style=dashed, constraint=false];\n  \"spec_gate\" -> \"test_gated_loop\" [label=\"pass\", fontsize=9, color=\"#6b7280\", fontcolor=\"#6b7280\"];\n  \"spec_gate\" -> \"abort_vague\" [label=\"fail\", fontsize=9, color=\"#6b7280\", fontcolor=\"#6b7280\"];\n  \"test_gated_loop\" -> \"document\" [label=\"exit\", fontsize=9, color=\"#6b7280\", fontcolor=\"#6b7280\"];\n  \"test_gated_loop\" -> \"document\" [label=\"final_code\", fontsize=9, color=\"#4f8ef7\", fontcolor=\"#4f8ef7\", style=dashed, constraint=false];\n  \"test_gated_loop\" -> \"extract\" [label=\"final_code\", fontsize=9, color=\"#4f8ef7\", fontcolor=\"#4f8ef7\", style=dashed, constraint=false];\n  \"document\" -> \"extract\" [label=\"\", fontsize=9, color=\"#6b7280\", fontcolor=\"#6b7280\"];\n  \"document\" -> \"merge_docs\" [label=\"docs\", fontsize=9, color=\"#4f8ef7\", fontcolor=\"#4f8ef7\", style=dashed, constraint=false];\n  \"document\" -> \"wf_exit\" [label=\"docs\", fontsize=9, color=\"#4f8ef7\", fontcolor=\"#4f8ef7\", style=dashed, constraint=false];\n  \"extract\" -> \"closure_gate\" [label=\"\", fontsize=9, color=\"#6b7280\", fontcolor=\"#6b7280\"];\n  \"extract\" -> \"judge\" [label=\"extracted_spec\", fontsize=9, color=\"#4f8ef7\", fontcolor=\"#4f8ef7\", style=dashed, constraint=false];\n  \"closure_gate\" -> \"judge\" [label=\"pass\", fontsize=9, color=\"#6b7280\", fontcolor=\"#6b7280\"];\n  \"closure_gate\" -> \"wf_exit\" [label=\"fail\", fontsize=9, color=\"#6b7280\", fontcolor=\"#6b7280\"];\n  \"judge\" -> \"merge_docs\" [label=\"\", fontsize=9, color=\"#6b7280\", fontcolor=\"#6b7280\"];\n  \"judge\" -> \"merge_docs\" [label=\"closure_report\", fontsize=9, color=\"#4f8ef7\", fontcolor=\"#4f8ef7\", style=dashed, constraint=false];\n  \"merge_docs\" -> \"wf_exit\" [label=\"\", fontsize=9, color=\"#6b7280\", fontcolor=\"#6b7280\"];\n  \"merge_docs\" -> \"wf_exit\" [label=\"merged\", fontsize=9, color=\"#4f8ef7\", fontcolor=\"#4f8ef7\", style=dashed, constraint=false];\n  \"merge_docs\" -> \"wf_exit\" [label=\"merged\", fontsize=9, color=\"#4f8ef7\", fontcolor=\"#4f8ef7\", style=dashed, constraint=false];\n  \"test_gated_loop/loop_gen\" -> \"test_gated_loop/loop_rev\" [label=\"\", fontsize=9, color=\"#6b7280\", fontcolor=\"#6b7280\"];\n  \"test_gated_loop/loop_gen\" -> \"test_gated_loop/loop_rev\" [label=\"code\", fontsize=9, color=\"#4f8ef7\", fontcolor=\"#4f8ef7\", style=dashed, constraint=false];\n  \"test_gated_loop/loop_gen\" -> \"test_gated_loop/loop_imp\" [label=\"code\", fontsize=9, color=\"#4f8ef7\", fontcolor=\"#4f8ef7\", style=dashed, constraint=false];\n  \"test_gated_loop/loop_rev\" -> \"test_gated_loop/loop_imp\" [label=\"\", fontsize=9, color=\"#6b7280\", fontcolor=\"#6b7280\"];\n  \"test_gated_loop/loop_rev\" -> \"test_gated_loop/loop_imp\" [label=\"feedback\", fontsize=9, color=\"#4f8ef7\", fontcolor=\"#4f8ef7\", style=dashed, constraint=false];\n  \"test_gated_loop/loop_imp\" -> \"test_gated_loop/loop_test\" [label=\"\", fontsize=9, color=\"#6b7280\", fontcolor=\"#6b7280\"];\n  \"test_gated_loop/loop_imp\" -> \"test_gated_loop/loop_test\" [label=\"improved_code\", fontsize=9, color=\"#4f8ef7\", fontcolor=\"#4f8ef7\", style=dashed, constraint=false];\n  \"test_gated_loop/loop_test\" -> \"test_gated_loop/loop_eval\" [label=\"\", fontsize=9, color=\"#6b7280\", fontcolor=\"#6b7280\"];\n  \"test_gated_loop/loop_test\" -> \"test_gated_loop/loop_eval\" [label=\"result\", fontsize=9, color=\"#4f8ef7\", fontcolor=\"#4f8ef7\", style=dashed, constraint=false];\n  \"test_gated_loop/loop_eval\" -> \"test_gated_loop/loop_guard\" [label=\"fail\", fontsize=9, color=\"#6b7280\", fontcolor=\"#6b7280\"];\n}",
+   "dot_fixed_size": "digraph G {\n  rankdir=LR; compound=true; fontsize=11;\n  node [fontsize=11, fontcolor=\"#222\"];\n  \"wf_entry\" [label=\"wf_entry\\nINPUT\", shape=box, style=\"rounded,filled\", fillcolor=\"#8a8f9855\", color=\"#8a8f98\", fixedsize=true, width=1.806, height=0.667];\n  \"analyze\" [label=\"analyze\\nGENERATE\", shape=box, style=\"rounded,filled\", fillcolor=\"#4f8ef755\", color=\"#4f8ef7\", fixedsize=true, width=1.806, height=0.667];\n  \"spec_gate\" [label=\"spec_gate\\nEVALUATE\", shape=diamond, style=\"filled\", fillcolor=\"#e0a21e55\", color=\"#e0a21e\", fixedsize=true, width=2.083, height=0.972];\n  \"abort_vague\" [label=\"abort_vague\\nRECOVER\", shape=box, style=\"rounded,filled\", fillcolor=\"#e5484d55\", color=\"#e5484d\", fixedsize=true, width=1.806, height=0.667];\n  subgraph \"cluster_test_gated_loop\" {\n    label=\"test_gated_loop\"; style=\"dashed,rounded\"; color=\"#9b59b6\";\n    \"test_gated_loop\" [label=\"test_gated_loop\\nLOOP\", shape=box, style=\"rounded,filled\", fillcolor=\"#9b59b655\", color=\"#9b59b6\", fixedsize=true, width=1.806, height=0.667];\n    \"test_gated_loop/loop_gen\" [label=\"loop_gen\\nGENERATE\", shape=box, style=\"rounded,filled\", fillcolor=\"#4f8ef755\", color=\"#4f8ef7\", fixedsize=true, width=1.806, height=0.667];\n    \"test_gated_loop/loop_rev\" [label=\"loop_rev\\nGENERATE\", shape=box, style=\"rounded,filled\", fillcolor=\"#4f8ef755\", color=\"#4f8ef7\", fixedsize=true, width=1.806, height=0.667];\n    \"test_gated_loop/loop_imp\" [label=\"loop_imp\\nGENERATE\", shape=box, style=\"rounded,filled\", fillcolor=\"#4f8ef755\", color=\"#4f8ef7\", fixedsize=true, width=1.806, height=0.667];\n    \"test_gated_loop/loop_test\" [label=\"loop_test\\nSOLVE\", shape=box, style=\"rounded,filled\", fillcolor=\"#2fa84f55\", color=\"#2fa84f\", fixedsize=true, width=1.806, height=0.667];\n    \"test_gated_loop/loop_eval\" [label=\"loop_eval\\nEVALUATE\", shape=diamond, style=\"filled\", fillcolor=\"#e0a21e55\", color=\"#e0a21e\", fixedsize=true, width=2.083, height=0.972];\n    \"test_gated_loop/loop_guard\" [label=\"loop_guard\\nGUARD\", shape=diamond, style=\"filled\", fillcolor=\"#e5484d55\", color=\"#e5484d\", fixedsize=true, width=2.083, height=0.972];\n  }\n  \"document\" [label=\"document\\nGENERATE\", shape=box, style=\"rounded,filled\", fillcolor=\"#4f8ef755\", color=\"#4f8ef7\", fixedsize=true, width=1.806, height=0.667];\n  \"extract\" [label=\"extract\\nGENERATE\", shape=box, style=\"rounded,filled\", fillcolor=\"#4f8ef755\", color=\"#4f8ef7\", fixedsize=true, width=1.806, height=0.667];\n  \"closure_gate\" [label=\"closure_gate\\nEVALUATE\", shape=diamond, style=\"filled\", fillcolor=\"#e0a21e55\", color=\"#e0a21e\", fixedsize=true, width=2.083, height=0.972];\n  \"judge\" [label=\"judge\\nGENERATE\", shape=box, style=\"rounded,filled\", fillcolor=\"#4f8ef755\", color=\"#4f8ef7\", fixedsize=true, width=1.806, height=0.667];\n  \"merge_docs\" [label=\"merge_docs\\nCONTEXT\", shape=box, style=\"rounded,filled\", fillcolor=\"#2fa84f55\", color=\"#2fa84f\", fixedsize=true, width=1.806, height=0.667];\n  \"wf_exit\" [label=\"wf_exit\\nOUTPUT\", shape=box, style=\"rounded,filled\", fillcolor=\"#8a8f9855\", color=\"#8a8f98\", fixedsize=true, width=1.806, height=0.667];\n  \"wf_entry\" -> \"analyze\" [label=\"\", fontsize=9, color=\"#6b7280\", fontcolor=\"#6b7280\"];\n  \"wf_entry\" -> \"analyze\" [label=\"spec\", fontsize=9, color=\"#4f8ef7\", fontcolor=\"#4f8ef7\", style=dashed, constraint=false];\n  \"wf_entry\" -> \"document\" [label=\"spec\", fontsize=9, color=\"#4f8ef7\", fontcolor=\"#4f8ef7\", style=dashed, constraint=false];\n  \"wf_entry\" -> \"test_gated_loop\" [label=\"spec\", fontsize=9, color=\"#4f8ef7\", fontcolor=\"#4f8ef7\", style=dashed, constraint=false];\n  \"wf_entry\" -> \"test_gated_loop\" [label=\"lang\", fontsize=9, color=\"#4f8ef7\", fontcolor=\"#4f8ef7\", style=dashed, constraint=false];\n  \"wf_entry\" -> \"test_gated_loop\" [label=\"max_cycles\", fontsize=9, color=\"#4f8ef7\", fontcolor=\"#4f8ef7\", style=dashed, constraint=false];\n  \"wf_entry\" -> \"closure_gate\" [label=\"check_closure\", fontsize=9, color=\"#4f8ef7\", fontcolor=\"#4f8ef7\", style=dashed, constraint=false];\n  \"wf_entry\" -> \"judge\" [label=\"spec\", fontsize=9, color=\"#4f8ef7\", fontcolor=\"#4f8ef7\", style=dashed, constraint=false];\n  \"analyze\" -> \"spec_gate\" [label=\"\", fontsize=9, color=\"#6b7280\", fontcolor=\"#6b7280\"];\n  \"analyze\" -> \"spec_gate\" [label=\"analysis\", fontsize=9, color=\"#4f8ef7\", fontcolor=\"#4f8ef7\", style=dashed, constraint=false];\n  \"analyze\" -> \"abort_vague\" [label=\"analysis\", fontsize=9, color=\"#4f8ef7\", fontcolor=\"#4f8ef7\", style=dashed, constraint=false];\n  \"spec_gate\" -> \"test_gated_loop\" [label=\"pass\", fontsize=9, color=\"#6b7280\", fontcolor=\"#6b7280\"];\n  \"spec_gate\" -> \"abort_vague\" [label=\"fail\", fontsize=9, color=\"#6b7280\", fontcolor=\"#6b7280\"];\n  \"test_gated_loop\" -> \"document\" [label=\"exit\", fontsize=9, color=\"#6b7280\", fontcolor=\"#6b7280\"];\n  \"test_gated_loop\" -> \"document\" [label=\"final_code\", fontsize=9, color=\"#4f8ef7\", fontcolor=\"#4f8ef7\", style=dashed, constraint=false];\n  \"test_gated_loop\" -> \"extract\" [label=\"final_code\", fontsize=9, color=\"#4f8ef7\", fontcolor=\"#4f8ef7\", style=dashed, constraint=false];\n  \"document\" -> \"extract\" [label=\"\", fontsize=9, color=\"#6b7280\", fontcolor=\"#6b7280\"];\n  \"document\" -> \"merge_docs\" [label=\"docs\", fontsize=9, color=\"#4f8ef7\", fontcolor=\"#4f8ef7\", style=dashed, constraint=false];\n  \"document\" -> \"wf_exit\" [label=\"docs\", fontsize=9, color=\"#4f8ef7\", fontcolor=\"#4f8ef7\", style=dashed, constraint=false];\n  \"extract\" -> \"closure_gate\" [label=\"\", fontsize=9, color=\"#6b7280\", fontcolor=\"#6b7280\"];\n  \"extract\" -> \"judge\" [label=\"extracted_spec\", fontsize=9, color=\"#4f8ef7\", fontcolor=\"#4f8ef7\", style=dashed, constraint=false];\n  \"closure_gate\" -> \"judge\" [label=\"pass\", fontsize=9, color=\"#6b7280\", fontcolor=\"#6b7280\"];\n  \"closure_gate\" -> \"wf_exit\" [label=\"fail\", fontsize=9, color=\"#6b7280\", fontcolor=\"#6b7280\"];\n  \"judge\" -> \"merge_docs\" [label=\"\", fontsize=9, color=\"#6b7280\", fontcolor=\"#6b7280\"];\n  \"judge\" -> \"merge_docs\" [label=\"closure_report\", fontsize=9, color=\"#4f8ef7\", fontcolor=\"#4f8ef7\", style=dashed, constraint=false];\n  \"merge_docs\" -> \"wf_exit\" [label=\"\", fontsize=9, color=\"#6b7280\", fontcolor=\"#6b7280\"];\n  \"merge_docs\" -> \"wf_exit\" [label=\"merged\", fontsize=9, color=\"#4f8ef7\", fontcolor=\"#4f8ef7\", style=dashed, constraint=false];\n  \"merge_docs\" -> \"wf_exit\" [label=\"merged\", fontsize=9, color=\"#4f8ef7\", fontcolor=\"#4f8ef7\", style=dashed, constraint=false];\n  \"test_gated_loop/loop_gen\" -> \"test_gated_loop/loop_rev\" [label=\"\", fontsize=9, color=\"#6b7280\", fontcolor=\"#6b7280\"];\n  \"test_gated_loop/loop_gen\" -> \"test_gated_loop/loop_rev\" [label=\"code\", fontsize=9, color=\"#4f8ef7\", fontcolor=\"#4f8ef7\", style=dashed, constraint=false];\n  \"test_gated_loop/loop_gen\" -> \"test_gated_loop/loop_imp\" [label=\"code\", fontsize=9, color=\"#4f8ef7\", fontcolor=\"#4f8ef7\", style=dashed, constraint=false];\n  \"test_gated_loop/loop_rev\" -> \"test_gated_loop/loop_imp\" [label=\"\", fontsize=9, color=\"#6b7280\", fontcolor=\"#6b7280\"];\n  \"test_gated_loop/loop_rev\" -> \"test_gated_loop/loop_imp\" [label=\"feedback\", fontsize=9, color=\"#4f8ef7\", fontcolor=\"#4f8ef7\", style=dashed, constraint=false];\n  \"test_gated_loop/loop_imp\" -> \"test_gated_loop/loop_test\" [label=\"\", fontsize=9, color=\"#6b7280\", fontcolor=\"#6b7280\"];\n  \"test_gated_loop/loop_imp\" -> \"test_gated_loop/loop_test\" [label=\"improved_code\", fontsize=9, color=\"#4f8ef7\", fontcolor=\"#4f8ef7\", style=dashed, constraint=false];\n  \"test_gated_loop/loop_test\" -> \"test_gated_loop/loop_eval\" [label=\"\", fontsize=9, color=\"#6b7280\", fontcolor=\"#6b7280\"];\n  \"test_gated_loop/loop_test\" -> \"test_gated_loop/loop_eval\" [label=\"result\", fontsize=9, color=\"#4f8ef7\", fontcolor=\"#4f8ef7\", style=dashed, constraint=false];\n  \"test_gated_loop/loop_eval\" -> \"test_gated_loop/loop_guard\" [label=\"fail\", fontsize=9, color=\"#6b7280\", fontcolor=\"#6b7280\"];\n}",
+   "edges": 38,
+   "mermaid": "flowchart LR\n  n0([\"wf_entry<br/>INPUT\"])\n  n1[\"analyze<br/>GENERATE\"]\n  n2{\"spec_gate<br/>EVALUATE\"}\n  n3[\"abort_vague<br/>RECOVER\"]\n  subgraph n4[\"test_gated_loop (LOOP)\"]\n    n11[\"loop_gen<br/>GENERATE\"]\n    n12[\"loop_rev<br/>GENERATE\"]\n    n13[\"loop_imp<br/>GENERATE\"]\n    n14[\"loop_test<br/>SOLVE\"]\n    n15{\"loop_eval<br/>EVALUATE\"}\n    n16{\"loop_guard<br/>GUARD\"}\n  end\n  n5[\"document<br/>GENERATE\"]\n  n6[\"extract<br/>GENERATE\"]\n  n7{\"closure_gate<br/>EVALUATE\"}\n  n8[\"judge<br/>GENERATE\"]\n  n9[\"merge_docs<br/>CONTEXT\"]\n  n10([\"wf_exit<br/>OUTPUT\"])\n  n0 --> n1\n  n0 -.->|\"spec\"| n1\n  n0 -.->|\"spec\"| n5\n  n0 -.->|\"spec\"| n4\n  n0 -.->|\"lang\"| n4\n  n0 -.->|\"max_cycles\"| n4\n  n0 -.->|\"check_closure\"| n7\n  n0 -.->|\"spec\"| n8\n  n1 --> n2\n  n1 -.->|\"analysis\"| n2\n  n1 -.->|\"analysis\"| n3\n  n2 -->|\"pass\"| n4\n  n2 -->|\"fail\"| n3\n  n4 -->|\"exit\"| n5\n  n4 -.->|\"final_code\"| n5\n  n4 -.->|\"final_code\"| n6\n  n5 --> n6\n  n5 -.->|\"docs\"| n9\n  n5 -.->|\"docs\"| n10\n  n6 --> n7\n  n6 -.->|\"extracted_spec\"| n8\n  n7 -->|\"pass\"| n8\n  n7 -->|\"fail\"| n10\n  n8 --> n9\n  n8 -.->|\"closure_report\"| n9\n  n9 --> n10\n  n9 -.->|\"merged\"| n10\n  n9 -.->|\"merged\"| n10\n  n11 --> n12\n  n11 -.->|\"code\"| n12\n  n11 -.->|\"code\"| n13\n  n12 --> n13\n  n12 -.->|\"feedback\"| n13\n  n13 --> n14\n  n13 -.->|\"improved_code\"| n14\n  n14 --> n15\n  n14 -.->|\"result\"| n15\n  n15 -->|\"fail\"| n16\n  classDef CONTEXT fill:#2fa84f55,stroke:#2fa84f,color:#222;\n  class n9 CONTEXT;\n  classDef EVALUATE fill:#e0a21e55,stroke:#e0a21e,color:#222;\n  class n2,n7,n15 EVALUATE;\n  classDef GENERATE fill:#4f8ef755,stroke:#4f8ef7,color:#222;\n  class n1,n5,n6,n8,n11,n12,n13 GENERATE;\n  classDef GUARD fill:#e5484d55,stroke:#e5484d,color:#222;\n  class n16 GUARD;\n  classDef INPUT fill:#8a8f9855,stroke:#8a8f98,color:#222;\n  class n0 INPUT;\n  classDef OUTPUT fill:#8a8f9855,stroke:#8a8f98,color:#222;\n  class n10 OUTPUT;\n  classDef RECOVER fill:#e5484d55,stroke:#e5484d,color:#222;\n  class n3 RECOVER;\n  classDef SOLVE fill:#2fa84f55,stroke:#2fa84f,color:#222;\n  class n14 SOLVE;\n",
+   "nodes": 17,
+   "note": ""
+  },
+  "self_refine": {
+   "cytoscape_elements": [
+    {
+     "data": {
+      "color": "#8a8f98",
+      "id": "wf_entry",
+      "info": "type: INPUT\nports: entry, out_topic",
+      "label": "wf_entry",
+      "shape": "round-rectangle",
+      "text": "wf_entry\nINPUT"
+     }
+    },
+    {
+     "data": {
+      "color": "#4f8ef7",
+      "id": "draft",
+      "info": "type: GENERATE\nprompt_ref: prompts.draft\nmodel: ollama/gemma3\nports: trigger, complete, in_topic, out_essay",
+      "label": "draft",
+      "shape": "rectangle",
+      "text": "draft\nGENERATE"
+     }
+    },
+    {
+     "data": {
+      "color": "#4f8ef7",
+      "id": "critique",
+      "info": "type: GENERATE\nprompt_ref: prompts.critique\nmodel: ollama/gemma3\nports: trigger, complete, in_essay, out_feedback",
+      "label": "critique",
+      "shape": "rectangle",
+      "text": "critique\nGENERATE"
+     }
+    },
+    {
+     "data": {
+      "color": "#4f8ef7",
+      "id": "refine",
+      "info": "type: GENERATE\nprompt_ref: prompts.refine\nmodel: ollama/gemma3\nports: trigger, complete, in_essay, in_feedback, out_essay",
+      "label": "refine",
+      "shape": "rectangle",
+      "text": "refine\nGENERATE"
+     }
+    },
+    {
+     "data": {
+      "color": "#8a8f98",
+      "id": "wf_exit",
+      "info": "type: OUTPUT\nports: trigger, exit, in_result",
+      "label": "wf_exit",
+      "shape": "round-rectangle",
+      "text": "wf_exit\nOUTPUT"
+     }
+    },
+    {
+     "data": {
+      "id": "e0",
+      "label": "",
+      "relation": "triggers",
+      "source": "wf_entry",
+      "sport": "entry",
+      "target": "draft",
+      "tport": "trigger"
+     }
+    },
+    {
+     "data": {
+      "id": "e1",
+      "label": "topic",
+      "relation": "binds",
+      "source": "wf_entry",
+      "sport": "out_topic",
+      "target": "draft",
+      "tport": "in_topic"
+     }
+    },
+    {
+     "data": {
+      "id": "e2",
+      "label": "",
+      "relation": "triggers",
+      "source": "draft",
+      "sport": "complete",
+      "target": "critique",
+      "tport": "trigger"
+     }
+    },
+    {
+     "data": {
+      "id": "e3",
+      "label": "essay",
+      "relation": "binds",
+      "source": "draft",
+      "sport": "out_essay",
+      "target": "critique",
+      "tport": "in_essay"
+     }
+    },
+    {
+     "data": {
+      "id": "e4",
+      "label": "essay",
+      "relation": "binds",
+      "source": "draft",
+      "sport": "out_essay",
+      "target": "refine",
+      "tport": "in_essay"
+     }
+    },
+    {
+     "data": {
+      "id": "e5",
+      "label": "",
+      "relation": "triggers",
+      "source": "critique",
+      "sport": "complete",
+      "target": "refine",
+      "tport": "trigger"
+     }
+    },
+    {
+     "data": {
+      "id": "e6",
+      "label": "feedback",
+      "relation": "binds",
+      "source": "critique",
+      "sport": "out_feedback",
+      "target": "refine",
+      "tport": "in_feedback"
+     }
+    },
+    {
+     "data": {
+      "id": "e7",
+      "label": "",
+      "relation": "triggers",
+      "source": "refine",
+      "sport": "complete",
+      "target": "wf_exit",
+      "tport": "trigger"
+     }
+    },
+    {
+     "data": {
+      "id": "e8",
+      "label": "essay",
+      "relation": "binds",
+      "source": "refine",
+      "sport": "out_essay",
+      "target": "wf_exit",
+      "tport": "in_result"
+     }
+    }
+   ],
+   "dot": "digraph G {\n  rankdir=LR; compound=true; fontsize=11;\n  node [fontsize=11, fontcolor=\"#222\"];\n  \"wf_entry\" [label=\"wf_entry\\nINPUT\", shape=box, style=\"rounded,filled\", fillcolor=\"#8a8f9855\", color=\"#8a8f98\"];\n  \"draft\" [label=\"draft\\nGENERATE\", shape=box, style=\"rounded,filled\", fillcolor=\"#4f8ef755\", color=\"#4f8ef7\"];\n  \"critique\" [label=\"critique\\nGENERATE\", shape=box, style=\"rounded,filled\", fillcolor=\"#4f8ef755\", color=\"#4f8ef7\"];\n  \"refine\" [label=\"refine\\nGENERATE\", shape=box, style=\"rounded,filled\", fillcolor=\"#4f8ef755\", color=\"#4f8ef7\"];\n  \"wf_exit\" [label=\"wf_exit\\nOUTPUT\", shape=box, style=\"rounded,filled\", fillcolor=\"#8a8f9855\", color=\"#8a8f98\"];\n  \"wf_entry\" -> \"draft\" [label=\"\", fontsize=9, color=\"#6b7280\", fontcolor=\"#6b7280\"];\n  \"wf_entry\" -> \"draft\" [label=\"topic\", fontsize=9, color=\"#4f8ef7\", fontcolor=\"#4f8ef7\", style=dashed, constraint=false];\n  \"draft\" -> \"critique\" [label=\"\", fontsize=9, color=\"#6b7280\", fontcolor=\"#6b7280\"];\n  \"draft\" -> \"critique\" [label=\"essay\", fontsize=9, color=\"#4f8ef7\", fontcolor=\"#4f8ef7\", style=dashed, constraint=false];\n  \"draft\" -> \"refine\" [label=\"essay\", fontsize=9, color=\"#4f8ef7\", fontcolor=\"#4f8ef7\", style=dashed, constraint=false];\n  \"critique\" -> \"refine\" [label=\"\", fontsize=9, color=\"#6b7280\", fontcolor=\"#6b7280\"];\n  \"critique\" -> \"refine\" [label=\"feedback\", fontsize=9, color=\"#4f8ef7\", fontcolor=\"#4f8ef7\", style=dashed, constraint=false];\n  \"refine\" -> \"wf_exit\" [label=\"\", fontsize=9, color=\"#6b7280\", fontcolor=\"#6b7280\"];\n  \"refine\" -> \"wf_exit\" [label=\"essay\", fontsize=9, color=\"#4f8ef7\", fontcolor=\"#4f8ef7\", style=dashed, constraint=false];\n}",
+   "dot_fixed_size": "digraph G {\n  rankdir=LR; compound=true; fontsize=11;\n  node [fontsize=11, fontcolor=\"#222\"];\n  \"wf_entry\" [label=\"wf_entry\\nINPUT\", shape=box, style=\"rounded,filled\", fillcolor=\"#8a8f9855\", color=\"#8a8f98\", fixedsize=true, width=1.806, height=0.667];\n  \"draft\" [label=\"draft\\nGENERATE\", shape=box, style=\"rounded,filled\", fillcolor=\"#4f8ef755\", color=\"#4f8ef7\", fixedsize=true, width=1.806, height=0.667];\n  \"critique\" [label=\"critique\\nGENERATE\", shape=box, style=\"rounded,filled\", fillcolor=\"#4f8ef755\", color=\"#4f8ef7\", fixedsize=true, width=1.806, height=0.667];\n  \"refine\" [label=\"refine\\nGENERATE\", shape=box, style=\"rounded,filled\", fillcolor=\"#4f8ef755\", color=\"#4f8ef7\", fixedsize=true, width=1.806, height=0.667];\n  \"wf_exit\" [label=\"wf_exit\\nOUTPUT\", shape=box, style=\"rounded,filled\", fillcolor=\"#8a8f9855\", color=\"#8a8f98\", fixedsize=true, width=1.806, height=0.667];\n  \"wf_entry\" -> \"draft\" [label=\"\", fontsize=9, color=\"#6b7280\", fontcolor=\"#6b7280\"];\n  \"wf_entry\" -> \"draft\" [label=\"topic\", fontsize=9, color=\"#4f8ef7\", fontcolor=\"#4f8ef7\", style=dashed, constraint=false];\n  \"draft\" -> \"critique\" [label=\"\", fontsize=9, color=\"#6b7280\", fontcolor=\"#6b7280\"];\n  \"draft\" -> \"critique\" [label=\"essay\", fontsize=9, color=\"#4f8ef7\", fontcolor=\"#4f8ef7\", style=dashed, constraint=false];\n  \"draft\" -> \"refine\" [label=\"essay\", fontsize=9, color=\"#4f8ef7\", fontcolor=\"#4f8ef7\", style=dashed, constraint=false];\n  \"critique\" -> \"refine\" [label=\"\", fontsize=9, color=\"#6b7280\", fontcolor=\"#6b7280\"];\n  \"critique\" -> \"refine\" [label=\"feedback\", fontsize=9, color=\"#4f8ef7\", fontcolor=\"#4f8ef7\", style=dashed, constraint=false];\n  \"refine\" -> \"wf_exit\" [label=\"\", fontsize=9, color=\"#6b7280\", fontcolor=\"#6b7280\"];\n  \"refine\" -> \"wf_exit\" [label=\"essay\", fontsize=9, color=\"#4f8ef7\", fontcolor=\"#4f8ef7\", style=dashed, constraint=false];\n}",
+   "edges": 9,
+   "mermaid": "flowchart LR\n  n0([\"wf_entry<br/>INPUT\"])\n  n1[\"draft<br/>GENERATE\"]\n  n2[\"critique<br/>GENERATE\"]\n  n3[\"refine<br/>GENERATE\"]\n  n4([\"wf_exit<br/>OUTPUT\"])\n  n0 --> n1\n  n0 -.->|\"topic\"| n1\n  n1 --> n2\n  n1 -.->|\"essay\"| n2\n  n1 -.->|\"essay\"| n3\n  n2 --> n3\n  n2 -.->|\"feedback\"| n3\n  n3 --> n4\n  n3 -.->|\"essay\"| n4\n  classDef GENERATE fill:#4f8ef755,stroke:#4f8ef7,color:#222;\n  class n1,n2,n3 GENERATE;\n  classDef INPUT fill:#8a8f9855,stroke:#8a8f98,color:#222;\n  class n0 INPUT;\n  classDef OUTPUT fill:#8a8f9855,stroke:#8a8f98,color:#222;\n  class n4 OUTPUT;\n",
+   "nodes": 5,
+   "note": ""
+  }
+ }
+}

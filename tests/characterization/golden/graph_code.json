@@ -1,0 +1,414 @@
+{
+ "_source": "graph-code@e8945b9",
+ "cases": {
+  "chain": {
+   "acyclic": "ok",
+   "build_order": [
+    "a",
+    "b",
+    "c",
+    "z"
+   ],
+   "gap_0": [
+    "a",
+    "b",
+    "c",
+    "z"
+   ],
+   "gap_1": [
+    "b",
+    "c",
+    "z"
+   ],
+   "gap_2": [
+    "z"
+   ],
+   "gap_3": [
+    "a"
+   ],
+   "gap_4": [
+    "a",
+    "b"
+   ],
+   "learning_path_0": [
+    "a",
+    "b",
+    "c",
+    "z"
+   ],
+   "learning_path_1": [
+    "b",
+    "c",
+    "z"
+   ],
+   "learning_path_2": [
+    "z"
+   ],
+   "learning_path_3": [
+    "a"
+   ],
+   "learning_path_4": [
+    "a",
+    "b"
+   ],
+   "productivity_order_w1": [
+    "a",
+    "b",
+    "c",
+    "z"
+   ],
+   "productivity_order_w2": [
+    "a",
+    "b",
+    "c",
+    "z"
+   ],
+   "reducible": true,
+   "reducible_first_radical_only": false
+  },
+  "cycle": {
+   "acyclic": {
+    "raises": "ToolFailed"
+   },
+   "build_order": {
+    "raises": "NetworkXUnfeasible"
+   },
+   "gap_0": {
+    "raises": "NetworkXUnfeasible"
+   },
+   "learning_path_0": {
+    "raises": "NetworkXUnfeasible"
+   },
+   "productivity_order_w1": [],
+   "productivity_order_w2": [],
+   "reducible": true,
+   "reducible_first_radical_only": false
+  },
+  "dangling": {
+   "acyclic": "ok",
+   "build_order": [
+    "a",
+    "b"
+   ],
+   "gap_0": [
+    "ghost",
+    "a",
+    "b"
+   ],
+   "learning_path_0": [
+    "ghost",
+    "a",
+    "b"
+   ],
+   "productivity_order_w1": [
+    "a",
+    "b"
+   ],
+   "productivity_order_w2": [
+    "a",
+    "b"
+   ],
+   "reducible": true,
+   "reducible_first_radical_only": false
+  },
+  "diamond": {
+   "acyclic": "ok",
+   "build_order": [
+    "a",
+    "b",
+    "c",
+    "d"
+   ],
+   "gap_0": [
+    "a",
+    "b",
+    "c",
+    "d"
+   ],
+   "gap_1": [
+    "a",
+    "c",
+    "d"
+   ],
+   "learning_path_0": [
+    "a",
+    "b",
+    "c",
+    "d"
+   ],
+   "learning_path_1": [
+    "a",
+    "c",
+    "d"
+   ],
+   "productivity_order_w1": [
+    "a",
+    "b",
+    "c",
+    "d"
+   ],
+   "productivity_order_w2": [
+    "a",
+    "b",
+    "c",
+    "d"
+   ],
+   "reducible": true,
+   "reducible_first_radical_only": false
+  },
+  "first_radical": {
+   "acyclic": "ok",
+   "build_order": [
+    "v",
+    "a",
+    "p"
+   ],
+   "gap_0": [
+    "v",
+    "p"
+   ],
+   "gap_1": [
+    "a"
+   ],
+   "learning_path_0": [
+    "v",
+    "p"
+   ],
+   "learning_path_1": [
+    "a"
+   ],
+   "productivity_order_w1": [
+    "v",
+    "a",
+    "p"
+   ],
+   "productivity_order_w2": [
+    "v",
+    "a",
+    "p"
+   ],
+   "reducible": true,
+   "reducible_first_radical_only": false
+  },
+  "foundation_concept": {
+   "acyclic": "ok",
+   "build_order": [
+    "root",
+    "a",
+    "b"
+   ],
+   "gap_0": [
+    "root",
+    "a",
+    "b"
+   ],
+   "learning_path_0": [
+    "root",
+    "a",
+    "b"
+   ],
+   "productivity_order_w1": [
+    "root",
+    "a",
+    "b"
+   ],
+   "productivity_order_w2": [
+    "root",
+    "a",
+    "b"
+   ],
+   "reducible": false,
+   "reducible_first_radical_only": false
+  },
+  "isolated": {
+   "acyclic": "ok",
+   "build_order": [
+    "lonely",
+    "a",
+    "z"
+   ],
+   "gap_0": [
+    "a",
+    "z"
+   ],
+   "learning_path_0": [
+    "a",
+    "z"
+   ],
+   "productivity_order_w1": [
+    "lonely",
+    "a",
+    "z"
+   ],
+   "productivity_order_w2": [
+    "lonely",
+    "a",
+    "z"
+   ],
+   "reducible": false,
+   "reducible_first_radical_only": false
+  },
+  "optional_edges": {
+   "acyclic": "ok",
+   "build_order": [
+    "a",
+    "e",
+    "b"
+   ],
+   "gap_0": [
+    "a",
+    "b"
+   ],
+   "learning_path_0": [
+    "a",
+    "b"
+   ],
+   "productivity_order_w1": [
+    "a",
+    "b",
+    "e"
+   ],
+   "productivity_order_w2": [
+    "a",
+    "b",
+    "e"
+   ],
+   "reducible": true,
+   "reducible_first_radical_only": false
+  },
+  "query_edges": {
+   "acyclic": "ok",
+   "build_order": [
+    "a",
+    "b"
+   ],
+   "gap_0": [],
+   "gap_1": {
+    "raises": "ToolFailed"
+   },
+   "gap_2": [
+    "a"
+   ],
+   "gap_3": [],
+   "learning_path_0": [],
+   "learning_path_1": {
+    "raises": "ToolFailed"
+   },
+   "learning_path_2": [
+    "a"
+   ],
+   "learning_path_3": [],
+   "productivity_order_w1": [
+    "a",
+    "b"
+   ],
+   "productivity_order_w2": [
+    "a",
+    "b"
+   ],
+   "reducible": true,
+   "reducible_first_radical_only": false
+  },
+  "reach_weighting": {
+   "acyclic": "ok",
+   "build_order": [
+    "a",
+    "e",
+    "b",
+    "c",
+    "d",
+    "x",
+    "y"
+   ],
+   "gap_0": [
+    "a",
+    "e",
+    "c",
+    "y"
+   ],
+   "gap_1": [
+    "b",
+    "x"
+   ],
+   "learning_path_0": [
+    "a",
+    "e",
+    "c",
+    "y"
+   ],
+   "learning_path_1": [
+    "b",
+    "x"
+   ],
+   "productivity_order_w1": [
+    "a",
+    "b",
+    "c",
+    "e",
+    "d",
+    "x",
+    "y"
+   ],
+   "productivity_order_w2": [
+    "a",
+    "b",
+    "c",
+    "e",
+    "d",
+    "x",
+    "y"
+   ],
+   "reducible": true,
+   "reducible_first_radical_only": false
+  },
+  "ties_unsorted": {
+   "acyclic": "ok",
+   "build_order": [
+    "zeta",
+    "mid",
+    "alpha",
+    "beta",
+    "omega",
+    "theta"
+   ],
+   "gap_0": [
+    "zeta",
+    "alpha",
+    "omega"
+   ],
+   "gap_1": [
+    "mid",
+    "beta",
+    "theta"
+   ],
+   "learning_path_0": [
+    "zeta",
+    "alpha",
+    "omega"
+   ],
+   "learning_path_1": [
+    "mid",
+    "beta",
+    "theta"
+   ],
+   "productivity_order_w1": [
+    "alpha",
+    "beta",
+    "mid",
+    "zeta",
+    "omega",
+    "theta"
+   ],
+   "productivity_order_w2": [
+    "alpha",
+    "beta",
+    "mid",
+    "zeta",
+    "omega",
+    "theta"
+   ],
+   "reducible": true,
+   "reducible_first_radical_only": false
+  }
+ }
+}

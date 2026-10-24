@@ -1,0 +1,134 @@
+{
+ "_source": "work-graph@08b9aea",
+ "cases": {
+  "unordered": {
+   "after_removing_b": {
+    "harvest": [],
+    "orphans": [],
+    "text": "schema: workgraph/1\nlayer: repo\nnodes:\n  - id: a\n    kind: file\n    label: A\nedges: []\nextra_key: kept\n"
+   },
+   "dump_yaml": "schema: workgraph/1\nlayer: repo\nnodes:\n  - id: a\n    kind: file\n    label: A\n  - id: b\n    kind: file\nedges:\n  - source: a\n    relation: imports\n    target: b\nextra_key: kept\n",
+   "harvest": [],
+   "harvest_is_stable": true,
+   "round_trip_orphans": [],
+   "round_trip_text": "schema: workgraph/1\nlayer: repo\nnodes:\n  - id: a\n    kind: file\n    label: A\n  - id: b\n    kind: file\nedges:\n  - source: a\n    relation: imports\n    target: b\nextra_key: kept\n"
+  },
+  "with_comments": {
+   "after_removing_b": {
+    "harvest": [
+     {
+      "item_key": "@section:schema",
+      "key": null,
+      "position": "before",
+      "text": "header of the file"
+     },
+     {
+      "item_key": "@section:nodes",
+      "key": null,
+      "position": "before",
+      "text": "the nodes"
+     },
+     {
+      "item_key": "a",
+      "key": null,
+      "position": "before",
+      "text": "first node"
+     },
+     {
+      "item_key": "a",
+      "key": null,
+      "position": "trailing",
+      "text": "trailing on the id line"
+     },
+     {
+      "item_key": "b",
+      "key": null,
+      "position": "before",
+      "text": "note on b's label"
+     },
+     {
+      "item_key": "a|imports|b",
+      "key": null,
+      "position": "before",
+      "text": "why a imports b"
+     },
+     {
+      "item_key": "a|imports|b",
+      "key": null,
+      "position": "before",
+      "text": "trailing on target"
+     }
+    ],
+    "orphans": [
+     {
+      "item_key": "b",
+      "key": "label",
+      "position": "before",
+      "text": "note on b's label"
+     },
+     {
+      "item_key": "a|imports|b",
+      "key": null,
+      "position": "before",
+      "text": "why a imports b"
+     },
+     {
+      "item_key": "a|imports|b",
+      "key": "target",
+      "position": "trailing",
+      "text": "trailing on target"
+     }
+    ],
+    "text": "# header of the file\nschema: workgraph/1\nlayer: repo\n# the nodes\nnodes:\n  # first node\n  - id: a  # trailing on the id line\n    kind: file\n    label: 'A # inside quotes is not a comment'\nedges: []\n# [orphaned from b] note on b's label\n# [orphaned from a|imports|b] why a imports b\n# [orphaned from a|imports|b] trailing on target\n"
+   },
+   "dump_yaml": "schema: workgraph/1\nlayer: repo\nnodes:\n  - id: a\n    kind: file\n    label: 'A # inside quotes is not a comment'\n  - id: b\n    kind: file\n    label: B\nedges:\n  - source: a\n    relation: imports\n    target: b\n",
+   "harvest": [
+    {
+     "item_key": "@section:schema",
+     "key": null,
+     "position": "before",
+     "text": "header of the file"
+    },
+    {
+     "item_key": "@section:nodes",
+     "key": null,
+     "position": "before",
+     "text": "the nodes"
+    },
+    {
+     "item_key": "a",
+     "key": null,
+     "position": "before",
+     "text": "first node"
+    },
+    {
+     "item_key": "a",
+     "key": null,
+     "position": "trailing",
+     "text": "trailing on the id line"
+    },
+    {
+     "item_key": "b",
+     "key": "label",
+     "position": "before",
+     "text": "note on b's label"
+    },
+    {
+     "item_key": "a|imports|b",
+     "key": null,
+     "position": "before",
+     "text": "why a imports b"
+    },
+    {
+     "item_key": "a|imports|b",
+     "key": "target",
+     "position": "trailing",
+     "text": "trailing on target"
+    }
+   ],
+   "harvest_is_stable": true,
+   "round_trip_orphans": [],
+   "round_trip_text": "# header of the file\nschema: workgraph/1\nlayer: repo\n# the nodes\nnodes:\n  # first node\n  - id: a  # trailing on the id line\n    kind: file\n    label: 'A # inside quotes is not a comment'\n  - id: b\n    kind: file\n    # note on b's label\n    label: B\nedges:\n  # why a imports b\n  - source: a\n    relation: imports\n    target: b  # trailing on target\n"
+  }
+ }
+}

@@ -1,0 +1,539 @@
+{
+ "_source": "conceptbook-app@e044e9b1",
+ "cases": {
+  "chain": {
+   "acyclic": true,
+   "ancestors_0": [
+    "a",
+    "b",
+    "c",
+    "p"
+   ],
+   "ancestors_1": [
+    "a",
+    "b",
+    "c",
+    "p"
+   ],
+   "ancestors_2": [
+    "a",
+    "b",
+    "c",
+    "p"
+   ],
+   "ancestors_3": [
+    "p"
+   ],
+   "ancestors_4": [
+    "a",
+    "p"
+   ],
+   "applications_of": {
+    "a": [],
+    "b": [],
+    "c": [
+     "z"
+    ],
+    "p": [],
+    "z": []
+   },
+   "gap_0": [
+    "a",
+    "b",
+    "c",
+    "p"
+   ],
+   "gap_1": [
+    "b",
+    "c",
+    "p"
+   ],
+   "gap_2": [
+    "p"
+   ],
+   "gap_3": [
+    "p"
+   ],
+   "gap_4": [
+    "a"
+   ],
+   "learning_path_0": [
+    "p",
+    "a",
+    "b",
+    "c"
+   ],
+   "learning_path_1": [
+    "b",
+    "c",
+    "p"
+   ],
+   "learning_path_2": [
+    "p"
+   ],
+   "learning_path_3": [
+    "p"
+   ],
+   "learning_path_4": [
+    "a"
+   ],
+   "productivity_order_w1": [
+    "p",
+    "a",
+    "b",
+    "c",
+    "z"
+   ],
+   "productivity_order_w2": [
+    "p",
+    "a",
+    "b",
+    "c",
+    "z"
+   ],
+   "reducible": true
+  },
+  "cycle": {
+   "acyclic": false,
+   "ancestors_0": [
+    "a",
+    "b",
+    "p"
+   ],
+   "applications_of": {
+    "a": [],
+    "b": [],
+    "c": [],
+    "p": []
+   },
+   "gap_0": [
+    "a",
+    "b",
+    "p"
+   ],
+   "learning_path_0": [
+    "p",
+    "a",
+    "b"
+   ],
+   "productivity_order_w1": [
+    "p"
+   ],
+   "productivity_order_w2": [
+    "p"
+   ],
+   "reducible": true
+  },
+  "dangling": {
+   "acyclic": true,
+   "ancestors_0": [
+    "a",
+    "ghost",
+    "p"
+   ],
+   "applications_of": {
+    "a": [],
+    "b": [],
+    "ghost": [],
+    "p": []
+   },
+   "gap_0": [
+    "a",
+    "ghost",
+    "p"
+   ],
+   "learning_path_0": [
+    "ghost",
+    "p",
+    "a"
+   ],
+   "productivity_order_w1": [
+    "ghost",
+    "p",
+    "a",
+    "b"
+   ],
+   "productivity_order_w2": [
+    "ghost",
+    "p",
+    "a",
+    "b"
+   ],
+   "reducible": false
+  },
+  "diamond": {
+   "acyclic": true,
+   "ancestors_0": [
+    "a",
+    "b",
+    "c",
+    "p1",
+    "p2"
+   ],
+   "ancestors_1": [
+    "a",
+    "b",
+    "c",
+    "p1",
+    "p2"
+   ],
+   "applications_of": {
+    "a": [],
+    "b": [],
+    "c": [],
+    "d": [],
+    "p1": [],
+    "p2": []
+   },
+   "gap_0": [
+    "a",
+    "b",
+    "c",
+    "p1",
+    "p2"
+   ],
+   "gap_1": [
+    "a",
+    "c",
+    "p1",
+    "p2"
+   ],
+   "learning_path_0": [
+    "p1",
+    "p2",
+    "a",
+    "b",
+    "c"
+   ],
+   "learning_path_1": [
+    "p1",
+    "p2",
+    "a",
+    "c"
+   ],
+   "productivity_order_w1": [
+    "p1",
+    "p2",
+    "a",
+    "b",
+    "c",
+    "d"
+   ],
+   "productivity_order_w2": [
+    "p1",
+    "p2",
+    "a",
+    "b",
+    "c",
+    "d"
+   ],
+   "reducible": true
+  },
+  "foundation_concept": {
+   "acyclic": true,
+   "ancestors_0": [
+    "a",
+    "p",
+    "root"
+   ],
+   "applications_of": {
+    "a": [],
+    "b": [],
+    "p": [],
+    "root": []
+   },
+   "gap_0": [
+    "a",
+    "p",
+    "root"
+   ],
+   "learning_path_0": [
+    "root",
+    "a",
+    "p"
+   ],
+   "productivity_order_w1": [
+    "root",
+    "a",
+    "p",
+    "b"
+   ],
+   "productivity_order_w2": [
+    "root",
+    "a",
+    "p",
+    "b"
+   ],
+   "reducible": true
+  },
+  "isolated": {
+   "acyclic": true,
+   "ancestors_0": [
+    "a",
+    "p"
+   ],
+   "applications_of": {
+    "a": [
+     "z"
+    ],
+    "lonely": [],
+    "p": [],
+    "z": []
+   },
+   "gap_0": [
+    "a",
+    "p"
+   ],
+   "learning_path_0": [
+    "p",
+    "a"
+   ],
+   "productivity_order_w1": [
+    "p",
+    "a",
+    "lonely",
+    "z"
+   ],
+   "productivity_order_w2": [
+    "p",
+    "a",
+    "lonely",
+    "z"
+   ],
+   "reducible": true
+  },
+  "listed_primitive": {
+   "acyclic": true,
+   "ancestors_0": [
+    "p",
+    "q"
+   ],
+   "applications_of": {
+    "a": [],
+    "p": [],
+    "q": []
+   },
+   "gap_0": [
+    "p",
+    "q"
+   ],
+   "learning_path_0": [
+    "p",
+    "q"
+   ],
+   "productivity_order_w1": [
+    "p",
+    "q",
+    "a"
+   ],
+   "productivity_order_w2": [
+    "p",
+    "q",
+    "a"
+   ],
+   "reducible": true
+  },
+  "query_edges": {
+   "acyclic": true,
+   "ancestors_0": [],
+   "ancestors_1": {
+    "raises": "NetworkXError"
+   },
+   "ancestors_2": [
+    "a",
+    "p"
+   ],
+   "ancestors_3": [
+    "a",
+    "p"
+   ],
+   "applications_of": {
+    "a": [],
+    "b": [],
+    "p": []
+   },
+   "gap_0": [],
+   "gap_1": {
+    "raises": "NetworkXError"
+   },
+   "gap_2": [
+    "a",
+    "p"
+   ],
+   "gap_3": [
+    "p"
+   ],
+   "learning_path_0": [],
+   "learning_path_1": {
+    "raises": "NetworkXError"
+   },
+   "learning_path_2": [
+    "p",
+    "a"
+   ],
+   "learning_path_3": [
+    "p"
+   ],
+   "productivity_order_w1": [
+    "p",
+    "a",
+    "b"
+   ],
+   "productivity_order_w2": [
+    "p",
+    "a",
+    "b"
+   ],
+   "reducible": true
+  },
+  "reach_weighting": {
+   "acyclic": true,
+   "ancestors_0": [
+    "a",
+    "c",
+    "e",
+    "p"
+   ],
+   "ancestors_1": [
+    "a",
+    "b",
+    "p"
+   ],
+   "applications_of": {
+    "a": [],
+    "b": [
+     "x"
+    ],
+    "c": [
+     "y"
+    ],
+    "d": [],
+    "e": [
+     "y"
+    ],
+    "p": [],
+    "x": [],
+    "y": []
+   },
+   "gap_0": [
+    "a",
+    "c",
+    "e",
+    "p"
+   ],
+   "gap_1": [
+    "b",
+    "p"
+   ],
+   "learning_path_0": [
+    "p",
+    "a",
+    "c",
+    "e"
+   ],
+   "learning_path_1": [
+    "b",
+    "p"
+   ],
+   "productivity_order_w1": [
+    "p",
+    "a",
+    "b",
+    "c",
+    "e",
+    "d",
+    "x",
+    "y"
+   ],
+   "productivity_order_w2": [
+    "p",
+    "a",
+    "b",
+    "c",
+    "e",
+    "d",
+    "x",
+    "y"
+   ],
+   "reducible": true
+  },
+  "ties_unsorted": {
+   "acyclic": true,
+   "ancestors_0": [
+    "alpha",
+    "ap",
+    "zeta",
+    "zp"
+   ],
+   "ancestors_1": [
+    "ap",
+    "beta",
+    "mid",
+    "zp"
+   ],
+   "applications_of": {
+    "alpha": [
+     "omega"
+    ],
+    "ap": [],
+    "beta": [
+     "theta"
+    ],
+    "mid": [
+     "theta"
+    ],
+    "omega": [],
+    "theta": [],
+    "zeta": [
+     "omega"
+    ],
+    "zp": []
+   },
+   "gap_0": [
+    "alpha",
+    "ap",
+    "zeta",
+    "zp"
+   ],
+   "gap_1": [
+    "ap",
+    "beta",
+    "mid",
+    "zp"
+   ],
+   "learning_path_0": [
+    "ap",
+    "zp",
+    "alpha",
+    "zeta"
+   ],
+   "learning_path_1": [
+    "ap",
+    "zp",
+    "beta",
+    "mid"
+   ],
+   "productivity_order_w1": [
+    "ap",
+    "zp",
+    "alpha",
+    "beta",
+    "mid",
+    "zeta",
+    "omega",
+    "theta"
+   ],
+   "productivity_order_w2": [
+    "ap",
+    "zp",
+    "alpha",
+    "beta",
+    "mid",
+    "zeta",
+    "omega",
+    "theta"
+   ],
+   "reducible": true
+  }
+ }
+}
