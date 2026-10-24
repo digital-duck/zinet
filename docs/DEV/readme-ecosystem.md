@@ -67,13 +67,13 @@ A body of knowledge is first a graph (nodes are concepts, edges are prerequisite
 
 ## How they differ
 
-| | zinet | ConceptBook | Graph-Code | work-graph | GraphLang |
+| | zinet | GraphLang | work-graph | Graph-Code | ConceptBook |
 |---|---|---|---|---|---|
-| Purpose | store and check a graph | teach a domain | build an app | remember a project | run a workflow |
-| Graph kind | dependency DAG | prerequisite DAG | typed form/function graph | layered multigraph | port graph, may have cycles |
-| Layers | primitives, concepts, applications | the same | form and function spaces | repo, product, org, process | none (nodes have types) |
-| Executes | no | no | builds code | no | yes |
-| Persisted as | `graph.yaml` (node lists) | `graph.yaml` (mappings) | `graph.yaml` (v2.1, or ConceptBook's flat v1.0) | JSON and YAML layer files | `*.graph.yaml` |
+| Purpose | store and check a graph | run a workflow | remember a project | build an app | teach a domain |
+| Graph kind | dependency DAG | port graph, may have cycles | layered multigraph | typed form/function graph | prerequisite DAG |
+| Layers | primitives, concepts, applications | none (nodes have types) | repo, product, org, process | form and function spaces | the same as zinet |
+| Executes | no | yes | no | builds code | no |
+| Persisted as | `graph.yaml` (node lists) | `*.graph.yaml` | JSON and YAML layer files | `graph.yaml` (v2.1, or ConceptBook's flat v1.0) | `graph.yaml` (mappings) |
 
 ## File names
 

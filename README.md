@@ -54,14 +54,16 @@ zinet diff old.yaml new.yaml         # exit 1 when the graphs differ
 zinet slice graph.yaml target_id -o part.yaml   # target plus its prerequisite closure
 zinet render graph.yaml                              # svg to stdout (default)
 zinet render graph.yaml --format mermaid             # mermaid flowchart text
+zinet render graph.yaml --format html -o graph.html  # interactive page (search, zoom, click a node); works offline
+zinet render graph.yaml --format ascii               # plain-text outline by depth
 zinet render graph.yaml --format png -o graph.png    # png and pdf need -o
 zinet prettify graph.yaml                            # diff against canonical formatting (exit 1 if it would change)
 zinet prettify graph.yaml --write                    # rewrite in place (refuses files with comments)
 zinet schema -o schemas/graph.schema.json            # JSON Schema for editors and other tools
 ```
 
-`render` supports `svg`, `png`, `pdf`, and `mermaid`. Mermaid needs nothing installed. The
-other formats need Graphviz's `dot` on PATH (`apt install graphviz`).
+`render` supports `svg`, `png`, `pdf`, `mermaid`, `html` and `ascii`. Mermaid, html and ascii need nothing installed. The
+`svg`, `png` and `pdf` need Graphviz's `dot` on PATH (`apt install graphviz`).
 
 Exit code 2 means a usage, load, or render error. `prettify` exits 1 when a file is not in
 canonical form, so it can run in CI.
@@ -106,6 +108,25 @@ A missing node raises `UnknownNodeError` (a `KeyError`) and a cycle raises `Cycl
 they differ, is frozen in `tests/characterization/` (see `divergences.md`). `topological_order` and `ancestors` also accept a
 `DiGraph`.
 
+## Drawing any graph
+
+`zinet.vis` draws and trims any `networkx` graph, not only zinet's, so other tools do not each carry their own copy
+(GraphLang and work-graph did). A `Style` is a set of small functions that read your attribute names (node label, kind, colour,
+shape, group; edge label and dashing), so no app has to rename anything.
+
+```python
+from zinet.vis import render, select, zinet_style
+G = zinet.to_networkx(zinet.load_graph("graph.yaml"))
+render(G, "graph.html")                         # engine="cytoscape" (default) | "graphviz" | "mermaid" | "ascii" | "pyvis" | "graphify"
+sub, note = select(G, node="app", hops=2)       # a readable neighbourhood of a big graph: filters, hidden kinds, hub edges, a node cap
+```
+
+The `cytoscape` engine writes one HTML file with Cytoscape.js bundled (MIT, see `src/zinet/vis/data/LICENSE-cytoscape.txt`), so it works
+offline; if Graphviz is installed it also takes the node layout from `dot` (it keeps a group together and picks a left-to-right or
+top-to-bottom shape that fits the screen). `graphviz` writes svg, png or pdf by file extension. `mermaid` writes flowchart text
+(`-o FILE.md` wraps it in a fenced block). `pyvis` and `graphify` need `pip install zinet[pyvis]` / `zinet[graphify]`.
+GraphLang's and work-graph's output through these engines is checked against golden files in `tests/characterization/`.
+
 ## Checks
 
 | Code | Severity | Meaning |
@@ -131,7 +152,9 @@ src/zinet/
   io.py           load_graph (with imports), dump_graph, to_yaml
   prettify.py     canonical formatting for `zinet prettify`
   transforms/     diff_graphs, slice_to
-  render.py       DOT and Mermaid generation, svg/png/pdf via `dot`
+  algorithms.py   graph algorithms on a plain networkx DiGraph (learning path, order, reducible, ...)
+  render.py       DOT and Mermaid generation for zinet graphs, svg/png/pdf via `dot`
+  vis/            drawing for any networkx graph: engines, `select`, `Style` (see "Drawing any graph")
   cli.py          the `zinet` command
 docs/SPECIFICATION.md   the graph.yaml format specification
 schemas/graph.schema.json   generated JSON Schema

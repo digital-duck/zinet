@@ -80,3 +80,15 @@ def test_engine_golden_covers_every_bundled_workflow():
     assert 'subgraph "cluster_test_gated_loop"' in cp["dot"] and "fixedsize" not in cp["dot"] and "fixedsize=true" in cp["dot_fixed_size"]
     assert any(e["data"].get("parent") == "test_gated_loop" for e in cp["cytoscape_elements"])
     assert not any("position" in e for e in cp["cytoscape_elements"])
+
+
+def test_select_golden_has_the_input_graph_and_every_call():
+    g = _load("workgraph_select")
+    assert set(g["cases"]) == set(g["calls"]) and "@" in g["_source"]
+    assert [n for n, _ in g["graph"]["nodes"]][:2] == ["project:p", "repo:a.py"]          # a list: node order is part of the input
+    assert g["cases"]["unknown_node"]["raises"] == "ValueError"
+
+
+def test_engine_golden_stores_the_graphs_it_was_drawn_from():
+    for name, case in _load("graphlang_engines")["cases"].items():
+        assert case["nodes"] == len(case["graph"]["nodes"]) and case["edges"] == len(case["graph"]["edges"]), name

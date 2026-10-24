@@ -91,7 +91,7 @@ Design requirements that come from the three apps we are adopting first:
 
 1. [x] **Characterisation tests first** (done, `tests/characterization/`; see `divergences.md`). Freeze today's behaviour of graph-code's `acyclic`, `build_order`, `learning_path`, `gap`, `productivity_order` and `reducible` (its existing test suite is the starting point), and of work-graph's `convert.py` round-trip and GraphLang's engines. ConceptBook's variants are read only for reference; their tests wait until ConceptBook is un-held.
 2. [x] **Algorithms and validator** (done, `src/zinet/algorithms.py`): plain `nx.DiGraph`, `to_networkx`, options that reproduce graph-code and both ConceptBook variants (`tests/test_algorithms_characterization.py`), one `CycleError` / `UnknownNodeError`. Optional validator checks `not_reducible` and `disconnected` (`zinet validate --check` / `--strict`), off by default so existing graphs stay valid.
-3. [ ] **`zinet.vis`**: engines, `select` and the style functions, based on GraphLang's `grafv`.
+3. [x] **`zinet.vis`** (done, `src/zinet/vis/`): `Style`, engines cytoscape / graphviz / mermaid / ascii in the core install and pyvis / graphify as extras, and `select`, based on GraphLang's `grafv` and work-graph's `viz.select`; output matches the golden files (`tests/test_vis_characterization.py`). `zinet render` gains `--format html` and `ascii`.
 4. [ ] **`zinet.roundtrip`**: move work-graph's comment-preserving YAML in; make `prettify --write` accept commented files.
 5. [ ] **Format recognition**: the zinet side of "say what a GraphLang file is" (cross-tool follow-ups below).
 

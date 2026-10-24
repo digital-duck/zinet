@@ -31,6 +31,8 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+pyvis = ["pyvis>=0.3"]                 # zinet.vis engine "pyvis"
+graphify = ["graphifyy>=0.7.19"]       # zinet.vis engine "graphify"
 dev = ["build", "pytest>=8", "twine"]
 
 [project.urls]

@@ -149,6 +149,8 @@ concepts2_placeholder
 | `png` | PNG image, needs `-o` | Graphviz `dot` |
 | `pdf` | PDF document, needs `-o` | Graphviz `dot` |
 | `mermaid` | Mermaid flowchart text | nothing |
+| `html` | one interactive page (search, zoom, click a node for its details), works offline | nothing (uses Graphviz for the layout when installed) |
+| `ascii` | a plain-text outline by depth | nothing |
 
 ```bash
 # Image files
@@ -359,7 +361,7 @@ the layer dependency rules and cycle detection.
 ```text
 zinet diff OLD NEW
 zinet prettify FILE [--write]
-zinet render FILE [--format svg|png|pdf|mermaid] [-o OUT] [--no-imports]
+zinet render FILE [--format svg|png|pdf|mermaid|html|ascii] [-o OUT] [--no-imports]
 zinet schema [-o OUT]
 zinet slice FILE TARGET [-o OUT]
 zinet validate FILE [--no-imports] [--check reducible|connected] [--strict]

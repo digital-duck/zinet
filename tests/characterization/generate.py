@@ -12,8 +12,8 @@ It builds the small graphs in `cases.py`, runs each source implementation on the
     conceptbook_v1  concept-book   spl/graph_lib.py                  (nx.DiGraph; `reducible` has a `strict` flag)
     conceptbook_v2  conceptbook-app spl/graph_lib.py                 (nx.DiGraph; older `reducible`, no `strict`)
 
-Two more files freeze work-graph's comment-preserving YAML round-trip (`generate_roundtrip.py`) and GraphLang's drawing
-output (`generate_engines.py`). The sources are read, never modified. Sibling repos are looked up next to this one (override with
+Three more files freeze work-graph's comment-preserving YAML round-trip (`generate_roundtrip.py`), GraphLang's drawing
+output (`generate_engines.py`) and work-graph's subgraph picker (`generate_select.py`). The sources are read, never modified. Sibling repos are looked up next to this one (override with
 ZINET_SOURCES_DIR). The commit of each source is stored in the golden file, so a change in a source shows up
 as a diff when this script is rerun.
 """
@@ -225,6 +225,7 @@ def main() -> int:
     sys.path.insert(0, str(HERE))
     import generate_engines
     import generate_roundtrip
+    import generate_select
 
     result = generate()
     files = {GOLDEN / f"{k}.json": json.dumps(v, indent=1, sort_keys=True) + "\n" for k, v in result.items()}
@@ -232,6 +233,7 @@ def main() -> int:
     files[HERE / "cases.json"] = json.dumps(CASES, indent=1) + "\n"
     files.update(generate_roundtrip.build(SOURCES_DIR, HERE))
     files.update(generate_engines.build(SOURCES_DIR, HERE))
+    files.update(generate_select.build(SOURCES_DIR, HERE))
     if "--check" in sys.argv:
         stale = [p.name for p, text in files.items() if not p.exists() or p.read_text(encoding="utf-8") != text]
         if stale:

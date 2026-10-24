@@ -11,7 +11,7 @@ import subprocess
 
 from .schema import EdgeType, Graph, Layer
 
-FORMATS = ("svg", "png", "pdf", "mermaid")
+FORMATS = ("svg", "png", "pdf", "mermaid", "html", "ascii")
 BINARY_FORMATS = ("png", "pdf")
 _GRAPHVIZ_FORMATS = ("svg", "png", "pdf")
 
@@ -94,9 +94,15 @@ def to_mermaid(graph: Graph) -> str:
 
 
 def render(graph: Graph, fmt: str) -> bytes:
-    """Render `graph` in `fmt` and return the raw bytes (UTF-8 text for svg and mermaid)."""
+    """Render `graph` in `fmt` and return the raw bytes (UTF-8 text for everything but png and pdf)."""
     if fmt == "mermaid":
         return to_mermaid(graph).encode("utf-8")
+    if fmt in ("html", "ascii"):                       # the zinet.vis engines (an interactive page; a plain-text outline)
+        from . import vis
+        from .algorithms import to_networkx
+        G, style = to_networkx(graph), vis.zinet_style("zinet graph")
+        text = vis.cytoscape_html(G, style) if fmt == "html" else vis.to_ascii_text(G, style)
+        return text.encode("utf-8")
     if fmt not in _GRAPHVIZ_FORMATS:
         raise ValueError(f"unknown format {fmt!r}; choose from {', '.join(FORMATS)}")
     return _run_dot(to_dot(graph), fmt)

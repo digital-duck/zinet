@@ -10,7 +10,8 @@ without changing anyone's results. They come first on purpose: the copies disagr
 | `golden/conceptbook_v1.json` | concept-book `spl/graph_lib.py` | the same family, plus `ancestors`, `applications_of`, `reducible(strict=True)` | step 2; ConceptBook itself is on hold |
 | `golden/conceptbook_v2.json` | conceptbook-app `spl/graph_lib.py` | as v1, with the older `reducible` rule | step 2; ConceptBook itself is on hold |
 | `golden/workgraph_roundtrip.json` | work-graph `convert.py` | `harvest`, `attach`, `dump_yaml`: comments survive a rewrite, orphans, canonical key order | step 4 (`zinet.roundtrip`) |
-| `golden/graphlang_engines.json` | graflang `graphlang/grafv` | Mermaid text, DOT text, cytoscape elements for the bundled workflows (no node positions) | step 3 (`zinet.vis`) |
+| `golden/graphlang_engines.json` | graflang `graphlang/grafv` | Mermaid text, DOT text, cytoscape elements for the bundled workflows (no node positions), with the input graphs | step 3 (`zinet.vis`), `tests/test_vis_characterization.py` |
+| `golden/workgraph_select.json` | work-graph `viz.select` | the subgraph picked by filters, neighbourhood, hidden kinds, hub edges and the node cap, with the input graph | step 3 (`zinet.vis.select`), same test file |
 
 `cases.py` and `roundtrip_cases.py` hold the inputs. They are small graphs, one behaviour each (a chain, a diamond, ties,
 a dangling reference, a cycle, optional edges, a two-radical set, a missing target, and so on).

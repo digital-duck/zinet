@@ -28,6 +28,9 @@ def build(sources_dir: Path, here: Path) -> dict[Path, str]:
             el.pop("position", None)                           # layout-dependent
         out[name] = {
             "nodes": G.number_of_nodes(), "edges": G.number_of_edges(), "note": note,
+            # the input, so zinet's tests can rebuild the graph without GraphLang installed
+            "graph": {"nodes": [[n, dict(d)] for n, d in G.nodes(data=True)],        # a list: order matters
+                      "edges": [[u, v, dict(d)] for u, v, d in G.edges(data=True)]},
             "mermaid": engines.to_mermaid_text(G),
             "dot": engines.to_dot(G),
             "dot_fixed_size": engines.to_dot(G, fixed_size=True),

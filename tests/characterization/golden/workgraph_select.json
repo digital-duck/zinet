@@ -1,0 +1,393 @@
+{
+ "_source": "work-graph@08b9aea",
+ "calls": {
+  "ambiguous_label": {
+   "node": "dup"
+  },
+  "capped": {
+   "max_nodes": 2
+  },
+  "default": {},
+  "everything": {
+   "hubs": true,
+   "include_code": true
+  },
+  "kind_file": {
+   "kind": "file"
+  },
+  "layer_product": {
+   "layer": "product"
+  },
+  "node_by_id_2hops": {
+   "hops": 2,
+   "node": "repo:a.py"
+  },
+  "node_by_label_1hop": {
+   "hops": 1,
+   "node": "a.py"
+  },
+  "node_with_code": {
+   "hops": 1,
+   "include_code": true,
+   "node": "repo:a.py"
+  },
+  "project_q": {
+   "project": "q"
+  },
+  "stage_design": {
+   "stage": "design"
+  },
+  "unknown_node": {
+   "node": "nope"
+  }
+ },
+ "cases": {
+  "ambiguous_label": {
+   "message": "'dup' matches 2 nodes; use the id",
+   "raises": "ValueError"
+  },
+  "capped": {
+   "edges": [
+    [
+     "repo:a.py",
+     "repo:b.py",
+     "imports"
+    ]
+   ],
+   "nodes": [
+    "repo:a.py",
+    "repo:b.py"
+   ],
+   "note": "showing the 2 best-connected of 7 nodes (raise --max-nodes, or filter)"
+  },
+  "default": {
+   "edges": [
+    [
+     "product:x",
+     "repo:a.py",
+     "part_of"
+    ],
+    [
+     "repo:a.py",
+     "repo:b.py",
+     "imports"
+    ],
+    [
+     "repo:b.py",
+     "repo:c.py",
+     "imports"
+    ],
+    [
+     "repo:dup1",
+     "repo:dup2",
+     "imports"
+    ]
+   ],
+   "nodes": [
+    "product:x",
+    "repo:a.py",
+    "repo:b.py",
+    "repo:c.py",
+    "repo:dup1",
+    "repo:dup2"
+   ],
+   "note": ""
+  },
+  "everything": {
+   "edges": [
+    [
+     "product:x",
+     "repo:a.py",
+     "part_of"
+    ],
+    [
+     "repo:a.py",
+     "project:p",
+     "belongs_to"
+    ],
+    [
+     "repo:a.py",
+     "repo:b.py",
+     "imports"
+    ],
+    [
+     "repo:a.py",
+     "sym",
+     "contains"
+    ],
+    [
+     "repo:b.py",
+     "repo:c.py",
+     "imports"
+    ],
+    [
+     "repo:dup1",
+     "repo:dup2",
+     "imports"
+    ]
+   ],
+   "nodes": [
+    "product:x",
+    "project:p",
+    "repo:a.py",
+    "repo:b.py",
+    "repo:c.py",
+    "repo:dup1",
+    "repo:dup2",
+    "sym"
+   ],
+   "note": ""
+  },
+  "kind_file": {
+   "edges": [
+    [
+     "repo:a.py",
+     "repo:b.py",
+     "imports"
+    ],
+    [
+     "repo:b.py",
+     "repo:c.py",
+     "imports"
+    ],
+    [
+     "repo:dup1",
+     "repo:dup2",
+     "imports"
+    ]
+   ],
+   "nodes": [
+    "repo:a.py",
+    "repo:b.py",
+    "repo:c.py",
+    "repo:dup1",
+    "repo:dup2"
+   ],
+   "note": ""
+  },
+  "layer_product": {
+   "edges": [],
+   "nodes": [
+    "product:x"
+   ],
+   "note": ""
+  },
+  "node_by_id_2hops": {
+   "edges": [
+    [
+     "product:x",
+     "repo:a.py",
+     "part_of"
+    ],
+    [
+     "repo:a.py",
+     "repo:b.py",
+     "imports"
+    ],
+    [
+     "repo:b.py",
+     "repo:c.py",
+     "imports"
+    ]
+   ],
+   "nodes": [
+    "product:x",
+    "repo:a.py",
+    "repo:b.py",
+    "repo:c.py"
+   ],
+   "note": "2 hop(s) around a.py"
+  },
+  "node_by_label_1hop": {
+   "edges": [
+    [
+     "product:x",
+     "repo:a.py",
+     "part_of"
+    ],
+    [
+     "repo:a.py",
+     "repo:b.py",
+     "imports"
+    ]
+   ],
+   "nodes": [
+    "product:x",
+    "repo:a.py",
+    "repo:b.py"
+   ],
+   "note": "1 hop(s) around a.py"
+  },
+  "node_with_code": {
+   "edges": [
+    [
+     "product:x",
+     "repo:a.py",
+     "part_of"
+    ],
+    [
+     "repo:a.py",
+     "repo:b.py",
+     "imports"
+    ],
+    [
+     "repo:a.py",
+     "sym",
+     "contains"
+    ]
+   ],
+   "nodes": [
+    "product:x",
+    "repo:a.py",
+    "repo:b.py",
+    "sym"
+   ],
+   "note": "1 hop(s) around a.py"
+  },
+  "project_q": {
+   "edges": [],
+   "nodes": [
+    "repo:c.py"
+   ],
+   "note": ""
+  },
+  "stage_design": {
+   "edges": [],
+   "nodes": [
+    "repo:c.py"
+   ],
+   "note": ""
+  },
+  "unknown_node": {
+   "message": "no node 'nope'",
+   "raises": "ValueError"
+  }
+ },
+ "graph": {
+  "edges": [
+   [
+    "repo:a.py",
+    "repo:b.py",
+    {
+     "confidence": "EXTRACTED",
+     "relation": "imports"
+    }
+   ],
+   [
+    "repo:a.py",
+    "project:p",
+    {
+     "confidence": "EXTRACTED",
+     "relation": "belongs_to"
+    }
+   ],
+   [
+    "repo:a.py",
+    "sym",
+    {
+     "confidence": "EXTRACTED",
+     "relation": "contains"
+    }
+   ],
+   [
+    "repo:b.py",
+    "repo:c.py",
+    {
+     "confidence": "INFERRED",
+     "relation": "imports"
+    }
+   ],
+   [
+    "repo:dup1",
+    "repo:dup2",
+    {
+     "confidence": "EXTRACTED",
+     "relation": "imports"
+    }
+   ],
+   [
+    "product:x",
+    "repo:a.py",
+    {
+     "confidence": "EXTRACTED",
+     "relation": "part_of"
+    }
+   ]
+  ],
+  "nodes": [
+   [
+    "project:p",
+    {
+     "kind": "project",
+     "label": "p",
+     "layer": "repo"
+    }
+   ],
+   [
+    "repo:a.py",
+    {
+     "kind": "file",
+     "label": "a.py",
+     "layer": "repo",
+     "project": "p"
+    }
+   ],
+   [
+    "repo:b.py",
+    {
+     "kind": "file",
+     "label": "b.py",
+     "layer": "repo",
+     "project": "p"
+    }
+   ],
+   [
+    "repo:c.py",
+    {
+     "kind": "file",
+     "label": "c.py",
+     "layer": "repo",
+     "project": "q",
+     "stages": [
+      "design"
+     ]
+    }
+   ],
+   [
+    "repo:dup1",
+    {
+     "kind": "file",
+     "label": "dup",
+     "layer": "repo",
+     "project": "p"
+    }
+   ],
+   [
+    "repo:dup2",
+    {
+     "kind": "file",
+     "label": "dup",
+     "layer": "repo",
+     "project": "p"
+    }
+   ],
+   [
+    "sym",
+    {
+     "kind": "symbol",
+     "label": "sym",
+     "layer": "repo",
+     "project": "p"
+    }
+   ],
+   [
+    "product:x",
+    {
+     "kind": "product",
+     "label": "X",
+     "layer": "product"
+    }
+   ]
+  ]
+ }
+}
