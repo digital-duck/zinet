@@ -249,31 +249,28 @@ knowledge representation.
 
 ### The duality that won't reduce further
 
-Three independent formalisms converge on the same two-element basis:
+Four independent domains converge on the same two-element basis:
 
 | Domain | Structure | Interaction |
 |---|---|---|
 | Physics | Fermion (matter, occupies space, Pauli exclusion) | Boson (force carrier, mediates exchange) |
-| Graph theory | Node (identity, state) | Edge (relation, flow) |
-| Form / Function | Form (what something *is*) | Function (what something *does*) |
+| Mathematics / CS | Node (identity, state) | Edge (relation, flow) |
 | Biology | Structure (anatomy: a protein's fold, an organ, a cell) | Function (physiology: what it does in the organism) |
+| Abstract / philosophical | Form (what something *is*) | Function (what something *does*) |
 
-Biology states the same duality as a working principle: structure determines function, and function constrains structure (a protein's fold fixes what it binds; the need to bind shapes the fold). Anatomy and physiology are the two ways to describe the same organism, which is the relation between a graph's nodes and its edges.
+**Physics.** Matter is made of fermions, which *stack* (no two in the same state, by Pauli exclusion), and forces are carried by bosons, which *superpose* (a laser is a trillion photons in the same state, coherently). The Standard Model looked for something more fundamental than this pair and did not find it.
 
-The mapping runs deeper than analogy.  In physics, fermions *stack* (no two in
-the same state — Pauli exclusion) while bosons *superpose* (a laser is a
-trillion photons in the same state, coherently).  In graphs, nodes are discrete
-and countable while edges are relational and can multiply between the same pair.
-In form/function duality, forms are bounded and identifiable while functions
-compose and chain freely.  The asymmetry is the same across all three domains.
+**Mathematics and computer science.** Graph theory begins with the same split. In 1736 Euler solved the Königsberg bridge problem by throwing away everything about the city except its land masses (nodes) and the bridges between them (edges), and showed from the degrees of the nodes that no walk crosses every bridge exactly once. Nodes are discrete, countable identities; edges are relations that can multiply between the same pair. Every data structure, dependency graph and program flow since has used the same two ingredients.
 
-### Why physics grounds this
+**Biology.** Structure determines function and function constrains structure: a protein's fold fixes what it binds, and the need to bind shaped the fold. Anatomy and physiology are two ways of describing the same organism, as nodes and edges are two ways of describing the same graph.
 
-The Standard Model tried hard to find something more fundamental than fermions
-and bosons — and could not.  That irreducibility is the point.  When the ZiNets
-graph-first IR arrives at the same two-element basis from a completely different
-direction (Chinese character decomposition → node/edge → `graph.yaml`), the
-convergence is evidence of a real structural truth, not a design decision.
+**Abstract and philosophical.** The oldest statement of the pair is form and function: what a thing *is* and what it *does* (Aristotle's form and its activity; "form follows function" in design). Forms are bounded and identifiable, while functions compose and chain freely.
+
+The four converge on one asymmetry: a stable, countable *something* (fermion, node, structure, form) and a relational, composable *doing* (boson, edge, function, function). The mapping runs deeper than analogy, and it is evidence rather than a design choice: when the ZiNets graph-first IR reached the same two-element basis from a completely different direction (Chinese character decomposition, then node and edge, then `graph.yaml`), it was not looking for it.
+
+### Why this grounds the IR
+
+The basis is not something we chose; every domain above arrives at it independently, and the physics case shows it does not reduce further. That is why `graph.yaml` can be a *minimal* structure rather than a convenient one, and why GraphLang can take the same pair (agents and the connections between their ports) as the whole of a program.
 
 ### Consequence for the five surfaces
 
