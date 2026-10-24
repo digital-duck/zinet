@@ -161,3 +161,33 @@ def test_select_hidden_kinds_and_dropped_edges():
     assert "c" in select(G, hidden=hidden, show_hidden=True)[0]
     sub, _ = select(G, drop_edge=lambda g, u, v, d: (u, v) == ("a", "b"))
     assert not sub.has_edge("a", "b") and "a" not in sub                    # a is isolated once its only edge goes
+
+
+def test_a_force_style_draws_sized_nodes_with_a_force_layout_and_marks(tmp_path, monkeypatch):
+    G = nx.DiGraph([("a", "b"), ("a", "c"), ("b", "c")])
+    style = Style(node_size=lambda g, n, d: 10 + 4 * g.degree(n), arrangement="force", title="t")
+    monkeypatch.setattr(shutil, "which", lambda name: "/usr/bin/dot")           # even with dot present, "force" does not use it
+    page = cytoscape_html(G, style, mark={"b"})
+    data = page_data(page)
+    nodes = {e["data"]["id"]: e for e in data if "source" not in e["data"]}
+    assert nodes["a"]["data"]["size"] == 18 and nodes["a"]["data"]["sized"] is True and nodes["a"]["data"]["text"] == "a"
+    assert nodes["b"]["data"]["mark"] == 1 and "mark" not in nodes["a"]["data"]
+    assert not any("position" in e for e in data) and "<option>dot</option>" not in page
+    assert page.index("<option>cose</option>") < page.index("<option>grid</option>")
+    assert "node[mark]" in page and "node[?sized]" in page
+
+
+def test_the_flow_arrangement_is_the_default_and_unsized():
+    style = zinet_style()
+    assert style.arrangement == "flow" and style.node_size is None
+    data = page_data(cytoscape_html(sample(), style))
+    assert all("sized" not in e["data"] and "mark" not in e["data"] for e in data if "source" not in e["data"])
+
+
+def test_pyvis_uses_a_force_layout_for_force_styles(tmp_path):
+    if not ENGINES["pyvis"]["ready"]()[0]:
+        pytest.skip("pyvis not installed")
+    G = nx.DiGraph([("a", "b"), ("b", "c")])
+    flow = render(G, tmp_path / "flow.html", "pyvis", Style()).read_text(encoding="utf-8")
+    force = render(G, tmp_path / "force.html", "pyvis", Style(node_size=lambda g, n, d: 20, arrangement="force")).read_text(encoding="utf-8")
+    assert "hierarchical" in flow and "hierarchical" not in force and "barnesHut" in force

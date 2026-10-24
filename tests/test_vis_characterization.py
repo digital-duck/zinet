@@ -108,3 +108,42 @@ def test_select_matches_workgraph(name):
     assert sorted(sub.nodes) == expected["nodes"]
     assert sorted([u, v, d.get("relation")] for u, v, d in sub.edges(data=True)) == expected["edges"]
     assert note == expected["note"]
+
+
+# ---- work-graph's interactive page --------------------------------------------------------------------------------
+
+WV = load("workgraph_viz")["cases"]
+LAYER_COLORS = {"repo": "#4f8ef7", "product": "#2fa84f", "org": "#e08a1e", "process": "#9b59b6"}
+
+
+def workgraph_style() -> Style:
+    """work-graph's look: circles sized by connections, the label below, a force layout, dashed edges for what was inferred."""
+    return Style(
+        label=lambda n, d: str(d.get("label", n)), kind=lambda n, d: d.get("layer"),
+        color=lambda n, d: LAYER_COLORS.get(d.get("layer", ""), "#8a8f98"),
+        shape=lambda n, d: "diamond" if d.get("kind") in STRUCTURE_KINDS else "ellipse",
+        info=lambda n, d: "\n".join([str(d.get("label", n))] + [f"{k}: {d[k]}" for k in ("kind", "layer", "project", "stages", "source_file", "status", "origin") if d.get(k) not in (None, "", [])]),
+        edge_kind=lambda u, v, d: d.get("relation", ""), edge_dashed=lambda u, v, d: d.get("confidence", "EXTRACTED") != "EXTRACTED",
+        node_size=lambda G, n, d: min(14 + 3 * int(dict(G.degree)[n] ** 0.5 * 2), 46), arrangement="force", title="workgraph")
+
+
+@pytest.mark.parametrize("name", sorted(WV))
+def test_cytoscape_page_data_matches_workgraph(name):
+    case = WV[name]
+    G = to_graph(case["graph"])
+    got = elements(G, workgraph_style(), mark=set(case["case"]["mark"]))
+    assert len(got) == len(case["elements"])
+    for mine, theirs in zip(got, case["elements"]):
+        a, b = mine["data"], theirs["data"]
+        assert "position" not in mine                                   # a force layout places the nodes
+        if "source" in b:
+            assert (a["source"], a["target"], a["relation"], a["dashed"]) == (b["source"], b["target"], b["relation"], b["confidence"] != "EXTRACTED")
+        else:
+            assert {k: a[k] for k in ("id", "label", "color", "size", "info", "shape")} == {k: b[k] for k in ("id", "label", "color", "size", "info", "shape")}
+            assert a.get("mark") == b.get("mark") and a["sized"] is True and a["text"] == b["label"]
+
+
+@pytest.mark.parametrize("name", sorted(WV))
+def test_legend_matches_workgraph(name):
+    case = WV[name]
+    assert [[k, c] for k, c in workgraph_style().legend(to_graph(case["graph"]))] == case["legend"]

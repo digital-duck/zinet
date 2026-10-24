@@ -41,6 +41,8 @@ const cy = cytoscape({container: document.getElementById('cy'), elements: data, 
       'text-wrap':'wrap', 'font-size':13, 'min-zoomed-font-size':5, width:130, height:48, color:'#111',
       'text-valign':'center', 'text-halign':'center', 'border-width':1, 'border-color':'data(color)'}},
     {selector:'node[shape="diamond"]', style:{width:150, height:70}},
+    {selector:'node[?sized]', style:{width:'data(size)', height:'data(size)', 'background-opacity':1, 'border-width':0,
+      color: dark?'#ddd':'#333', 'text-valign':'bottom', 'text-halign':'center', 'text-margin-y':3, 'min-zoomed-font-size':8}},
     {selector:':parent', style:{'background-opacity':0.07, 'border-style':'dashed', 'border-width':2, 'text-valign':'top',
       'text-halign':'center', 'padding':20, shape:'round-rectangle', color: dark?'#ddd':'#333', 'font-weight':'bold'}},
     {selector:'edge', style:{width:2, 'line-color':'#6b7280', 'target-arrow-color':'#6b7280', 'target-arrow-shape':'triangle',
@@ -48,6 +50,7 @@ const cy = cytoscape({container: document.getElementById('cy'), elements: data, 
       'text-background-color': dark?'#16181d':'#fff', 'text-background-opacity':0.9, 'text-background-padding':2}},
     {selector:'edge[?dashed]', style:{'line-style':'dashed', width:1.5, 'line-color':'#4f8ef7', 'target-arrow-color':'#4f8ef7'}},
     {selector:'.faded', style:{opacity:0.12}},
+    {selector:'node[mark]', style:{'border-width':4, 'border-color':'#e5484d'}},
     {selector:'node:selected', style:{'border-width':4, 'border-color':'#e5484d'}}]});
 function layout(){
   const name = document.getElementById('layout').value === 'dot' ? 'preset' : document.getElementById('layout').value;
@@ -94,14 +97,20 @@ def _legend(G: nx.Graph, style: Style) -> str:
     return boxes + lines
 
 
-def elements(G: nx.Graph, style: Style, positions: dict | None = None) -> list[dict]:
-    """The Cytoscape element list for G. `positions` (id -> {x, y}) is optional; nodes without one are placed by a layout."""
+def elements(G: nx.Graph, style: Style, positions: dict | None = None, mark: set[str] | None = None) -> list[dict]:
+    """The Cytoscape element list for G. `positions` (id -> {x, y}) is optional; nodes without one are placed by a layout.
+    Nodes in `mark` get a red ring (the node a view is about)."""
     members = groups_of(G, style)
     out = []
     for n, d in G.nodes(data=True):
         label, kind = style.label(n, d), style.kind(n, d)
-        data = {"id": n, "label": label, "text": label if (n in members or not kind) else f"{label}\n{kind}",
+        sized = style.node_size is not None
+        data = {"id": n, "label": label, "text": label if (sized or n in members or not kind) else f"{label}\n{kind}",
                 "color": style.color(n, d), "info": style.info(n, d), "shape": style.shape(n, d)}
+        if sized:
+            data["sized"], data["size"] = True, style.node_size(G, n, d)
+        if mark and n in mark:
+            data["mark"] = 1
         if style.group(n, d) is not None:
             data["parent"] = style.group(n, d)
         el = {"data": data}
@@ -115,15 +124,16 @@ def elements(G: nx.Graph, style: Style, positions: dict | None = None) -> list[d
     return out
 
 
-def cytoscape_html(G: nx.Graph, style: Style, note: str = "") -> str:
-    """The self-contained page for G. Node positions come from `dot` when it is installed (it lays out clusters properly)."""
-    pos = dot_positions(G, style)
+def cytoscape_html(G: nx.Graph, style: Style, note: str = "", mark: set[str] | None = None) -> str:
+    """The self-contained page for G. In the "flow" arrangement the node positions come from `dot` when it is installed (it
+    lays out clusters properly); in the "force" arrangement a force layout places the nodes. `mark` ids get a red ring."""
+    pos = dot_positions(G, style) if style.arrangement == "flow" else {}
     layouts = (["dot"] if pos else []) + ["cose", "breadthfirst", "concentric", "circle", "grid"]
     js = (resources.files("zinet.vis") / "data" / "cytoscape.min.js").read_text(encoding="utf-8")
     return (CYTOSCAPE_PAGE.replace("__TITLE__", html.escape(style.title)).replace("__NOTE__", html.escape(note))
             .replace("__LEGEND__", _legend(G, style))
             .replace("__LAYOUTS__", "".join(f"<option>{l}</option>" for l in layouts))
-            .replace("__DATA__", json.dumps(elements(G, style, pos)).replace("</", "<\\/"))
+            .replace("__DATA__", json.dumps(elements(G, style, pos, mark)).replace("</", "<\\/"))
             .replace("__CYTOSCAPE__", js.replace("</script", "<\\/script")))
 
 

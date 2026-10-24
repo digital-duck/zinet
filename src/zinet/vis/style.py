@@ -7,7 +7,7 @@ instead of renaming attributes. `zinet_style()` is the default: it reads what `z
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Callable
+from typing import Any, Callable, Literal
 
 # Shapes every engine understands (the names are Cytoscape's).
 SHAPES = ("rectangle", "round-rectangle", "diamond", "hexagon", "ellipse")
@@ -15,6 +15,7 @@ OTHER_COLOR = "#8a8f98"
 
 NodeFn = Callable[[str, dict], Any]
 EdgeFn = Callable[[str, str, dict], Any]
+SizeFn = Callable[[Any, str, dict], int]          # (graph, node id, attributes) -> diameter in pixels
 
 # zinet's layers
 LAYER_COLORS = {"primitive": "#2fa84f", "concept": "#4f8ef7", "application": "#e0a21e"}
@@ -38,6 +39,11 @@ class Style:
     edge_legend: tuple[tuple[str, bool], ...] = ()            # e.g. (("control", False), ("data", True))
     title: str = "graph"
     kind_colors: dict[str, str] = field(default_factory=dict)  # fixes the legend order and colours when given
+    # How the picture is arranged. "flow" suits a pipeline or a dependency graph: labelled boxes in dependency order (laid out by
+    # Graphviz when it is installed). "force" suits a big knowledge graph: circles pulled together by a force layout. With
+    # `node_size` set, nodes are drawn as sized shapes with the label below them (bigger = more connected, for example).
+    arrangement: Literal["flow", "force"] = "flow"
+    node_size: SizeFn | None = None
 
     def legend(self, G) -> list[tuple[str, str]]:
         """(kind, colour) for every kind present, in kind order."""

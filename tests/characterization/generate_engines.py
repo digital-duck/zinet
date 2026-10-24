@@ -1,5 +1,10 @@
 """Characterize GraphLang's drawing code (graphlang/grafv) on its bundled example workflows.
 
+FROZEN: NOT RUN ANY MORE. `golden/graphlang_engines.json` is the output of GraphLang's own engines at graflang commit 11032e2.
+GraphLang now draws through zinet.vis (graflang ee98e66), so rerunning this would record zinet's output as if it were the
+original, and the test that compares against it would prove nothing. The golden stays as the reference that
+`tests/test_vis_characterization.py` checks zinet.vis against.
+
 What is frozen: the Mermaid text, the DOT text (with and without fixed node sizes), and the cytoscape elements
 (ids, labels, colours, shapes, groups, edge relations and labels). Node positions are not frozen: they come from
 Graphviz and change with its version.

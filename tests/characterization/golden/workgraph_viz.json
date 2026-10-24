@@ -1,0 +1,658 @@
+{
+ "_source": "work-graph@08b9aea",
+ "cases": {
+  "default": {
+   "case": {
+    "mark": [],
+    "select": {},
+    "title": "workgraph"
+   },
+   "elements": [
+    {
+     "data": {
+      "color": "#4f8ef7",
+      "id": "repo:a.py",
+      "info": "a.py\nkind: file\nlayer: repo\nproject: p",
+      "label": "a.py",
+      "shape": "ellipse",
+      "size": 20
+     }
+    },
+    {
+     "data": {
+      "color": "#4f8ef7",
+      "id": "repo:b.py",
+      "info": "b.py\nkind: file\nlayer: repo\nproject: p",
+      "label": "b.py",
+      "shape": "ellipse",
+      "size": 20
+     }
+    },
+    {
+     "data": {
+      "color": "#4f8ef7",
+      "id": "repo:c.py",
+      "info": "c.py\nkind: file\nlayer: repo\nproject: q\nstages: ['design']",
+      "label": "c.py",
+      "shape": "ellipse",
+      "size": 20
+     }
+    },
+    {
+     "data": {
+      "color": "#4f8ef7",
+      "id": "repo:dup1",
+      "info": "dup\nkind: file\nlayer: repo\nproject: p",
+      "label": "dup",
+      "shape": "ellipse",
+      "size": 20
+     }
+    },
+    {
+     "data": {
+      "color": "#4f8ef7",
+      "id": "repo:dup2",
+      "info": "dup\nkind: file\nlayer: repo\nproject: p",
+      "label": "dup",
+      "shape": "ellipse",
+      "size": 20
+     }
+    },
+    {
+     "data": {
+      "color": "#2fa84f",
+      "id": "product:x",
+      "info": "X\nkind: product\nlayer: product",
+      "label": "X",
+      "shape": "ellipse",
+      "size": 20
+     }
+    },
+    {
+     "data": {
+      "confidence": "EXTRACTED",
+      "id": "e0",
+      "relation": "imports",
+      "source": "repo:a.py",
+      "target": "repo:b.py"
+     }
+    },
+    {
+     "data": {
+      "confidence": "INFERRED",
+      "id": "e1",
+      "relation": "imports",
+      "source": "repo:b.py",
+      "target": "repo:c.py"
+     }
+    },
+    {
+     "data": {
+      "confidence": "EXTRACTED",
+      "id": "e2",
+      "relation": "imports",
+      "source": "repo:dup1",
+      "target": "repo:dup2"
+     }
+    },
+    {
+     "data": {
+      "confidence": "EXTRACTED",
+      "id": "e3",
+      "relation": "part_of",
+      "source": "product:x",
+      "target": "repo:a.py"
+     }
+    }
+   ],
+   "graph": {
+    "edges": [
+     [
+      "repo:a.py",
+      "repo:b.py",
+      {
+       "confidence": "EXTRACTED",
+       "relation": "imports"
+      }
+     ],
+     [
+      "repo:b.py",
+      "repo:c.py",
+      {
+       "confidence": "INFERRED",
+       "relation": "imports"
+      }
+     ],
+     [
+      "repo:dup1",
+      "repo:dup2",
+      {
+       "confidence": "EXTRACTED",
+       "relation": "imports"
+      }
+     ],
+     [
+      "product:x",
+      "repo:a.py",
+      {
+       "confidence": "EXTRACTED",
+       "relation": "part_of"
+      }
+     ]
+    ],
+    "nodes": [
+     [
+      "repo:a.py",
+      {
+       "kind": "file",
+       "label": "a.py",
+       "layer": "repo",
+       "project": "p"
+      }
+     ],
+     [
+      "repo:b.py",
+      {
+       "kind": "file",
+       "label": "b.py",
+       "layer": "repo",
+       "project": "p"
+      }
+     ],
+     [
+      "repo:c.py",
+      {
+       "kind": "file",
+       "label": "c.py",
+       "layer": "repo",
+       "project": "q",
+       "stages": [
+        "design"
+       ]
+      }
+     ],
+     [
+      "repo:dup1",
+      {
+       "kind": "file",
+       "label": "dup",
+       "layer": "repo",
+       "project": "p"
+      }
+     ],
+     [
+      "repo:dup2",
+      {
+       "kind": "file",
+       "label": "dup",
+       "layer": "repo",
+       "project": "p"
+      }
+     ],
+     [
+      "product:x",
+      {
+       "kind": "product",
+       "label": "X",
+       "layer": "product"
+      }
+     ]
+    ]
+   },
+   "legend": [
+    [
+     "product",
+     "#2fa84f"
+    ],
+    [
+     "repo",
+     "#4f8ef7"
+    ]
+   ],
+   "note": ""
+  },
+  "everything": {
+   "case": {
+    "mark": [],
+    "select": {
+     "hubs": true,
+     "include_code": true
+    },
+    "title": "workgraph"
+   },
+   "elements": [
+    {
+     "data": {
+      "color": "#4f8ef7",
+      "id": "project:p",
+      "info": "p\nkind: project\nlayer: repo",
+      "label": "p",
+      "shape": "diamond",
+      "size": 20
+     }
+    },
+    {
+     "data": {
+      "color": "#4f8ef7",
+      "id": "repo:a.py",
+      "info": "a.py\nkind: file\nlayer: repo\nproject: p",
+      "label": "a.py",
+      "shape": "ellipse",
+      "size": 26
+     }
+    },
+    {
+     "data": {
+      "color": "#4f8ef7",
+      "id": "repo:b.py",
+      "info": "b.py\nkind: file\nlayer: repo\nproject: p",
+      "label": "b.py",
+      "shape": "ellipse",
+      "size": 20
+     }
+    },
+    {
+     "data": {
+      "color": "#4f8ef7",
+      "id": "repo:c.py",
+      "info": "c.py\nkind: file\nlayer: repo\nproject: q\nstages: ['design']",
+      "label": "c.py",
+      "shape": "ellipse",
+      "size": 20
+     }
+    },
+    {
+     "data": {
+      "color": "#4f8ef7",
+      "id": "repo:dup1",
+      "info": "dup\nkind: file\nlayer: repo\nproject: p",
+      "label": "dup",
+      "shape": "ellipse",
+      "size": 20
+     }
+    },
+    {
+     "data": {
+      "color": "#4f8ef7",
+      "id": "repo:dup2",
+      "info": "dup\nkind: file\nlayer: repo\nproject: p",
+      "label": "dup",
+      "shape": "ellipse",
+      "size": 20
+     }
+    },
+    {
+     "data": {
+      "color": "#4f8ef7",
+      "id": "sym",
+      "info": "sym\nkind: symbol\nlayer: repo\nproject: p",
+      "label": "sym",
+      "shape": "ellipse",
+      "size": 20
+     }
+    },
+    {
+     "data": {
+      "color": "#2fa84f",
+      "id": "product:x",
+      "info": "X\nkind: product\nlayer: product",
+      "label": "X",
+      "shape": "ellipse",
+      "size": 20
+     }
+    },
+    {
+     "data": {
+      "confidence": "EXTRACTED",
+      "id": "e0",
+      "relation": "imports",
+      "source": "repo:a.py",
+      "target": "repo:b.py"
+     }
+    },
+    {
+     "data": {
+      "confidence": "EXTRACTED",
+      "id": "e1",
+      "relation": "belongs_to",
+      "source": "repo:a.py",
+      "target": "project:p"
+     }
+    },
+    {
+     "data": {
+      "confidence": "EXTRACTED",
+      "id": "e2",
+      "relation": "contains",
+      "source": "repo:a.py",
+      "target": "sym"
+     }
+    },
+    {
+     "data": {
+      "confidence": "INFERRED",
+      "id": "e3",
+      "relation": "imports",
+      "source": "repo:b.py",
+      "target": "repo:c.py"
+     }
+    },
+    {
+     "data": {
+      "confidence": "EXTRACTED",
+      "id": "e4",
+      "relation": "imports",
+      "source": "repo:dup1",
+      "target": "repo:dup2"
+     }
+    },
+    {
+     "data": {
+      "confidence": "EXTRACTED",
+      "id": "e5",
+      "relation": "part_of",
+      "source": "product:x",
+      "target": "repo:a.py"
+     }
+    }
+   ],
+   "graph": {
+    "edges": [
+     [
+      "repo:a.py",
+      "repo:b.py",
+      {
+       "confidence": "EXTRACTED",
+       "relation": "imports"
+      }
+     ],
+     [
+      "repo:a.py",
+      "project:p",
+      {
+       "confidence": "EXTRACTED",
+       "relation": "belongs_to"
+      }
+     ],
+     [
+      "repo:a.py",
+      "sym",
+      {
+       "confidence": "EXTRACTED",
+       "relation": "contains"
+      }
+     ],
+     [
+      "repo:b.py",
+      "repo:c.py",
+      {
+       "confidence": "INFERRED",
+       "relation": "imports"
+      }
+     ],
+     [
+      "repo:dup1",
+      "repo:dup2",
+      {
+       "confidence": "EXTRACTED",
+       "relation": "imports"
+      }
+     ],
+     [
+      "product:x",
+      "repo:a.py",
+      {
+       "confidence": "EXTRACTED",
+       "relation": "part_of"
+      }
+     ]
+    ],
+    "nodes": [
+     [
+      "project:p",
+      {
+       "kind": "project",
+       "label": "p",
+       "layer": "repo"
+      }
+     ],
+     [
+      "repo:a.py",
+      {
+       "kind": "file",
+       "label": "a.py",
+       "layer": "repo",
+       "project": "p"
+      }
+     ],
+     [
+      "repo:b.py",
+      {
+       "kind": "file",
+       "label": "b.py",
+       "layer": "repo",
+       "project": "p"
+      }
+     ],
+     [
+      "repo:c.py",
+      {
+       "kind": "file",
+       "label": "c.py",
+       "layer": "repo",
+       "project": "q",
+       "stages": [
+        "design"
+       ]
+      }
+     ],
+     [
+      "repo:dup1",
+      {
+       "kind": "file",
+       "label": "dup",
+       "layer": "repo",
+       "project": "p"
+      }
+     ],
+     [
+      "repo:dup2",
+      {
+       "kind": "file",
+       "label": "dup",
+       "layer": "repo",
+       "project": "p"
+      }
+     ],
+     [
+      "sym",
+      {
+       "kind": "symbol",
+       "label": "sym",
+       "layer": "repo",
+       "project": "p"
+      }
+     ],
+     [
+      "product:x",
+      {
+       "kind": "product",
+       "label": "X",
+       "layer": "product"
+      }
+     ]
+    ]
+   },
+   "legend": [
+    [
+     "product",
+     "#2fa84f"
+    ],
+    [
+     "repo",
+     "#4f8ef7"
+    ]
+   ],
+   "note": ""
+  },
+  "marked_neighbourhood": {
+   "case": {
+    "mark": [
+     "repo:a.py"
+    ],
+    "select": {
+     "hops": 1,
+     "include_code": true,
+     "node": "repo:a.py"
+    },
+    "title": "around a.py"
+   },
+   "elements": [
+    {
+     "data": {
+      "color": "#4f8ef7",
+      "id": "repo:a.py",
+      "info": "a.py\nkind: file\nlayer: repo\nproject: p",
+      "label": "a.py",
+      "mark": 1,
+      "shape": "ellipse",
+      "size": 23
+     }
+    },
+    {
+     "data": {
+      "color": "#4f8ef7",
+      "id": "repo:b.py",
+      "info": "b.py\nkind: file\nlayer: repo\nproject: p",
+      "label": "b.py",
+      "shape": "ellipse",
+      "size": 20
+     }
+    },
+    {
+     "data": {
+      "color": "#4f8ef7",
+      "id": "sym",
+      "info": "sym\nkind: symbol\nlayer: repo\nproject: p",
+      "label": "sym",
+      "shape": "ellipse",
+      "size": 20
+     }
+    },
+    {
+     "data": {
+      "color": "#2fa84f",
+      "id": "product:x",
+      "info": "X\nkind: product\nlayer: product",
+      "label": "X",
+      "shape": "ellipse",
+      "size": 20
+     }
+    },
+    {
+     "data": {
+      "confidence": "EXTRACTED",
+      "id": "e0",
+      "relation": "imports",
+      "source": "repo:a.py",
+      "target": "repo:b.py"
+     }
+    },
+    {
+     "data": {
+      "confidence": "EXTRACTED",
+      "id": "e1",
+      "relation": "contains",
+      "source": "repo:a.py",
+      "target": "sym"
+     }
+    },
+    {
+     "data": {
+      "confidence": "EXTRACTED",
+      "id": "e2",
+      "relation": "part_of",
+      "source": "product:x",
+      "target": "repo:a.py"
+     }
+    }
+   ],
+   "graph": {
+    "edges": [
+     [
+      "repo:a.py",
+      "repo:b.py",
+      {
+       "confidence": "EXTRACTED",
+       "relation": "imports"
+      }
+     ],
+     [
+      "repo:a.py",
+      "sym",
+      {
+       "confidence": "EXTRACTED",
+       "relation": "contains"
+      }
+     ],
+     [
+      "product:x",
+      "repo:a.py",
+      {
+       "confidence": "EXTRACTED",
+       "relation": "part_of"
+      }
+     ]
+    ],
+    "nodes": [
+     [
+      "repo:a.py",
+      {
+       "kind": "file",
+       "label": "a.py",
+       "layer": "repo",
+       "project": "p"
+      }
+     ],
+     [
+      "repo:b.py",
+      {
+       "kind": "file",
+       "label": "b.py",
+       "layer": "repo",
+       "project": "p"
+      }
+     ],
+     [
+      "sym",
+      {
+       "kind": "symbol",
+       "label": "sym",
+       "layer": "repo",
+       "project": "p"
+      }
+     ],
+     [
+      "product:x",
+      {
+       "kind": "product",
+       "label": "X",
+       "layer": "product"
+      }
+     ]
+    ]
+   },
+   "legend": [
+    [
+     "product",
+     "#2fa84f"
+    ],
+    [
+     "repo",
+     "#4f8ef7"
+    ]
+   ],
+   "note": "1 hop(s) around a.py"
+  }
+ }
+}

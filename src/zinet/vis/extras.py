@@ -35,14 +35,22 @@ def to_pyvis(G: nx.Graph, out: Path, style: Style, note: str = "") -> None:
         group, kind = style.group(n, d), style.kind(n, d)
         color = style.color(n, d)
         label = f"{style.label(n, d)}\n{kind}" if kind else style.label(n, d)
+        shape = style.shape(n, d)
+        if style.node_size is not None:                # circles sized by the style, the label below (a force-layout graph)
+            net.add_node(n, label=style.label(n, d), title=style.info(n, d), color=color,
+                         size=style.node_size(G, n, d) / 2, shape="diamond" if shape == "diamond" else "dot")
+            continue
         net.add_node(n, label=label, title=style.info(n, d) + (f"\nin: {group}" if group else ""),
-                     color={"background": color, "border": color}, shape=_PYVIS_SHAPES.get(style.shape(n, d), "box"),
+                     color={"background": color, "border": color}, shape=_PYVIS_SHAPES.get(shape, "box"),
                      shapeProperties={"borderDashes": [5, 5]} if group else {})
     for u, v, d in G.edges(data=True):
         dashed = bool(style.edge_dashed(u, v, d))
         net.add_edge(u, v, label=style.edge_label(u, v, d), title=f"{style.edge_kind(u, v, d)} {style.edge_info(u, v, d)}".strip(),
                      arrows="to", dashes=dashed, color=DATA_COLOR if dashed else CONTROL_COLOR)
-    net.set_options(PYVIS_OPTIONS)
+    if style.arrangement == "force":
+        net.barnes_hut(spring_length=140)
+    else:
+        net.set_options(PYVIS_OPTIONS)
     net.write_html(str(out), notebook=False)
 
 
