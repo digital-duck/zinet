@@ -24,15 +24,14 @@ This three-layer DAG maps naturally to every domain in the ecosystem:
 
 | Tool | `primitives` | `concepts` | `applications` |
 |---|---|---|---|
-| SPL | built-in tools (`llm_call`, `api_call`, `cache_get`) | workflow steps, intermediate transforms | runnable recipes (e.g. `build_concept_book`) |
-| Momagrid | GPU node | Hub-Spoke network | low-cost decentralized inference |
-| ConceptBook | concept, atomic facts, definitions | composed ideas, theorems | capstone insights, worked examples |
-| Graph-Code | leaf components, APIs | composed modules, services | deployable apps, systems |
+| [GraphLang](https://github.com/digital-duck/graflang) | node types (`GENERATE`, `EVALUATE`, `GUARD`, ...) | composed workflows (a `LOOP` body, a procedure) | runnable workflows (e.g. `code_pipeline`) |
+| [SPL](https://github.com/digital-duck/SPL.py) | built-in tools (`llm_call`, `api_call`, `cache_get`) | workflow steps, intermediate transforms | runnable recipes (e.g. `build_concept_book`) |
+| [Graph-Code](https://github.com/digital-duck/graph-code) | leaf components, APIs | composed modules, services | deployable apps, systems |
+| [Momagrid](https://github.com/digital-duck/momagrid) | GPU node | Hub-Spoke network | low-cost decentralized inference |
+| [ConceptBook](https://github.com/digital-duck/concept-book) | concept, atomic facts, definitions; primitive concepts (irreducible knowledge units) | composed ideas, theorems; prerequisite-ordered compositions | capstone insights, worked examples; capstone mastery — the target concept the learner navigates toward |
 | Solver | decision variables, parameters | constraints, derived quantities | objectives, solution targets |
-| GraphLang | node types (`GENERATE`, `EVALUATE`, `GUARD`, ...) | composed workflows (a `LOOP` body, a procedure) | runnable workflows (e.g. `code_pipeline`) |
-| **Education** | primitive concepts (irreducible knowledge units) | prerequisite-ordered compositions | capstone mastery — the target concept the learner navigates toward |
 
-The same `graph.yaml` validator, the same navigator (`graph.html`), and the same diff semantics work across all six knowledge domains above. That is the leverage. (GraphLang's own file is a different graph, an executable workflow; this row shows the same three levels of composition, not the same file format. See "Two graphs, one family".)
+The same `graph.yaml` validator, the same navigator (`graph.html`), and the same diff semantics work across all the knowledge domains above. That is the leverage. (GraphLang's own file is a different graph, an executable workflow; this row shows the same three levels of composition, not the same file format. See "Two graphs, one family".)
 
 ---
 
