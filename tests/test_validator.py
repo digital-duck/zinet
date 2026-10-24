@@ -55,3 +55,34 @@ def test_isolated_nodes_are_warnings_not_errors():
     issues = validate(graph)
     assert codes(issues, "error") == []
     assert codes(issues, "warning") == ["orphan", "orphan"]
+
+
+def test_optional_checks_are_off_by_default():
+    graph = build(primitives=[{"id": "p"}], concepts=[{"id": "lost"}, {"id": "ok", "deps": ["p"]}])
+    assert codes(validate(graph), "error") == []
+    assert codes(validate(graph), "warning") == ["orphan"]
+
+
+def test_reducible_check_finds_a_concept_without_a_primitive_ancestor():
+    graph = build(primitives=[{"id": "p"}], concepts=[{"id": "a", "deps": ["p"]}, {"id": "root"}, {"id": "b", "deps": ["root", "a"]}])
+    issues = validate(graph, checks=["reducible"])
+    assert [(i.code, i.node) for i in issues if i.severity == "error"] == [("not_reducible", "root")]
+
+
+def test_reducible_check_is_skipped_without_primitives_or_with_a_cycle():
+    assert validate(build(concepts=[{"id": "a"}]), checks=["reducible"]) == []
+    cyclic = build(primitives=[{"id": "p"}], concepts=[{"id": "a", "deps": ["b"]}, {"id": "b", "deps": ["a"]}])
+    assert "not_reducible" not in codes(validate(cyclic, checks=["reducible"]), "error")
+
+
+def test_connected_check_reports_separate_pieces():
+    graph = build(primitives=[{"id": "p"}, {"id": "q"}], concepts=[{"id": "a", "deps": ["p"]}, {"id": "b", "deps": ["q"]}])
+    issues = [i for i in validate(graph, checks=["connected"]) if i.code == "disconnected"]
+    assert len(issues) == 1 and issues[0].severity == "warning" and "a, p; b, q" in issues[0].message
+    joined = build(primitives=[{"id": "p"}], concepts=[{"id": "a", "deps": ["p"]}])
+    assert validate(joined, checks=["connected"]) == []
+
+
+def test_unknown_check_name_is_rejected():
+    with pytest.raises(ValueError, match="unknown check"):
+        validate(build(), checks=["nonsense"])

@@ -91,6 +91,15 @@ Edge types affect rendering and documentation only. Validation treats all edges 
 |---|---|
 | `orphan` | A node with no `deps` and no dependents, in a document with more than one node. Warnings do not make a document invalid. |
 
+### Optional checks
+
+Off by default, so a document that is valid under v1.0 stays valid. A reader MAY offer them (`zinet validate --check NAME` or `--strict`).
+
+| Code | Severity | Rule |
+|---|---|---|
+| `not_reducible` | error | With `reducible`: when the document has primitives and no cycle, every concept and application SHOULD have at least one primitive among its transitive dependencies. |
+| `disconnected` | warning | With `connected`: the document SHOULD be one piece when edges are read as undirected. |
+
 A document is valid when it has no errors. Structural validation does not check `meta`, `label`,
 or domain semantics. Those belong to the consuming tool.
 

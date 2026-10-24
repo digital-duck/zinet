@@ -49,6 +49,7 @@ uv venv .venv && uv pip install -p .venv/bin/python -e ".[dev]"
 
 ```bash
 zinet validate graph.yaml            # exit 1 on errors; warnings are printed but do not fail
+zinet validate graph.yaml --strict   # also check that every concept reaches a primitive and the graph is one piece
 zinet diff old.yaml new.yaml         # exit 1 when the graphs differ
 zinet slice graph.yaml target_id -o part.yaml   # target plus its prerequisite closure
 zinet render graph.yaml                              # svg to stdout (default)
@@ -82,6 +83,29 @@ for issue in validate(graph):
 prereqs = slice_to(graph, "minimize_cost")
 ```
 
+## Graph algorithms
+
+Plain-`networkx` functions that the apps share (graph-code, ConceptBook and others had their own copies). The input is a
+`networkx.DiGraph` with edges from a dependency to its dependent and an optional `kind` attribute per node (`primitive`,
+`concept`, `application`; none means "referenced but never declared"). `to_networkx(graph)` builds one from a zinet `Graph`.
+
+```python
+import zinet
+G = zinet.to_networkx(zinet.load_graph("graph.yaml"))
+zinet.learning_path(G, "app", known=["a"])        # what is still needed to reach `app`, dependencies first
+zinet.productivity_order(G)                       # order that unlocks the most nodes as early as possible
+zinet.reducible(G)                                # does everything rest on primitives?
+zinet.build_order(G), zinet.gap(G, "app", ["a"]), zinet.applications_of(G, "a"), zinet.restrict(G, nodes)
+zinet.ensure_acyclic(G)                           # raises CycleError, naming the nodes on the cycle
+```
+
+The options select the behaviour of the code these functions replace: `include_primitives`, `include_target`,
+`order="topological"|"alphabetical"|"reach"`, `weighted_applications`, `seed_by_reach`, and four `reducible` rules
+(`primitive_ancestry`, `declared`, `declared_or_listed`, `named_primitives`). Defaults follow graph-code.
+A missing node raises `UnknownNodeError` (a `KeyError`) and a cycle raises `CycleError`. What each copy did, and where
+they differ, is frozen in `tests/characterization/` (see `divergences.md`). `topological_order` and `ancestors` also accept a
+`DiGraph`.
+
 ## Checks
 
 | Code | Severity | Meaning |
@@ -92,6 +116,10 @@ prereqs = slice_to(graph, "minimize_cost")
 | `layer_violation` | error | a node depends on an application |
 | `cycle` | error | the dependency graph is not a DAG |
 | `orphan` | warning | a node with no deps and no dependents |
+| `not_reducible` | error | optional (`--check reducible`): a concept or application with no primitive ancestor |
+| `disconnected` | warning | optional (`--check connected`): the graph is in more than one piece when edges are read as undirected |
+
+`zinet validate --strict` runs both optional checks. They are off by default, so a graph that is valid today stays valid.
 
 ## Layout
 

@@ -109,6 +109,8 @@ broken.yaml: warning: orphan [app]: not connected to any other node
 | `layer_violation` | error | a node depends on an application |
 | `cycle` | error | the dependency graph is not a DAG (self-loops count) |
 | `orphan` | warning | a node with no deps and no dependents |
+| `not_reducible` | error | only with `--check reducible` or `--strict`: a concept or application with no primitive ancestor |
+| `disconnected` | warning | only with `--check connected` or `--strict`: the graph is in more than one piece |
 
 Warnings are printed but do not change the exit code.
 
@@ -290,7 +292,9 @@ dump_graph(prereqs, "budget_part.yaml")
 print(to_mermaid(graph))
 ```
 
-`load_graph` does not validate on its own. Call `validate` when you want the structural checks.
+`load_graph` does not validate on its own. Call `validate` when you want the structural checks (`validate(graph, checks=["reducible", "connected"])` adds the optional ones).
+
+The same graph as a `networkx` graph gives you the shared algorithms: `G = zinet.to_networkx(graph)`, then `zinet.learning_path(G, "app")`, `zinet.productivity_order(G)`, `zinet.reducible(G)` and others (see the README, "Graph algorithms").
 
 ---
 
@@ -358,6 +362,6 @@ zinet prettify FILE [--write]
 zinet render FILE [--format svg|png|pdf|mermaid] [-o OUT] [--no-imports]
 zinet schema [-o OUT]
 zinet slice FILE TARGET [-o OUT]
-zinet validate FILE [--no-imports]
+zinet validate FILE [--no-imports] [--check reducible|connected] [--strict]
 zinet --version
 ```

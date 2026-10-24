@@ -18,12 +18,12 @@ from .prettify import prettify_file
 from .render import BINARY_FORMATS, FORMATS, render
 from .schema import json_schema_text
 from .transforms import diff_graphs, slice_to
-from .validator import validate
+from .validator import OPTIONAL_CHECKS, validate
 
 
 def _cmd_validate(args: argparse.Namespace) -> int:
     graph = load_graph(args.file, resolve_imports=not args.no_imports)
-    issues = validate(graph)
+    issues = validate(graph, checks=OPTIONAL_CHECKS if args.strict else args.check)
     for issue in issues:
         print(f"{args.file}: {issue}")
     if not issues:
@@ -135,6 +135,9 @@ def _build_parser() -> argparse.ArgumentParser:
     p_validate = sub.add_parser("validate", help="check a graph.yaml for structural errors")
     p_validate.add_argument("file")
     p_validate.add_argument("--no-imports", action="store_true", help="do not resolve imports")
+    p_validate.add_argument("--check", action="append", default=[], choices=OPTIONAL_CHECKS, metavar="NAME",
+                            help=f"also run an optional check (repeatable): {', '.join(OPTIONAL_CHECKS)}")
+    p_validate.add_argument("--strict", action="store_true", help="run every optional check")
     p_validate.set_defaults(handler=_cmd_validate)
     return parser
 

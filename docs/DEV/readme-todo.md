@@ -5,7 +5,7 @@ onto zinet. Nothing here is started unless marked otherwise. Items are in rough 
 within each section.
 
 Background: [README-graph-vision.md](README-graph-vision.md) describes the `graph.yaml` IR design.
-zinet v0.1.0 implements the flat v1.0 schema (primitives, concepts, applications). graph-code
+zinet v0.1.0 implements its own flat v1.0 schema (primitives, concepts, applications as lists of nodes with `deps`; ConceptBook's flat v1.0 writes the same layers as mappings with `composed_of` / `needs`, see the ecosystem page). graph-code
 uses the richer v2.1 schema (form/function spaces, events, transitions, aliased imports), so the
 two cannot be merged directly. Work is to share the schema-agnostic algorithms first.
 
@@ -24,7 +24,9 @@ measured by file hash and line count on 2026-10-24. Nothing below is started unl
   There is **no** `*.zinet.yaml`: `zinet` is a tool brand, not a file format, and `.yaml` is the
   base format ("graph" says the file persists graph data). The name is only a convention: tools tell
   the two kinds apart by content (`workflow:` + `nodes:` + `edges:` is GraphLang; `primitives:` /
-  `concepts:` / `applications:` is zinet), so a file called `graph.yaml` works with either tool.
+  `concepts:` / `applications:` is a knowledge graph), so a file called `graph.yaml` works with either tool.
+  Note (found 2026-10-24): "knowledge graph" covers two dialects, zinet's (lists, `deps`) and ConceptBook /
+  graph-code's (mappings, `composed_of` / `needs`); zinet cannot read the second yet. See question 6.
 - **zinet and GraphLang stay separate repos.** zinet is a published, domain-free library (a static
   dependency DAG: `deps`, `edge_types`, opaque `meta`). GraphLang is an executable workflow IR
   (typed nodes with ports, `triggers`/`binds` edges, cycles allowed for retries, Cedar). The models
@@ -87,8 +89,8 @@ Design requirements that come from the three apps we are adopting first:
 
 **Phase A: zinet foundation (on a branch, no release pressure)**
 
-1. [ ] **Characterisation tests first.** Freeze today's behaviour of graph-code's `acyclic`, `build_order`, `learning_path`, `gap`, `productivity_order` and `reducible` (its existing test suite is the starting point), and of work-graph's `convert.py` round-trip and GraphLang's engines. ConceptBook's variants are read only for reference; their tests wait until ConceptBook is un-held.
-2. [ ] **Algorithms and validator** on a plain `nx.DiGraph`, with `to_networkx`. New validator codes for the connected and reducible checks.
+1. [x] **Characterisation tests first** (done, `tests/characterization/`; see `divergences.md`). Freeze today's behaviour of graph-code's `acyclic`, `build_order`, `learning_path`, `gap`, `productivity_order` and `reducible` (its existing test suite is the starting point), and of work-graph's `convert.py` round-trip and GraphLang's engines. ConceptBook's variants are read only for reference; their tests wait until ConceptBook is un-held.
+2. [x] **Algorithms and validator** (done, `src/zinet/algorithms.py`): plain `nx.DiGraph`, `to_networkx`, options that reproduce graph-code and both ConceptBook variants (`tests/test_algorithms_characterization.py`), one `CycleError` / `UnknownNodeError`. Optional validator checks `not_reducible` and `disconnected` (`zinet validate --check` / `--strict`), off by default so existing graphs stay valid.
 3. [ ] **`zinet.vis`**: engines, `select` and the style functions, based on GraphLang's `grafv`.
 4. [ ] **`zinet.roundtrip`**: move work-graph's comment-preserving YAML in; make `prettify --write` accept commented files.
 5. [ ] **Format recognition**: the zinet side of "say what a GraphLang file is" (cross-tool follow-ups below).
@@ -150,6 +152,8 @@ but refactor /home/papagame/projects/digital-duck/concept-book-base, so that fut
 5. Should `spl2graph` (SPL to GraphLang) stay in SPL.py, or should SPL scripts as `graph.yaml` (the spl section below) be the primary path, with GraphLang generated from it?
 
 [WEN] let `spl2graph` (SPL to GraphLang) stay in SPL.py for now, we will migrate SPL cookbook to GraphLang cookbook (which is a big task), Once GraphLang is well tested and proven, we may stop developing SPL, but shift focus to GraphLang
+
+6. **New (2026-10-24): should zinet's loader also read the ConceptBook / graph-code mapping dialect?** A real ConceptBook `graph.yaml` (`cb-linalg/public/domains/graph.yaml`) fails in `zinet validate` ("Input should be a valid list"), although the layers are the same. Options: (a) leave it: apps convert to a `networkx` graph themselves and use the shared algorithms (what Phase B does); (b) add a reader in zinet that accepts the mapping dialect and maps `composed_of` / `needs` to `deps` and the other fields to `meta`, so `zinet validate|render|slice` work on ConceptBook files; (c) also write that dialect. My suggestion: (a) now, (b) when ConceptBook is un-held, since it needs the same decisions as that refactor. Also decide what plain `graph.yaml` should mean in the file-name rule.
 
 Feedback:  see my comments above tagged by "[WEN]"
 

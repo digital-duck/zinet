@@ -4,7 +4,20 @@ Primitives -> concepts -> applications, with typed dependency edges, a structura
 validator, and graph transforms reused by every ZiNets back-end (spl3, mg, cba, gfc, solver).
 """
 
-from .dag import CycleError, ancestors, topological_order
+from .algorithms import (
+    applications_of,
+    build_order,
+    ensure_acyclic,
+    gap,
+    is_acyclic,
+    learning_path,
+    mandatory_subgraph,
+    productivity_order,
+    reducible,
+    restrict,
+    to_networkx,
+)
+from .dag import CycleError, UnknownNodeError, ancestors, topological_order
 from .io import dump_graph, load_graph, to_yaml
 from .render import render, to_dot, to_mermaid
 from .schema import EdgeType, Graph, Layer, Node
@@ -21,14 +34,26 @@ __all__ = [
     "Issue",
     "Layer",
     "Node",
+    "UnknownNodeError",
     "ancestors",
+    "applications_of",
+    "build_order",
     "diff_graphs",
     "dump_graph",
+    "ensure_acyclic",
+    "gap",
+    "is_acyclic",
+    "learning_path",
     "load_graph",
+    "mandatory_subgraph",
+    "productivity_order",
+    "reducible",
     "render",
+    "restrict",
     "slice_to",
     "to_dot",
     "to_mermaid",
+    "to_networkx",
     "to_yaml",
     "topological_order",
     "validate",

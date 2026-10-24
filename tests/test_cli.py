@@ -31,3 +31,13 @@ def test_diff_identical_exit_0(capsys):
     path = str(FIXTURES / "concept_book.yaml")
     assert main(["diff", path, path]) == 0
     assert "no differences" in capsys.readouterr().out
+
+
+def test_validate_strict_runs_the_optional_checks(tmp_path, capsys):
+    f = tmp_path / "g.yaml"
+    f.write_text("primitives:\n  - id: p\n  - id: q\nconcepts:\n  - id: a\n    deps: [p]\n  - id: lone\n    deps: [q]\n  - id: root\napplications:\n  - id: z\n    deps: [a, lone, root]\n")
+    assert main(["validate", str(f)]) == 0
+    assert main(["validate", str(f), "--strict"]) == 1
+    out = capsys.readouterr().out
+    assert "not_reducible [root]" in out
+    assert main(["validate", str(f), "--check", "connected"]) == 0
