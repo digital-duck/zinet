@@ -45,7 +45,8 @@ measured by file hash and line count on 2026-10-24. Nothing below is started unl
   work is ready, and other repos use editable installs until then.
 - **`spl2graph` stays in SPL.py.** The SPL cookbook will be migrated to a GraphLang cookbook (a big
   task). Once GraphLang is well tested and proven, SPL development may stop and the focus shifts to
-  GraphLang. So the SPL-to-`graph.yaml` items in the spl section below are on hold too.
+  GraphLang. So the SPL-to-`graph.yaml` items in the spl section below are on hold too (the SPL to
+  *GraphLang* conversion is the exception: it is in progress, see the spl section).
 
 ### What is duplicated today
 
@@ -231,7 +232,9 @@ are based on the vision doc and must be checked first.
 
 ## spl (spl3)
 
-> **On hold:** `spl2graph` stays in SPL.py, and the SPL cookbook is to be migrated to GraphLang first (see the decisions above). Nothing here is started.
+> **In progress (2026-10-24):** `spl2graph` (SPL script to GraphLang workflow) stays in SPL.py (`spl3/spl2graph.py`), and another Claude session is implementing it now: the Qwen draft (127 lines, unreviewed, did not work on real recipes) is being rewritten against the real SPL AST (about 400 lines so far, uncommitted). The SPL cookbook then migrates to a GraphLang cookbook. The items below are about SPL to zinet `graph.yaml`, a different target, and stay on hold.
+>
+> What GraphLang gives that session to aim at: `graf validate` checks the result (ports, edges, resources), `graf vis` draws it for review (no `.spl` to Mermaid step), and `graf run --adapter mock` runs it offline. A converted recipe is done when it validates, draws sensibly and runs under `mock`; comparing real-adapter output with the SPL original is the stricter check.
 
 Repo: `~/projects/digital-duck/SPL.py` (per the vision doc). Not yet inspected in this work.
 
