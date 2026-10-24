@@ -58,7 +58,9 @@ zinet render graph.yaml --format html -o graph.html  # interactive page (search,
 zinet render graph.yaml --format ascii               # plain-text outline by depth
 zinet render graph.yaml --format png -o graph.png    # png and pdf need -o
 zinet prettify graph.yaml                            # diff against canonical formatting (exit 1 if it would change)
-zinet prettify graph.yaml --write                    # rewrite in place (refuses files with comments)
+zinet prettify graph.yaml --write                    # rewrite in place; comments are kept
+zinet convert graph.yaml                             # to graph.json; the comments are kept in a small database
+zinet convert graph.json                             # back to graph.yaml, with the comments put back
 zinet schema -o schemas/graph.schema.json            # JSON Schema for editors and other tools
 ```
 
@@ -108,6 +110,17 @@ A missing node raises `UnknownNodeError` (a `KeyError`) and a cycle raises `Cycl
 they differ, is frozen in `tests/characterization/` (see `divergences.md`). `topological_order` and `ancestors` also accept a
 `DiGraph`.
 
+## Comments
+
+`prettify --write` keeps your YAML comments. Each comment is pinned to what it sits next to (a node by `id`, a key of that node,
+or a top-level section; a comment block at the top of the file stays on top) and put back into the canonical text. If any
+comment cannot be put back exactly, the file is not rewritten.
+
+`zinet convert` goes between YAML and JSON. JSON has no comments, so the YAML's comments are stored in a small SQLite database
+(`~/.zinet/comments.db`, or `$ZINET_HOME`, or `--store PATH`) and put back when you convert the JSON to YAML again. A comment
+whose node was removed or renamed is written at the end of the file as `# [orphaned from <id>] ...` and returns if the node does.
+This is the approach work-graph uses for its layer files (the same code, see `zinet.roundtrip`); there is nothing to install.
+
 ## Drawing any graph
 
 `zinet.vis` draws and trims any `networkx` graph, not only zinet's, so other tools do not each carry their own copy
@@ -151,6 +164,7 @@ src/zinet/
   validator.py    structural checks -> Issue list
   io.py           load_graph (with imports), dump_graph, to_yaml
   prettify.py     canonical formatting for `zinet prettify`
+  roundtrip.py    comment-preserving YAML (harvest and re-attach), SQLite comment store, `zinet convert`
   transforms/     diff_graphs, slice_to
   algorithms.py   graph algorithms on a plain networkx DiGraph (learning path, order, reducible, ...)
   render.py       DOT and Mermaid generation for zinet graphs, svg/png/pdf via `dot`
@@ -172,5 +186,4 @@ tests/            pytest suite; tests/fixtures holds one graph per domain
 
 - Domain-specific JSON Schema overlays (solver, spl, cba).
 - `graph.html` interactive explorer (belongs to `cba`).
-- Comment-preserving formatting. `prettify --write` refuses files with comments.
 - `spl3` integration, which is the next step: SPL scripts compiling to `GraphIR`.

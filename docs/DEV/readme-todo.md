@@ -35,7 +35,7 @@ measured by file hash and line count on 2026-10-24. Nothing below is started unl
 - **Minimal dependencies (WEN, 2026-10-24).** The core install stays small. It holds everything that
   needs no heavy package: the algorithms, the validator, the cytoscape viewer (JavaScript bundled in
   the wheel), graphviz (through the `dot` program), mermaid, ascii, and comment-preserving YAML
-  (`ruamel.yaml`). `pyvis` (pulls in ipython, jinja2, jsonpickle) and `graphify` (numpy, rapidfuzz and
+  (text-based on PyYAML and the built-in `sqlite3`; `ruamel.yaml` turned out not to be needed). `pyvis` (pulls in ipython, jinja2, jsonpickle) and `graphify` (numpy, rapidfuzz and
   about 25 tree-sitter packages) stay optional extras: `zinet[pyvis]`, `zinet[graphify]`.
 - **Scope for now: graph-code, work-graph and GraphLang.** The ConceptBook paper is work in progress,
   so ConceptBook is frozen (the refactoring will be revisited in future): the `cb-*` repos (and the other copies of `concept_graph.py` /
@@ -92,7 +92,7 @@ Design requirements that come from the three apps we are adopting first:
 1. [x] **Characterisation tests first** (done, `tests/characterization/`; see `divergences.md`). Freeze today's behaviour of graph-code's `acyclic`, `build_order`, `learning_path`, `gap`, `productivity_order` and `reducible` (its existing test suite is the starting point), and of work-graph's `convert.py` round-trip and GraphLang's engines. ConceptBook's variants are read only for reference; their tests wait until ConceptBook is un-held.
 2. [x] **Algorithms and validator** (done, `src/zinet/algorithms.py`): plain `nx.DiGraph`, `to_networkx`, options that reproduce graph-code and both ConceptBook variants (`tests/test_algorithms_characterization.py`), one `CycleError` / `UnknownNodeError`. Optional validator checks `not_reducible` and `disconnected` (`zinet validate --check` / `--strict`), off by default so existing graphs stay valid.
 3. [x] **`zinet.vis`** (done, `src/zinet/vis/`): `Style`, engines cytoscape / graphviz / mermaid / ascii in the core install and pyvis / graphify as extras, and `select`, based on GraphLang's `grafv` and work-graph's `viz.select`; output matches the golden files (`tests/test_vis_characterization.py`). `zinet render` gains `--format html` and `ascii`.
-4. [ ] **`zinet.roundtrip`**: move work-graph's comment-preserving YAML in; make `prettify --write` accept commented files.
+4. [x] **`zinet.roundtrip`** (done, `src/zinet/roundtrip.py`): work-graph's harvest / attach generalised over a `Layout` (its own `nodes`/`edges` layout reproduces its frozen output exactly), the SQLite comment store (stdlib `sqlite3`), `zinet convert` (YAML <-> JSON), and `prettify --write` keeps comments. No new dependency: the logic is text-based, so `ruamel.yaml` is not needed.
 5. [ ] **Format recognition**: the zinet side of "say what a GraphLang file is" (cross-tool follow-ups below).
 
 **Phase B: adoption, one app at a time (each keeps its own tests green)**

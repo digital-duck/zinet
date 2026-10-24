@@ -15,6 +15,7 @@ from pathlib import Path
 from . import __version__
 from .io import dump_graph, load_graph, to_yaml
 from .prettify import prettify_file
+from .roundtrip import CommentStore, json_to_yaml, yaml_to_json
 from .render import BINARY_FORMATS, FORMATS, render
 from .schema import json_schema_text
 from .transforms import diff_graphs, slice_to
@@ -67,19 +68,32 @@ def _cmd_render(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_convert(args: argparse.Namespace) -> int:
+    src = Path(args.file)
+    to_json = src.suffix.lower() in (".yaml", ".yml")
+    if not to_json and src.suffix.lower() != ".json":
+        raise ValueError("convert takes a .yaml, .yml or .json file")
+    dst = Path(args.output) if args.output else src.with_suffix(".json" if to_json else ".yaml")
+    with CommentStore(args.store) as store:
+        info = (yaml_to_json if to_json else json_to_yaml)(src, dst, store)
+    note = f" ({info['comments']} comment(s) kept in {store.path}" + (f", {info['orphans']} orphaned)" if info.get("orphans") else ")")
+    print(f"{src} -> {dst}{note}")
+    return 0
+
+
 def _cmd_prettify(args: argparse.Namespace) -> int:
     result = prettify_file(args.file)
     if not result.changed:
         print(f"{args.file}: already formatted")
         return 0
     if args.write:
-        if result.has_comments:
-            raise ValueError(f"{args.file} has comments; prettify would drop them, so it was not rewritten")
+        if not result.comments_preserved:
+            raise ValueError(f"{args.file} has comments that could not be kept in place, so it was not rewritten")
         Path(args.file).write_text(result.formatted, encoding="utf-8")
         print(f"{args.file}: rewritten")
         return 0
-    if result.has_comments:
-        print(f"note: {args.file} has comments; --write would drop them", file=sys.stderr)
+    if not result.comments_preserved:
+        print(f"note: {args.file} has comments that could not be kept in place; --write would not rewrite it", file=sys.stderr)
     sys.stdout.writelines(
         difflib.unified_diff(
             result.original.splitlines(keepends=True),
@@ -121,6 +135,12 @@ def _build_parser() -> argparse.ArgumentParser:
     p_render.add_argument("-o", "--output", help="write to this file instead of stdout")
     p_render.add_argument("--no-imports", action="store_true", help="do not resolve imports")
     p_render.set_defaults(handler=_cmd_render)
+
+    p_convert = sub.add_parser("convert", help="convert a graph between YAML and JSON, keeping the YAML comments in a small database")
+    p_convert.add_argument("file", help="a .yaml or .yml file (to JSON) or a .json file (to YAML)")
+    p_convert.add_argument("-o", "--output", help="output file (default: the same name with the other extension)")
+    p_convert.add_argument("--store", help="comment database (default: $ZINET_HOME/comments.db, or ~/.zinet/comments.db)")
+    p_convert.set_defaults(handler=_cmd_convert)
 
     p_schema = sub.add_parser("schema", help="print the JSON Schema for graph.yaml")
     p_schema.add_argument("-o", "--output", help="write to this file instead of stdout")

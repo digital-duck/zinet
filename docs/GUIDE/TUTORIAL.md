@@ -336,8 +336,21 @@ zinet prettify messy.yaml --write     # rewrite the file in place
 ```
 
 `prettify` formats one file and never resolves imports, so imported nodes are not copied into it.
-YAML comments are not kept. `--write` refuses a file that contains comments, and exits 2 without
-changing it.
+YAML comments are kept: each stays next to the node, key or section it was on (a comment block at the top of the file stays
+on top). `--write` refuses a file only if a comment could not be put back exactly, and then exits 2 without changing it.
+A comment on an entry of a block `deps:` list stays on that entry (while the entry is still at the same position in the list).
+
+### Converting to JSON and back: `zinet convert`
+
+```bash
+zinet convert graph.yaml            # writes graph.json; the comments go into ~/.zinet/comments.db
+zinet convert graph.json            # writes graph.yaml, with the comments put back
+zinet convert graph.yaml -o out/g.json --store my-comments.db
+```
+
+JSON cannot hold comments, so they wait in a small SQLite database (`$ZINET_HOME`, `--store`) until the JSON is converted back.
+Comments you add to the YAML between two conversions are kept. A comment whose node was removed or renamed is written at the end of
+the file as `# [orphaned from <id>] ...` and returns if the node comes back.
 
 ---
 
@@ -359,6 +372,7 @@ the layer dependency rules and cycle detection.
 ## Quick reference
 
 ```text
+zinet convert FILE [-o OUT] [--store DB]
 zinet diff OLD NEW
 zinet prettify FILE [--write]
 zinet render FILE [--format svg|png|pdf|mermaid|html|ascii] [-o OUT] [--no-imports]

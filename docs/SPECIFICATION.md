@@ -127,8 +127,10 @@ The canonical form is the output of `zinet prettify --write`:
 - Fields holding their default value are omitted, except `version`, which is always written.
 - List items are indented under their parent key.
 
-Formatting does not change meaning. Comments are not preserved, so `zinet prettify --write` refuses
-to rewrite a file that contains comments.
+Formatting does not change meaning. Comments are kept: each is anchored to the node (by `id`), the node key or the top-level
+section it sits next to, and re-attached in the canonical text; a comment block above the first line stays at the top of the
+file. A formatter MUST NOT rewrite a file if a comment cannot be put back. Comments on lines deeper than a node's own keys
+move to the key they belong to; a comment on an entry of a block `deps` list is anchored to the entry by position and moves to the `deps` key if the entry is gone.
 
 ---
 

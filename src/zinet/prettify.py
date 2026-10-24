@@ -4,8 +4,9 @@ The canonical form is what `to_yaml` writes: `version` first, layers in order, k
 field order, and defaults omitted. Formatting works on one file only and never resolves imports,
 so imported nodes are not copied into the file being formatted.
 
-YAML comments are not preserved, because PyYAML does not expose them. `has_comments` lets the
-CLI refuse to rewrite a file that would lose them.
+YAML comments are kept: they are harvested from the file and put back into the canonical text
+(see `roundtrip`). If any comment could not be put back exactly, the plain canonical text is
+returned with `comments_preserved` False, and the CLI refuses to write it.
 """
 
 from __future__ import annotations
@@ -14,7 +15,8 @@ import re
 from dataclasses import dataclass
 from pathlib import Path
 
-from .io import load_graph, to_yaml
+from .io import load_graph
+from .roundtrip import format_keeping_comments
 
 _INLINE_COMMENT = re.compile(r"(^|\s)#")
 
@@ -24,6 +26,7 @@ class Prettified:
     original: str
     formatted: str
     has_comments: bool
+    comments_preserved: bool = True
 
     @property
     def changed(self) -> bool:
@@ -40,4 +43,5 @@ def prettify_file(path: str | Path) -> Prettified:
     source = Path(path)
     original = source.read_text(encoding="utf-8")
     graph = load_graph(source, resolve_imports=False)
-    return Prettified(original=original, formatted=to_yaml(graph), has_comments=has_comments(original))
+    formatted, preserved = format_keeping_comments(original, graph)
+    return Prettified(original=original, formatted=formatted, has_comments=has_comments(original), comments_preserved=preserved)

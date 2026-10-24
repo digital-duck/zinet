@@ -32,13 +32,25 @@ def test_write_rewrites_in_place(tmp_path):
     assert main(["prettify", str(source)]) == 0  # now stable
 
 
-def test_write_refuses_files_with_comments(tmp_path, capsys):
+def test_write_keeps_comments_in_place(tmp_path, capsys):
     source = tmp_path / "commented.yaml"
-    original = "# keep me\nprimitives:\n  - id: a  # note\n"
+    source.write_text("# keep me\nprimitives:\n  - id: a   # note on a\n  - meta: {x: 1}\n    id: b\n")
+    assert main(["prettify", str(source), "--write"]) == 0
+    text = source.read_text()
+    assert text.startswith("# keep me\nversion: '1.0'") and "- id: a  # note on a" in text      # the header stays on top
+    assert load_graph(source).index().keys() == {"a", "b"}
+    assert main(["prettify", str(source)]) == 0           # stable: its own output is already formatted
+    assert "already formatted" in capsys.readouterr().out
+
+
+def test_write_refuses_when_a_comment_could_not_be_kept(tmp_path, capsys, monkeypatch):
+    import zinet.prettify as prettify_module
+    source = tmp_path / "commented.yaml"
+    original = "primitives:\n  - id: a  # note\n  - id: b\n"
     source.write_text(original)
+    monkeypatch.setattr(prettify_module, "format_keeping_comments", lambda text, graph: ("version: '1.0'\n", False))
     assert main(["prettify", str(source), "--write"]) == 2
-    assert source.read_text() == original
-    assert "would drop them" in capsys.readouterr().err
+    assert source.read_text() == original and "could not be kept in place" in capsys.readouterr().err
 
 
 def test_prettify_does_not_inline_imports(tmp_path):
