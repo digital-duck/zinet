@@ -104,8 +104,8 @@ Whether zinet should also *read* the mapping dialect is an open question in [rea
 |---|---|
 | `graph.yaml` format, validator, diff, slice, prettify, render, JSON Schema | in zinet 0.1.0 |
 | Graph algorithms (acyclic, ancestors, gap, learning path, productivity order, reducible) | duplicated in ConceptBook and Graph-Code; planned for zinet 0.2.0, adopted first by Graph-Code |
-| Drawing engines (cytoscape, graphviz, mermaid, ascii in the core install; pyvis and graphify as extras) | duplicated in work-graph, GraphLang and ConceptBook; planned for zinet 0.2.0, adopted by GraphLang (done), next work-graph |
-| Comment-preserving YAML | in zinet (`zinet.roundtrip`, `prettify --write`, `zinet convert`); work-graph can switch to it |
+| Drawing engines (cytoscape, graphviz, mermaid, ascii in the core install; pyvis and graphify as extras) | duplicated in work-graph, GraphLang and ConceptBook; planned for zinet 0.2.0, adopted by GraphLang and work-graph (done) |
+| Comment-preserving YAML | in zinet (`zinet.roundtrip`, `prettify --write`, `zinet convert`); work-graph's `convert.py` uses it |
 | Recognising each other's files | done in GraphLang (not yet committed); to do in zinet |
 
 ConceptBook is frozen for now (its paper is in progress): the `cb-*` repos stay as they are, and refactoring `concept-book-press` and `concept-book-base` is on hold, to be revisited in future. The first adopters are GraphLang, work-graph and Graph-Code.
