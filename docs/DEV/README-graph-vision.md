@@ -247,7 +247,7 @@ The graph-first approach is not an architectural preference — it reflects a
 structural truth that appears independently across physics, mathematics, and
 knowledge representation.
 
-### The binary that won't reduce further
+### The duality that won't reduce further
 
 Three independent formalisms converge on the same two-element basis:
 
@@ -256,6 +256,9 @@ Three independent formalisms converge on the same two-element basis:
 | Physics | Fermion (matter, occupies space, Pauli exclusion) | Boson (force carrier, mediates exchange) |
 | Graph theory | Node (identity, state) | Edge (relation, flow) |
 | Form / Function | Form (what something *is*) | Function (what something *does*) |
+| Biology | Structure (anatomy: a protein's fold, an organ, a cell) | Function (physiology: what it does in the organism) |
+
+Biology states the same duality as a working principle: structure determines function, and function constrains structure (a protein's fold fixes what it binds; the need to bind shapes the fold). Anatomy and physiology are the two ways to describe the same organism, which is the relation between a graph's nodes and its edges.
 
 The mapping runs deeper than analogy.  In physics, fermions *stack* (no two in
 the same state — Pauli exclusion) while bosons *superpose* (a laser is a
