@@ -51,6 +51,26 @@ Each CLI is independently installable and operable, yet they compose naturally: 
 
 ---
 
+## Two graphs, one family: knowledge and computation (2026-10-24)
+
+The vision has become clearer with GraphLang ([`graflang`](https://github.com/digital-duck/graflang), command `graf`). There are two kinds of graph, and both live in plain YAML (the file persists the graph; the name is a convention):
+
+| | Knowledge graph (zinet `graph.yaml`) | Computation graph (GraphLang `*.graph.yaml`) |
+|---|---|---|
+| What the graph is | what depends on what: a static dependency DAG, three layers | what runs and when: the program itself |
+| Edges | `deps`, typed (`prerequisite`, `data_flow`, `constraint`, ...) | `triggers` (control) and `binds` (data) between **ports** |
+| Cycles | forbidden | allowed (retry wires, `LOOP`) |
+| Who changes it | people and tools that author knowledge | the model itself: it changes the topology (`MUTATE`) instead of writing code |
+| Tools | `zinet` | `graf run`, `validate`, `compile`, `vis` |
+
+**Interaction nets.** GraphLang's execution model comes from Lafont's *interaction nets* (Lafont, 1990): a program is a graph of agents with ports; a computation is a sequence of local rewrites where two connected agents interact; the rewrites are local, so independent ones can run in any order and still agree (confluence). That is why the graph can be the program, why parallelism comes from the topology, and why a rewrite can be checked locally (Cedar `GUARD` / `MUTATE`). Be exact about the status: GraphLang runs a **token-passing dataflow** over such a graph, not a true rewrite engine; interaction nets are the foundation, not a strict specification, and LLM-sampling nodes and `LOOP` are outside the confluent core (see graflang's `docs/DEV/readme-design.md`, gaps #26 and the semantics section).
+
+**Graph-native workflows.** SPL scripts were text that had to be turned back into a picture (`.spl` to Mermaid) to be reviewed. A GraphLang workflow *is* the graph, so review is the graph itself: `graf vis FILE` shows the control flow first, data edges on demand, loops as one box that opens on a click. SPL scripts are being migrated to GraphLang workflows; the SPL-to-`graph.yaml` item below is therefore on hold, and `spl2graph` stays in SPL.py for the migration.
+
+**Shared infrastructure.** Because both are graphs, they share code in zinet: the graph algorithms (`zinet.algorithms`), drawing and subgraph selection (`zinet.vis`, used by `graf vis` and `workgraph viz`), comment-preserving YAML (`zinet.roundtrip`), and recognising each other's files (`zinet.formats`). The next step is authoring workflows in the graph view itself (a visual IDE; see `readme-todo.md`). The ecosystem page [readme-ecosystem.md](readme-ecosystem.md) lists the apps and how each relates.
+
+---
+
 ## SPL scripts as graph.yaml - *TODO*
 
 An `.spl` script is already a computation DAG: tools are nodes, data flows are edges, recipes are capstone entry points. Persisting SPL scripts as `graph.yaml` makes that DAG visible:
@@ -296,6 +316,8 @@ to a new domain.
   - `solver/SPL-solver-recipes.md` — concrete SPL recipes for LP/ILP/scheduling/routing
   - `solver/solver-guide.md` — practitioner's guide to Solver Advisor
   - `solver/Solver-Box.md` — full Solver Advisor design document
+- **Lafont, Y. (1990).** Interaction nets. *Proceedings of the 17th ACM SIGPLAN-SIGACT Symposium on Principles of Programming Languages (POPL).* — the graph-rewriting model GraphLang is grounded in: agents with ports, local rewrite rules, confluence.
+- `~/projects/digital-duck/graflang/` — GraphLang (`graf`): executable workflow graphs; `docs/DEV/readme-design.md` has the exact semantics and the gap table.
 - [README-LLVM.md](README-LLVM.md) — LLVM tutorial: IR architecture, SSA form, optimization passes, and the graph.yaml parallel
 - **Novak, J. D., & Gowin, D. B. (1984).** *Learning How to Learn.* Cambridge University Press. — concept maps as prerequisite graphs for learners; grounded in Ausubel's assimilation theory; independent convergence with the graph-first IR from cognitive science. Cited in `docs/publication/TMLR/SPL-for-Education/spl4ed-paper-v1.1.tex` (§1.3, §2.1, §7.3).
 - **Collins, A. M., & Quillian, M. R. (1969).** Retrieval time from semantic memory. *Journal of Verbal Learning and Verbal Behavior.* — original semantic network model of long-term memory as a directed concept graph; foundational neuroscience anchor for the Education surface.
