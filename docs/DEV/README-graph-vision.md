@@ -258,13 +258,21 @@ Four independent domains converge on the same two-element basis:
 | Biology | Structure (anatomy: a protein's fold, an organ, a cell) | Function (physiology: what it does in the organism) |
 | Abstract / philosophical | Form (what something *is*) | Function (what something *does*) |
 
-**Physics.** Matter is made of fermions, which *stack* (no two in the same state, by Pauli exclusion), and forces are carried by bosons, which *superpose* (a laser is a trillion photons in the same state, coherently). The Standard Model looked for something more fundamental than this pair and did not find it.
+**Physics.** Matter is made of fermions such as protons, neutrons and electrons, which *stack* (no two in the same state, by Pauli exclusion), and forces are carried by bosons, which *superpose* (a laser is a trillion photons in the same state, coherently). The Standard Model looked for something more fundamental than this pair and did not find it.
+
+*Read further:* HyperPhysics, [The division into fermions and bosons](https://hyperphysics.phy-astr.gsu.edu/hbase/Astro/wcferm.html) (a short, plain explanation of Fermi-Dirac and Bose-Einstein statistics and the Pauli exclusion principle); D. Griffiths, *Introduction to Elementary Particles* (Wiley, 1987), for the Standard Model.
 
 **Mathematics and computer science.** Graph theory begins with the same split. In 1736 Euler solved the Königsberg bridge problem by throwing away everything about the city except its land masses (nodes) and the bridges between them (edges), and showed from the degrees of the nodes that no walk crosses every bridge exactly once. Nodes are discrete, countable identities; edges are relations that can multiply between the same pair. Every data structure, dependency graph and program flow since has used the same two ingredients.
 
+*Read further:* L. Euler, "Solutio problematis ad geometriam situs pertinentis", *Commentarii Academiae Scientiarum Imperialis Petropolitanae* 8 (1736), pp. 128-140 (presented 1735; the volume was issued later), the first paper of graph theory; N. L. Biggs, E. K. Lloyd and R. J. Wilson, *Graph Theory 1736-1936* (Oxford University Press, 1976), which reprints it with an English translation (see [Graph Theory, 1736-1936](https://en.wikipedia.org/wiki/Graph_Theory,_1736%E2%80%931936) and [Seven Bridges of Königsberg](https://en.wikipedia.org/wiki/Seven_Bridges_of_K%C3%B6nigsberg)).
+
 **Biology.** Structure determines function and function constrains structure: a protein's fold fixes what it binds, and the need to bind shaped the fold. Anatomy and physiology are two ways of describing the same organism, as nodes and edges are two ways of describing the same graph.
 
+*Read further:* D'Arcy W. Thompson, *On Growth and Form* (Cambridge University Press, 1917; [free text on Project Gutenberg](https://www.gutenberg.org/ebooks/55264)), the classic argument that the physical form of an organism follows from the forces acting on it, so that structure explains function.
+
 **Abstract and philosophical.** The oldest statement of the pair is Aristotle's hylomorphism: a thing is matter organised by a *form*, and for a living thing the soul is the form of the body, its "first actuality" (*De Anima* II.1), what makes the body the kind of thing it is and lets it do what it does. In design the same pair became a slogan: Louis Sullivan wrote "form ever follows function" in "The Tall Office Building Artistically Considered" (1896), and the idea is traced further back to Horatio Greenough and, by Sullivan himself, to Vitruvius. Forms are bounded and identifiable, while functions compose and chain freely.
+
+*Read further:* Stanford Encyclopedia of Philosophy, [Aristotle's Psychology](https://plato.stanford.edu/entries/aristotle-psychology/) (soul as the form of the body); L. H. Sullivan, "The Tall Office Building Artistically Considered", *Lippincott's Magazine* (1896), and [Form follows function](https://en.wikipedia.org/wiki/Form_follows_function) for the history of the phrase.
 
 The four converge on one asymmetry: a stable, countable *something* (fermion, node, structure, form) and a relational, composable *doing* (boson, edge, function, function). The mapping runs deeper than analogy, and it is evidence rather than a design choice: when the ZiNets graph-first IR reached the same two-element basis from a completely different direction (Chinese character decomposition, then node and edge, then `graph.yaml`), it was not looking for it.
 
@@ -318,6 +326,9 @@ to a new domain.
   - `solver/Solver-Box.md` — full Solver Advisor design document
 - **Aristotle.** *De Anima* II.1 (soul as the form of a natural body, its first actuality); see the Stanford Encyclopedia of Philosophy, [Aristotle's Psychology](https://plato.stanford.edu/entries/aristotle-psychology/).
 - **Sullivan, L. H. (1896).** The Tall Office Building Artistically Considered. *Lippincott's Magazine.* — "form ever follows function"; the earlier attribution to Greenough is disputed (see [Form follows function](https://en.wikipedia.org/wiki/Form_follows_function)).
+- **Euler, L. (1736).** Solutio problematis ad geometriam situs pertinentis. — the Königsberg bridges; **Biggs, Lloyd & Wilson (1976).** *Graph Theory 1736-1936.* Oxford University Press.
+- **Thompson, D. W. (1917).** *On Growth and Form.* Cambridge University Press.
+- **Griffiths, D. (1987).** *Introduction to Elementary Particles.* Wiley.
 - **Lafont, Y. (1990).** Interaction nets. *Proceedings of the 17th ACM SIGPLAN-SIGACT Symposium on Principles of Programming Languages (POPL).* — the graph-rewriting model GraphLang is grounded in: agents with ports, local rewrite rules, confluence.
 - `~/projects/digital-duck/graflang/` — GraphLang (`graf`): executable workflow graphs; `docs/DEV/readme-design.md` has the exact semantics and the gap table.
 - [README-LLVM.md](README-LLVM.md) — LLVM tutorial: IR architecture, SSA form, optimization passes, and the graph.yaml parallel
