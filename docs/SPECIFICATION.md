@@ -114,7 +114,7 @@ or domain semantics. Those belong to the consuming tool.
 - Import cycles are an error.
 - The resolved graph has no `imports`. Loading does not validate. Run validation separately.
 
-Namespacing and optional imports are not in v1.0. See `docs/DEV/readme-todo.md`.
+Namespacing and optional imports are not in v1.0. They are on the maintainer's roadmap.
 
 ---
 

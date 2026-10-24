@@ -7,7 +7,7 @@ same sense (the graph is the main artifact, not a by-product), but each has its 
 its own job. This page says what each one is and how it relates to zinet.
 
 For the wider design, see [README-graph-vision.md](README-graph-vision.md) (the six-CLI ecosystem
-and the layered design). For the shared-code plan, see [readme-todo.md](readme-todo.md).
+and the layered design). For the shared-code plan, see the maintainer's planning notes.
 
 Last reviewed: 2026-10-24.
 
@@ -39,7 +39,7 @@ lifecycle and the knowledge around it. Status per its README: hackathon project,
 - Several graphs (repo, product, org, process) with their own vocabularies that reference each
   other, stored as JSON (canonical) and YAML (for review).
 - Useful to zinet because it already has a comment-preserving YAML round-trip and a graph-drawing
-  module with several engines. Both are listed in [readme-todo.md](readme-todo.md) as code that
+  module with several engines. Both are listed in the maintainer's planning notes as code that
   could live in zinet.
 
 ### Graph-Code
@@ -61,7 +61,7 @@ A body of knowledge is first a graph (nodes are concepts, edges are prerequisite
 - Input is a `graph.yaml` with the same three layers as zinet, but written as mappings keyed by id with `composed_of` / `needs` / `tier` / `defines`. zinet's loader cannot read it yet (it expects lists of nodes with `deps`).
 - Today every domain repo carries its own copy of `scripts/concept_graph.py` (19 copies) and
   `spl/graph_lib.py` (18 copies). Moving that code into zinet is the main item in
-  [readme-todo.md](readme-todo.md).
+  the maintainer's planning notes.
 
 
 
@@ -96,7 +96,7 @@ The knowledge graphs share three layers (primitives, concepts, applications) but
 
 zinet's loader reads only its own dialect (verified on a real ConceptBook file: "Input should be a valid list"). The shared
 algorithms in zinet work on a plain `networkx` graph, so ConceptBook and graph-code can use them without converting files.
-Whether zinet should also *read* the mapping dialect is an open question in [readme-todo.md](readme-todo.md).
+Whether zinet should also *read* the mapping dialect is an open question in the maintainer's planning notes.
 
 ## What is shared today and what is planned
 
@@ -110,4 +110,4 @@ Whether zinet should also *read* the mapping dialect is an open question in [rea
 
 ConceptBook is frozen for now (its paper is in progress): the `cb-*` repos stay as they are, and refactoring `concept-book-press` and `concept-book-base` is on hold, to be revisited in future. The first adopters are GraphLang, work-graph and Graph-Code.
 
-Details, the order of work, risks and decisions are in [readme-todo.md](readme-todo.md).
+Details, the order of work, risks and decisions are in the maintainer's planning notes.
