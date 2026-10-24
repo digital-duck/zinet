@@ -104,7 +104,7 @@ Whether zinet should also *read* the mapping dialect is an open question in [rea
 |---|---|
 | `graph.yaml` format, validator, diff, slice, prettify, render, JSON Schema | in zinet 0.1.0 |
 | Graph algorithms (acyclic, ancestors, gap, learning path, productivity order, reducible) | duplicated in ConceptBook and Graph-Code; planned for zinet 0.2.0, adopted first by Graph-Code |
-| Drawing engines (cytoscape, graphviz, mermaid, ascii in the core install; pyvis and graphify as extras) | duplicated in work-graph, GraphLang and ConceptBook; planned for zinet 0.2.0, adopted first by GraphLang, then work-graph |
+| Drawing engines (cytoscape, graphviz, mermaid, ascii in the core install; pyvis and graphify as extras) | duplicated in work-graph, GraphLang and ConceptBook; planned for zinet 0.2.0, adopted by GraphLang (done), next work-graph |
 | Comment-preserving YAML | in zinet (`zinet.roundtrip`, `prettify --write`, `zinet convert`); work-graph can switch to it |
 | Recognising each other's files | done in GraphLang (not yet committed); to do in zinet |
 

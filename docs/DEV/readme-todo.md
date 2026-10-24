@@ -97,7 +97,7 @@ Design requirements that come from the three apps we are adopting first:
 
 **Phase B: adoption, one app at a time (each keeps its own tests green)**
 
-6. [ ] **GraphLang first.** `grafv/engines.py` (355 lines) is replaced by `zinet.vis`. `grafv/model.py` (workflow to graph) and `graf vis` stay. Smallest change: the engines already match, and it proves the style-function design.
+6. [x] **GraphLang first** (done; graflang `ee98e66`). `grafv/engines.py` (355 lines) is replaced by `zinet.vis`: now a GraphLang `Style` and a `render` wrapper (about 60 lines), the bundled Cytoscape.js moved to zinet, `formats.py` reuses `zinet.formats`, output unchanged, and `graf vis` gained the `ascii` engine. `grafv/model.py` (workflow to graph) and `graf vis` stay. Smallest change: the engines already match, and it proves the style-function design.
 7. [ ] **work-graph second.** `viz.py` engines and `convert.py` move to zinet; `select`, the layer colours and the `INFERRED` dashes become style functions. Keeps `layers.py`, `refs.py`, search and embeddings.
 8. [ ] **graph-code third.** `acyclic` (today `nx.simple_cycles`, which can be exponential), `build_order`, `learning_path`, `gap`, `productivity_order` and `reducible` use zinet. Events, transitions, call contracts, drift and clustering stay. Largest semantic risk, so it goes last and relies on its existing tests.
 
