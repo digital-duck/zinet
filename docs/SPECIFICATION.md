@@ -1,6 +1,6 @@
 # graph.yaml Specification (v1.0)
 
-This document specifies the `graph.yaml` format as implemented by zinet 0.1.0. The machine-readable
+This document specifies the `graph.yaml` format as implemented by zinet 0.2.0. The machine-readable
 schema is [`schemas/graph.schema.json`](../schemas/graph.schema.json), generated from the Pydantic
 models by `zinet schema`. If this document and the schema disagree, the schema is the reference
 for structure and this document is the reference for the rules that a schema cannot express.

@@ -2,7 +2,7 @@
 
 This tutorial walks through the `zinet` command-line tool, which validates, compares, slices,
 renders, and formats `graph.yaml` files, and exports its JSON Schema. Every example uses the sample graphs in `tests/fixtures/`, and the
-outputs shown were produced by the current version (`zinet 0.1.0`).
+outputs shown were produced by the current version (`zinet 0.2.0`).
 
 ---
 
@@ -15,7 +15,7 @@ uv venv .venv
 source .venv/bin/activate
 uv pip install -p .venv/bin/python -e ".[dev]"
 
-zinet --version                    # zinet 0.1.0
+zinet --version                    # zinet 0.2.0
 ```
 
 Rendering to SVG, PNG, or PDF also needs Graphviz's `dot` on your PATH. Mermaid output needs nothing.

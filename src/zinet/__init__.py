@@ -24,7 +24,7 @@ from .schema import EdgeType, Graph, Layer, Node
 from .transforms import GraphDiff, diff_graphs, slice_to
 from .validator import Issue, validate
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 __all__ = [
     "CycleError",
