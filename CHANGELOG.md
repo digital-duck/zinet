@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.1
+
+- `Style.show_kind` (default `True`): set it to `False` and nodes show only their label, in the interactive page, graphviz, mermaid and pyvis; the colour and the legend still say the kind.
+- Node text in the interactive page wraps inside the box (long labels no longer overflow).
+- Tests: the page's JavaScript is checked with `node` and its behaviour in headless Chrome (skipped when either is missing).
+
 ## 0.2.0
 
 Additive: the public API of 0.1.0 (`load_graph`, `validate`, `diff_graphs`, `slice_to`, `dump_graph`, `render`) is unchanged.
