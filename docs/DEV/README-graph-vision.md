@@ -1,6 +1,6 @@
 # The Graph Vision: graph.yaml as Universal Declarative IR
 
-*ZiNets Ecosystem Architecture — formalized 2026-09-27*
+*ZiNets Ecosystem Architecture — formalized 2026-09-27, revised 2026-10-24*
 
 ---
 
@@ -27,8 +27,8 @@ This three-layer DAG maps naturally to every domain in the ecosystem:
 | [GraphLang](https://github.com/digital-duck/graflang) | node types (`GENERATE`, `EVALUATE`, `GUARD`, ...) | composed workflows (a `LOOP` body, a procedure) | runnable workflows (e.g. `code_pipeline`) |
 | [SPL](https://github.com/digital-duck/SPL.py) | built-in tools (`llm_call`, `api_call`, `cache_get`) | workflow steps, intermediate transforms | runnable recipes (e.g. `build_concept_book`) |
 | [Graph-Code](https://github.com/digital-duck/graph-code) | leaf components, APIs | composed modules, services | deployable apps, systems |
-| [Momagrid](https://github.com/digital-duck/momagrid) | GPU node | Hub-Spoke network | low-cost decentralized inference |
 | [ConceptBook](https://github.com/digital-duck/concept-book) | concept, atomic facts, definitions; primitive concepts (irreducible knowledge units) | composed ideas, theorems; prerequisite-ordered compositions | capstone insights, worked examples; capstone mastery — the target concept the learner navigates toward |
+| [Momagrid](https://github.com/digital-duck/momagrid) | GPU node | Hub-Spoke network | low-cost decentralized inference |
 | Solver | decision variables, parameters | constraints, derived quantities | objectives, solution targets |
 
 The same `graph.yaml` validator, the same navigator (`graph.html`), and the same diff semantics work across all the knowledge domains above. That is the leverage. (GraphLang's own file is a different graph, an executable workflow; this row shows the same three levels of composition, not the same file format. See "Two graphs, one family".)
@@ -233,13 +233,13 @@ The basis is not something we chose; every domain above arrives at it independen
 
 If every domain decomposes into nodes (identities with state) and edges (relations with flow), then `graph.yaml` is the right IR not by convention but by necessity — it is the minimal structure capable of representing anything:
 
-- **SPL scripts**: tools are nodes, data flows are edges, recipes are capstone paths.
-- **Momagrid**: GPU nodes, Hub-Spoke network edges, distributed inference as a flow graph.
-- **ConceptBook**: concepts are nodes, logical dependencies are edges, worked examples are paths.
-- **Graph-Code**: components are nodes, APIs and imports are edges, deployable apps are entry paths.
-- **Solver**: decision variables are nodes, constraints are edges, the objective is the target path.
 - **GraphLang**: agents (`GENERATE`, `EVALUATE`, ...) are nodes, `triggers` and `binds` between their ports are edges, a runnable workflow is the whole graph; the model changes the topology instead of writing code.
+- **SPL scripts**: tools are nodes, data flows are edges, recipes are capstone paths.
+- **Graph-Code**: components are nodes, APIs and imports are edges, deployable apps are entry paths.
+- **ConceptBook**: concepts are nodes, logical dependencies are edges, worked examples are paths.
 - **Education**: primitive knowledge units are nodes, prerequisite relations are edges, the target mastery concept is the capstone path — grounded in Novak & Gowin's (1984) concept maps, which independently arrived at the same representation from cognitive science rather than from physics or graph theory.  If validated against neuroscience (semantic networks, schema theory, cognitive load), this surface carries the deepest claim: the graph-first IR reflects not just a useful abstraction but actual memory architecture.
+- **Momagrid**: GPU nodes, Hub-Spoke network edges, distributed inference as a flow graph.
+- **Solver**: decision variables are nodes, constraints are edges, the objective is the target path.
 
 The `primitives → concepts → applications` three-layer schema is the same fermion/boson duality applied recursively: primitives are pure form (leaves, no decomposition), edges between them are pure function (relations, no identity of their own), and applications are where form and function crystallize into a usable whole.
 
