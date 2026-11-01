@@ -28,6 +28,7 @@ This three-layer DAG maps naturally to every domain in the ecosystem:
 | [SPL](https://github.com/digital-duck/SPL.py) | built-in tools (`llm_call`, `api_call`, `cache_get`) | workflow steps, intermediate transforms | runnable recipes (e.g. `build_concept_book`) |
 | [Graph-Code](https://github.com/digital-duck/graph-code) | leaf components, APIs | composed modules, services | deployable apps, systems |
 | [ConceptBook](https://github.com/digital-duck/concept-book) | concept, atomic facts, definitions; primitive concepts (irreducible knowledge units) | composed ideas, theorems; prerequisite-ordered compositions | capstone insights, worked examples; capstone mastery — the target concept the learner navigates toward |
+| [Work-Graph](https://github.com/digital-duck/work-graph) | artifacts: files, symbols, requirements, decisions, notes; org and process-step nodes | composed units: process stages, sub-graphs (a team, a product, a delivery process), requirement → design → test traces | graph-grounded answers (cited subgraphs), gap and traceability reports, impact analysis |
 | [Momagrid](https://github.com/digital-duck/momagrid) | GPU node | Hub-Spoke network | low-cost decentralized inference |
 | Solver | decision variables, parameters | constraints, derived quantities | objectives, solution targets |
 
@@ -35,9 +36,9 @@ The same `graph.yaml` validator, the same navigator (`graph.html`), and the same
 
 ---
 
-## The six-CLI ecosystem
+## The seven-CLI ecosystem
 
-As of 2026-09-27 the ZiNets toolchain has matured to five CLIs sharing `graph.yaml` as their common exchange format, and a sixth, `graf` (GraphLang, 2026-10), that applies the same graph-first idea to execution:
+As of 2026-09-27 the ZiNets toolchain has matured to five CLIs sharing `graph.yaml` as their common exchange format, a sixth, `graf` (GraphLang, 2026-10), that applies the same graph-first idea to execution, and a seventh, `workgraph` (Work-Graph), that applies it to the development process and the knowledge around it:
 
 | CLI | Stack | Role | Purpose |
 |---|---|---|---|
@@ -47,8 +48,9 @@ As of 2026-09-27 the ZiNets toolchain has matured to five CLIs sharing `graph.ya
 | `gfc` | Graph-Code | `graph.yaml` → software blueprints and scaffolded apps | app builder |
 | `solver` | Solver Box | `graph.yaml` → deterministic solver for real-world optimization | solution |
 | `graf` | GraphLang | `*.graph.yaml` workflow graph → run, validate, draw (`graf vis`), compile; the successor to SPL scripts | executable workflows |
+| `workgraph` | Work-Graph | project artifacts, process and org layers → one knowledge graph with gap analysis, search and a Claude Code session memory | development-process knowledge |
 
-Each CLI is independently installable and operable, yet they compose naturally: `spl3` generates `graph.yaml`; `gfc` and `cba` consume it; `solver` uses the same format to formulate (problem, solution) pair; `graf` runs workflows whose graph is the program, and is replacing `spl3` as the way workflows are written. All six share the code in zinet (algorithms, drawing, comment-preserving YAML).
+Each CLI is independently installable and operable, yet they compose naturally: `spl3` generates `graph.yaml`; `gfc` and `cba` consume it; `solver` uses the same format to formulate (problem, solution) pair; `graf` runs workflows whose graph is the program, and is replacing `spl3` as the way workflows are written. `workgraph` builds on graphify and reads the project's files into the graph. All seven share the code in zinet (algorithms, drawing, comment-preserving YAML).
 
 ---
 

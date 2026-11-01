@@ -16,9 +16,11 @@ CYTOSCAPE_PAGE = """<!doctype html>
 <title>__TITLE__</title>
 <style>
   html,body{margin:0;height:100%;font:16px system-ui,sans-serif;background:#fff;color:#222}
-  #bar{display:flex;gap:12px;align-items:center;padding:8px 12px;min-height:34px;border-bottom:1px solid #ddd;flex-wrap:wrap}
-  #cy{position:absolute;top:52px;bottom:0;left:0;right:340px}
-  #side{position:absolute;top:52px;bottom:0;right:0;width:340px;font-size:15px;overflow:auto;border-left:1px solid #ddd;padding:8px;box-sizing:border-box}
+  body{display:flex;flex-direction:column}       /* the bar may wrap to two rows in a narrow window: the picture and the side panel take what is left */
+  #bar{display:flex;gap:12px;align-items:center;padding:8px 12px;min-height:34px;border-bottom:1px solid #ddd;flex-wrap:wrap;flex:none}
+  #main{flex:1;display:flex;min-height:0}
+  #cy{flex:1;min-width:0;position:relative}
+  #side{flex:none;width:340px;font-size:15px;overflow:auto;border-left:1px solid #ddd;padding:8px;box-sizing:border-box}
   .sw{display:inline-block;width:12px;height:12px;border-radius:3px;margin:0 3px 0 8px}
   .ln{display:inline-block;width:22px;border-top:2px solid #6b7280;vertical-align:middle;margin:0 3px 0 8px}
   .ln.d{border-top-style:dashed;border-color:#4f8ef7}
@@ -33,7 +35,7 @@ CYTOSCAPE_PAGE = """<!doctype html>
  <button id="zin" title="Zoom in">+</button><button id="zout" title="Zoom out">&minus;</button><button id="zfit" title="Fit the whole graph">Fit</button><button id="reset" title="Clear the selection, the highlight and the search">Reset</button>
  __CONTROLS__
  <span>__LEGEND__</span><span style="opacity:.7">__NOTE__</span></div>
-<div id="cy"></div><div id="side"><i>Hover a node to see its connections; click it for details.</i></div>
+<div id="main"><div id="cy"></div><div id="side"><i>Hover a node to see its connections; click it for details.</i></div></div>
 <script>__CYTOSCAPE__</script>
 <script>
 const data = __DATA__;
@@ -154,7 +156,7 @@ document.getElementById('q').oninput = e => {
   if (hit && hit.length) cy.fit(hit, 60);
 };
 document.getElementById('layout').onchange = layout;
-window.addEventListener('resize', () => cy.fit(undefined, 30));
+new ResizeObserver(() => { cy.resize(); cy.fit(undefined, 30); }).observe(document.getElementById('cy'));     // a resized window, a wrapped bar, a dragged splitter
 function zoomBy(f){ cy.zoom({level: cy.zoom() * f, renderedPosition: {x: cy.width() / 2, y: cy.height() / 2}}); }
 document.getElementById('zin').onclick = () => zoomBy(1.3);
 document.getElementById('zout').onclick = () => zoomBy(1 / 1.3);
