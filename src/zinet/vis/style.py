@@ -50,6 +50,7 @@ class Style:
     show_kind: bool = True      # False: nodes show only their label (the colour and the legend already say the kind)
     secondary_hidden: bool = False
     groups_collapsed: bool = False
+    default_layout: str | None = None   # the arrangement the page's selector starts on ("grid", "cose", ...); None: the first one offered
 
     def legend(self, G) -> list[tuple[str, str]]:
         """(kind, colour) for every kind present, in kind order."""

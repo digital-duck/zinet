@@ -132,10 +132,13 @@ function setAll(collapseThem){
 function describe(n){
   const d = n.data();
   const other = x => (x.source().id()===n.id() ? x.target() : x.source()).data('label');
-  const rows = n.connectedEdges().map(x => (x.source().id()===n.id() ? '→ ' : '← ') + esc(x.data('relation')) + ' ' +
-    esc(other(x)) + (x.data('info') ? '  (' + esc(x.data('info')) + ')' : '')).sort();
+  const row = x => (x.source().id()===n.id() ? '🟠➡️ ' : '🟢⬅️ ') + esc(x.data('relation')) + ' ' +
+    esc(other(x)) + (x.data('info') ? '  (' + esc(x.data('info')) + ')' : '');
+  const edges = n.connectedEdges();
+  const rows = [...edges.filter(x => x.target().id()===n.id() && x.source().id()!==n.id()).map(row).sort(),   // incoming first
+                ...edges.filter(x => x.source().id()===n.id()).map(row).sort()];
   const hint = store[n.id()] ? '<div class="hint">Click it again to expand.</div>' : (n.isParent() ? '<div class="hint">Double-click to collapse.</div>' : '');
-  document.getElementById('side').innerHTML = '<b>' + esc(d.label) + '</b><pre>' + esc(d.info) + '</pre>' + hint +
+  document.getElementById('side').innerHTML = '<b>Node: ' + esc(d.label) + '</b><pre>' + String(d.info || '').split('\\n').filter(l => l.trim()).map(l => '🔵 ' + esc(l)).join('\\n') + '</pre>' + hint + '<br><br>' +
     '<b>Links</b><pre>' + rows.join('\\n') + '</pre>';
 }
 cy.on('mouseover', 'node', e => { hover = e.target; refresh(); });
@@ -243,7 +246,7 @@ def cytoscape_html(G: nx.Graph, style: Style, note: str = "", mark: set[str] | N
             .replace("__CONTROLS__", _controls(style, bool(dashed), has_groups, opts["dataHidden"]))
             .replace("__OPTS__", json.dumps(opts))
             .replace("__LEGEND__", _legend(G, style))
-            .replace("__LAYOUTS__", "".join(f"<option>{l}</option>" for l in layouts))
+            .replace("__LAYOUTS__", "".join(f"<option{' selected' if l == style.default_layout else ''}>{l}</option>" for l in layouts))
             .replace("__DATA__", json.dumps(elements(G, style, pos, mark, placed)).replace("</", "<\\/"))
             .replace("__CYTOSCAPE__", js.replace("</script", "<\\/script")))
 
