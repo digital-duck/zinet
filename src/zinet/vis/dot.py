@@ -115,17 +115,21 @@ def _best_layout(G: nx.Graph, style: Style, canvas_aspect: float, rankdirs=("LR"
     return best
 
 
-def dot_layouts(G: nx.Graph, style: Style, canvas_aspect: float = 1.6) -> dict[str, dict[str, dict[str, float]]]:
+def dot_layouts(G: nx.Graph, style: Style, canvas_aspect: float = 1.6, rankdir: str | None = None) -> dict[str, dict[str, dict[str, float]]]:
     """Node positions for the interactive page, from Graphviz; {} when `dot` is missing or fails.
 
     "expanded": every node, with each group drawn around its members (a group's own anchor is left out: it is a box on the page).
     "collapsed": the layout of the graph with every group contracted to one node, so a page that starts collapsed is compact.
     "centers": the middle of each group's members, where a group sits when it is collapsed on its own.
     Left-to-right and top-to-bottom are both tried and the shape closer to the page's is kept (a long pipeline is unreadable as
-    one very wide row); the collapsed layout uses the same direction."""
+    one very wide row); the collapsed layout uses the same direction. `rankdir` "LR" or "TB" fixes the direction instead."""
     if not shutil.which("dot"):
         return {}
-    best = _best_layout(G, style, canvas_aspect)
+    if rankdir:
+        got = _dot_json(G, style, rankdir)
+        best = (got[0], rankdir) if got else None
+    else:
+        best = _best_layout(G, style, canvas_aspect)
     if best is None:
         return {}
     pos, rankdir = best

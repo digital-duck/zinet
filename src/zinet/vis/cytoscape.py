@@ -32,7 +32,7 @@ CYTOSCAPE_PAGE = """<!doctype html>
 </style></head><body>
 <div id="bar"><b>__TITLE__</b><input id="q" placeholder="find a node" size="18" style="font-size:15px">
  <select id="layout" style="font-size:15px">__LAYOUTS__</select>
- <button id="zin" title="Zoom in">+</button><button id="zout" title="Zoom out">&minus;</button><button id="zfit" title="Fit the whole graph">Fit</button><button id="reset" title="Clear the selection, the highlight and the search">Reset</button>
+ <button id="zin" title="Zoom in">+</button><button id="zout" title="Zoom out">&minus;</button><button id="zfit" title="Fit the whole graph">Fit</button><button id="reset" title="Clear the selection, the highlight and the search">Reset</button><button id="capture" title="Save the picture as a PDF (in an app that listens it is saved there; on its own page it downloads)">Capture</button>
  __CONTROLS__
  <span>__LEGEND__</span><span style="opacity:.7">__NOTE__</span></div>
 <div id="main"><div id="cy"></div><div id="side"><i>Hover a node to see its connections; click it for details.</i></div></div>
@@ -85,10 +85,12 @@ function refresh(){
 }
 
 // ---- layout -----------------------------------------------------------------------------------------------------
-const isDot = () => document.getElementById('layout').value === 'dot';
+const isDot = () => document.getElementById('layout').value.startsWith('dot');
+const dirOf = () => document.getElementById('layout').value === 'dot horizontal' ? '_LR' : '';
+const at = (n, key) => n.data(key + dirOf()) || n.data(key);          // a fixed direction's positions, else the automatic ones
 function layout(){
   if (isDot()) {
-    cy.nodes().forEach(n => { if (n.data('pos') && !store[n.id()]) n.position(n.data('pos')); });
+    cy.nodes().forEach(n => { if (at(n, 'pos') && !store[n.id()]) n.position(at(n, 'pos')); });
     applyPositions(false);
     return;
   }
@@ -101,7 +103,7 @@ function applyPositions(animate){                     // the precomputed dot lay
   if (!isDot()) { cy.fit(undefined, 30); return; }
   const allCollapsed = GROUPS.length > 0 && GROUPS.every(id => store[id]);
   cy.nodes().forEach(n => {
-    const p = allCollapsed && n.data('posc') ? n.data('posc') : (store[n.id()] ? n.data('center') : n.data('pos'));
+    const p = allCollapsed && at(n, 'posc') ? at(n, 'posc') : (store[n.id()] ? at(n, 'center') : at(n, 'pos'));
     if (!p) return;
     if (animate) n.animate({position: p}, {duration: 250}); else n.position(p);
   });
@@ -112,10 +114,10 @@ function applyPositions(animate){                     // the precomputed dot lay
 function collapse(g){
   if (store[g.id()] || !g.isParent()) return;
   const kids = g.descendants(), bb = kids.boundingBox();
-  const at = g.data('center') || {x: (bb.x1 + bb.x2) / 2, y: (bb.y1 + bb.y2) / 2};
+  const c0 = g.data('center') || {x: (bb.x1 + bb.x2) / 2, y: (bb.y1 + bb.y2) / 2};
   g.data('text', g.data('label') + '\\n' + kids.nodes().length + ' nodes');
   store[g.id()] = kids.remove();
-  g.addClass('collapsed'); g.position(at);
+  g.addClass('collapsed'); g.position(c0);
   if (selected && !live(selected)) selected = null;
 }
 function expand(g){
@@ -175,6 +177,46 @@ const collapseAll = document.getElementById('collapseall'), expandAll = document
 if (collapseAll) collapseAll.onclick = () => setAll(true);
 if (expandAll) expandAll.onclick = () => setAll(false);
 
+// ---- capture: the picture as a one-page PDF (a JPEG of the whole graph, no library) ---------------------------------
+function pdfOfJpeg(jpeg, w, h){
+  const enc = new TextEncoder(), parts = [], off = []; let len = 0;
+  const add = x => { const b = typeof x === 'string' ? enc.encode(x) : x; parts.push(b); len += b.length; };
+  const obj = (i, body) => { off[i] = len; add(i + ' 0 obj\\n' + body + '\\nendobj\\n'); };
+  const pw = Math.round(w * 0.75), ph = Math.round(h * 0.75), c = 'q ' + pw + ' 0 0 ' + ph + ' 0 0 cm /Im0 Do Q';
+  add('%PDF-1.4\\n');
+  obj(1, '<< /Type /Catalog /Pages 2 0 R >>');
+  obj(2, '<< /Type /Pages /Kids [3 0 R] /Count 1 >>');
+  obj(3, '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ' + pw + ' ' + ph + '] /Resources << /XObject << /Im0 4 0 R >> >> /Contents 5 0 R >>');
+  off[4] = len;
+  add('4 0 obj\\n<< /Type /XObject /Subtype /Image /Width ' + w + ' /Height ' + h + ' /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ' + jpeg.length + ' >>\\nstream\\n');
+  add(jpeg); add('\\nendstream\\nendobj\\n');
+  obj(5, '<< /Length ' + c.length + ' >>\\nstream\\n' + c + '\\nendstream');
+  const xref = len; add('xref\\n0 6\\n0000000000 65535 f \\n');
+  for (let i = 1; i <= 5; i++) add(String(off[i]).padStart(10, '0') + ' 00000 n \\n');
+  add('trailer\\n<< /Size 6 /Root 1 0 R >>\\nstartxref\\n' + xref + '\\n%%EOF');
+  const out = new Uint8Array(len); let at = 0; for (const b of parts) { out.set(b, at); at += b.length; }
+  return out;
+}
+function b64(bytes){ let s = ''; for (let i = 0; i < bytes.length; i += 8192) s += String.fromCharCode.apply(null, bytes.subarray(i, i + 8192)); return btoa(s); }
+function download(bytes, name){
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([bytes], {type: 'application/pdf'})); a.download = name; a.click();
+}
+document.getElementById('capture').onclick = () => {
+  const btn = document.getElementById('capture'), url = cy.jpg({full: true, scale: 2, quality: 0.92, bg: '#ffffff'}), img = new Image();
+  img.onload = () => {
+    const pdf = pdfOfJpeg(Uint8Array.from(atob(url.split(',')[1]), ch => ch.charCodeAt(0)), img.width, img.height);
+    const name = (document.querySelector('#bar b').textContent || 'graph').replace(/[^A-Za-z0-9_-]+/g, '_') + '.pdf';
+    const done = txt => { btn.textContent = txt; setTimeout(() => btn.textContent = 'Capture', 2500); };
+    if (window.parent === window) { download(pdf, name); done('Saved'); return; }          // a page of its own: the browser downloads it
+    let got = false;
+    const onAck = e => { if (e.data && e.data.graf === 'got') { got = true; done('Sent'); } };
+    window.addEventListener('message', onAck);
+    parent.postMessage({graf: 'capture', name: name, pdf: b64(pdf)}, '*');                 // inside an app that listens: it saves the file
+    setTimeout(() => { window.removeEventListener('message', onAck); if (!got) { download(pdf, name); done('Saved'); } }, 1200);
+  };
+  img.src = url;
+};
+
 layout();
 if (OPTS.collapsed && GROUPS.length) setAll(true); else refresh();
 </script></body></html>
@@ -201,7 +243,7 @@ def _controls(style: Style, has_dashed: bool, has_groups: bool, hidden: bool) ->
 
 
 def elements(G: nx.Graph, style: Style, positions: dict | None = None, mark: set[str] | None = None,
-             layouts: dict | None = None) -> list[dict]:
+             layouts: dict | None = None, fixed: dict | None = None) -> list[dict]:
     """The Cytoscape element list for G. `positions` (id -> {x, y}) is optional; nodes without one are placed by a layout.
     Nodes in `mark` get a red ring (the node a view is about). `layouts` (from `dot_layouts`) adds the data the page needs to
     switch between the expanded and the collapsed arrangement: `pos`, `posc` (collapsed) and, for a group, `center`."""
@@ -221,6 +263,9 @@ def elements(G: nx.Graph, style: Style, positions: dict | None = None, mark: set
         for key, source in (("pos", "expanded"), ("posc", "collapsed"), ("center", "centers")):
             if layouts and n in layouts.get(source, {}):
                 data[key] = layouts[source][n]
+            for suffix, lay in (fixed or {}).items():                  # the same positions with the direction fixed: pos_TB, posc_LR, ...
+                if n in lay.get(source, {}):
+                    data[f"{key}_{suffix}"] = lay[source][n]
         el = {"data": data}
         if positions and n in positions:
             el = {"position": positions[n], **el}
@@ -235,9 +280,10 @@ def elements(G: nx.Graph, style: Style, positions: dict | None = None, mark: set
 def cytoscape_html(G: nx.Graph, style: Style, note: str = "", mark: set[str] | None = None) -> str:
     """The self-contained page for G. In the "flow" arrangement the node positions come from `dot` when it is installed (it
     lays out clusters properly); in the "force" arrangement a force layout places the nodes. `mark` ids get a red ring."""
-    placed = dot_layouts(G, style) if style.arrangement == "flow" else {}
+    placed = dot_layouts(G, style, rankdir="TB") if style.arrangement == "flow" else {}      # "dot" is top to bottom
     pos = placed.get("expanded", {})
-    layouts = (["dot"] if pos else []) + ["cose", "breadthfirst", "concentric", "circle", "grid"]
+    fixed = {"LR": dot_layouts(G, style, rankdir="LR")} if pos else {}
+    layouts = (["dot", "dot horizontal"] if pos else []) + ["cose", "breadthfirst", "concentric", "circle", "grid"]
     has_groups = bool(groups_of(G, style))
     dashed = [(u, v) for u, v, d in G.edges(data=True) if style.edge_dashed(u, v, d)]
     opts = {"dataHidden": bool(style.secondary_hidden and dashed), "collapsed": bool(style.groups_collapsed and has_groups)}
@@ -247,7 +293,7 @@ def cytoscape_html(G: nx.Graph, style: Style, note: str = "", mark: set[str] | N
             .replace("__OPTS__", json.dumps(opts))
             .replace("__LEGEND__", _legend(G, style))
             .replace("__LAYOUTS__", "".join(f"<option{' selected' if l == style.default_layout else ''}>{l}</option>" for l in layouts))
-            .replace("__DATA__", json.dumps(elements(G, style, pos, mark, placed)).replace("</", "<\\/"))
+            .replace("__DATA__", json.dumps(elements(G, style, pos, mark, placed, fixed)).replace("</", "<\\/"))
             .replace("__CYTOSCAPE__", js.replace("</script", "<\\/script")))
 
 

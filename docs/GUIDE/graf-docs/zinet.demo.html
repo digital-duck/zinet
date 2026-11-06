@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>zinet</title>
+<style>
+  :root {
+    --ink: #1c2330; --muted: #5b6678; --paper: #fbfbfa; --line: #dfe3ea;
+    --blue: #4f8df5; --gray: #8a919c; --green: #2e9e6b; --orange: #e8913a; --red: #d8473f;
+    --code-bg: #0f1623; --code-ink: #dbe4f3;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: #e9ebef; color: var(--ink);
+    font: 26px/1.42 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  .deck { position: fixed; inset: 0 0 4.5vh 0; display: grid; place-items: center; }
+  .slide { display: none; width: min(96vw, 158vh); height: min(54vw, 89vh); background: var(--paper);
+    border-radius: 14px; box-shadow: 0 8px 40px rgba(20,30,50,.18); padding: 4.2% 5.5% 3.5%;
+    flex-direction: column; overflow: hidden; position: relative; }
+  .slide.on { display: flex; }
+  h1 { font-size: 2.5em; line-height: 1.1; margin: 0 0 .3em; letter-spacing: -.02em; }
+  h2 { font-size: 1.7em; margin: 0 0 .5em; letter-spacing: -.01em; }
+  h2::after { content: ""; display: block; width: 64px; height: 4px; background: var(--blue); border-radius: 2px; margin-top: .25em; }
+  h3 { font-size: 1.05em; margin: 0 0 .3em; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .06em; }
+  p { margin: 0 0 .6em; }
+  ul { margin: 0; padding-left: 1.1em; }
+  li { margin: .3em 0; }
+  li > ul { font-size: .82em; margin-top: .1em; }
+  li::marker { color: var(--blue); }
+  .sub { color: var(--muted); font-size: 1.15em; }
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 3%; align-items: start; flex: 1; min-height: 0; }
+  .cols.wide-left { grid-template-columns: 1.25fr 1fr; }
+  .cols.wide-right { grid-template-columns: 1fr 1.25fr; }
+  pre, code { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+  code { background: #eef0f4; padding: .05em .35em; border-radius: 4px; font-size: .88em; }
+  pre { background: var(--code-bg); color: var(--code-ink); padding: .7em .9em; border-radius: 10px; font-size: .66em; line-height: 1.45;
+    margin: 0 0 .6em; overflow: hidden; white-space: pre; }
+  pre .c { color: #7d8ba3; } pre .k { color: #8cc4ff; } pre .s { color: #a5e3b4; } pre .h { color: #ffcf7a; }
+  .card { background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: .6em .9em; }
+  .tag { display: inline-block; font-size: .62em; font-weight: 700; padding: .12em .6em; border-radius: 99px; color: #fff; vertical-align: middle; }
+  .t-gen { background: var(--blue); } .t-io { background: var(--gray); } .t-sol { background: var(--green); }
+  .t-ctl { background: var(--orange); } .t-safe { background: var(--red); }
+  table { border-collapse: collapse; width: 100%; font-size: .92em; }
+  th, td { text-align: left; padding: .35em .6em; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--muted); font-weight: 600; font-size: .85em; text-transform: uppercase; letter-spacing: .05em; }
+  .big { font-size: 1.5em; line-height: 1.3; }
+  .center { text-align: center; }
+  .grow { flex: 1; min-height: 0; }
+  .foot { position: absolute; left: 5.5%; right: 5.5%; bottom: 1.8%; display: flex; justify-content: space-between;
+    color: #9aa3b2; font-size: .5em; }
+  .foot a { color: inherit; text-decoration: underline; }
+  .refs a { color: var(--blue); display: block; }
+  .refs li { font-size: .78em; }
+  .quiet { color: var(--muted); }
+  .good { color: var(--green); font-weight: 600; } .bad { color: var(--red); font-weight: 600; }
+  .demo { border-left: 6px solid var(--orange); background: #fff6ea; border-radius: 0 10px 10px 0; padding: .5em .9em; margin-bottom: .7em; font-size: .85em; }
+  .demo b { color: var(--orange); letter-spacing: .06em; font-size: .8em; text-transform: uppercase; }
+  .stack > * { margin-bottom: .45em; }
+  svg { max-width: 100%; height: auto; }
+  svg text { font: 600 13px system-ui, sans-serif; }
+  #bar { position: fixed; left: 0; top: 0; height: 4px; background: var(--blue); width: 0; transition: width .2s; z-index: 5; }
+  #nav { position: fixed; left: 50%; bottom: 8px; transform: translateX(-50%); display: flex; gap: 6px; z-index: 6; }
+  #nav button { font: 600 14px system-ui, sans-serif; min-width: 44px; padding: 6px 12px; border-radius: 8px; border: 1px solid #c9ced8;
+    background: #fff; color: var(--ink); cursor: pointer; }
+  #nav button:hover { background: #eef2fb; border-color: var(--blue); }
+  #nav button:disabled { opacity: .4; cursor: default; background: #fff; border-color: #c9ced8; }
+  #nav #pdf { margin-left: 10px; }
+  #nav #tocbtn { margin-right: 10px; }
+  #hud { position: fixed; right: 14px; bottom: 10px; font-size: 13px; color: #7d8696; z-index: 5; }
+  .toc { columns: 3; column-gap: 3%; list-style: none; margin: 0; padding: 0; font-size: .8em; }
+  .toc li { break-inside: avoid; margin: .22em 0; padding: .12em .3em; border-radius: 6px; cursor: pointer; display: flex; gap: .6em; }
+  .toc li:hover { background: #eef2fb; }
+  .toc .n { color: var(--blue); font-weight: 700; min-width: 1.6em; text-align: right; }
+  .notes { display: none; }
+  #notes-box { display: none; }
+  body.show-notes #notes-box { display: block; position: fixed; left: 0; right: 0; bottom: 0; max-height: 34vh; overflow: auto;
+    background: #141a26; color: #d7deeb; padding: 14px 6vw; font-size: 17px; line-height: 1.5; z-index: 9; }
+  @page { size: 13.333in 7.5in; margin: 0; }
+  @media print {
+    html, body { background: #fff; height: auto; font-size: 24px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .deck { position: static; display: block; }
+    .slide { display: flex !important; width: 13.333in; height: 7.5in; border-radius: 0; box-shadow: none; break-after: page; page-break-after: always; }
+    .slide:last-child { break-after: auto; page-break-after: auto; }
+    pre { font-size: .58em; }       /* the page is smaller than the screen: keep code lines inside their box */
+    #bar, #hud, #nav, .notes, #notes-box { display: none !important; }
+  }
+</style>
+</head>
+<body data-title="zinet">
+<div id="bar"></div>
+<div id="nav">
+  <button id="tocbtn" title="Outline (T)">TOC</button>
+  <button id="first" title="First slide (Home)">&lt;&lt;</button>
+  <button id="prev" title="Previous slide (←)">&lt;</button>
+  <button id="next" title="Next slide (→ or space)">&gt;</button>
+  <button id="last" title="Last slide (End)">&gt;&gt;</button>
+  <button id="pdf" title="Opens the print dialog: choose Save as PDF, landscape, margins None, and tick Background graphics">PDF</button>
+</div>
+<div id="hud">← → or space · T outline · F fullscreen · N notes · O overview</div>
+<div class="deck" id="deck">
+<section class="slide">
+  <div style="margin:auto 0">
+    <h1>zinet</h1>
+    <p class="big">The shared graph IR core: a <code>graph.yaml</code> format with a validator and transforms.</p>
+    <p class="sub">Like LLVM IR for the ZiNets ecosystem: front-ends emit it, back-ends consume it.</p>
+  </div>
+  <div class="foot"><span><a href="https://github.com/digital-duck/zinet" target="_blank" rel="noopener">https://github.com/digital-duck/zinet</a></span><span></span></div>
+  <aside class="notes">zinet is a small Python package. It holds the graph format and the code that checks and transforms it, so the other apps do not each keep a copy.</aside>
+</section>
+
+<section class="slide" id="outline">
+  <h2>Outline</h2>
+  <ol class="toc" id="toc"></ol>
+  <aside class="notes">The outline lists every slide title; click a line to jump.</aside>
+</section>
+
+<section class="slide">
+  <h2>The problem: duplicated graph code</h2>
+  <div class="cols">
+    <ul>
+      <li>Graph-Code, ConceptBook, GraphLang and work-graph each carried their <b>own copies</b> of graph algorithms.</li>
+      <li>Drawing code was copied too (GraphLang and work-graph).</li>
+      <li>YAML handling was copied as well, including comment-preserving round trips in work-graph.</li>
+      <li>ConceptBook is named as the closest relative and the biggest source of duplicated graph code.</li>
+    </ul>
+    <div class="card stack">
+      <h3>Cost of copies</h3>
+      <div>The copies differ in small ways.</div>
+      <div>The differences are frozen in characterization tests.</div>
+    </div>
+  </div>
+  <aside class="notes">The ecosystem has several graph-first apps. Each grew its own learning-path, ordering, drawing and YAML code. zinet pulls that into one package.</aside>
+</section>
+
+<section class="slide">
+  <h2>The idea: one graph IR</h2>
+  <div class="cols">
+    <ul>
+      <li>Front-ends <b>emit</b> <code>graph.yaml</code>.</li>
+      <li>Back-ends <b>consume</b> it.</li>
+      <li>The validator and transforms live <b>once</b>, in a shared package.</li>
+      <li>zinet is small and domain-free; domain rules (for example solver bounds) belong in the back-end.</li>
+      <li>It persists a graph in plain YAML and does not run anything.</li>
+    </ul>
+    <div class="card stack">
+      <h3>Shared here</h3>
+      <div>✔ format and schema</div>
+      <div>✔ validate, diff, slice</div>
+      <div>✔ render and prettify</div>
+      <div>✔ algorithms and drawing</div>
+    </div>
+  </div>
+  <aside class="notes">The comparison is with compilers: one intermediate form, many front-ends and back-ends. Only the core checks are in zinet.</aside>
+</section>
+
+<section class="slide">
+  <h2>Origin: characters as decomposition graphs</h2>
+  <div class="cols">
+    <ul>
+      <li>ZiNets began with Chinese characters: each decomposes into radicals, strokes and abstract primitives.</li>
+      <li>That decomposition is a <b>directed acyclic graph</b>.</li>
+      <li>The same structure turned out to fit knowledge, code, computation and optimization.</li>
+      <li>The instinct is a physicist's: protons to quarks to fields.</li>
+    </ul>
+    <div class="card stack">
+      <h3>Every complex thing</h3>
+      <div>primitives</div>
+      <div>compositions</div>
+      <div>capstone applications</div>
+    </div>
+  </div>
+  <aside class="notes">This is the history from the graph vision notes. The character explorer was the first user of the graph, and the data structure generalised.</aside>
+</section>
+
+<section class="slide">
+  <h2>Three layers: primitives, concepts, applications</h2>
+<pre><span class="k">primitives</span>:            <span class="c"># leaves: must not have deps</span>
+  - id: x_units
+    meta: {type: variable}
+<span class="k">concepts</span>:              <span class="c"># composed from the layer below</span>
+  - id: capacity_constraint
+    deps: [x_units, max_units]
+    edge_types: {max_units: constraint}
+<span class="k">applications</span>:          <span class="c"># capstones: nothing depends on these</span>
+  - id: minimize_cost
+    deps: [capacity_constraint]</pre>
+  <ul>
+    <li>Primitives are leaves and must have no <code>deps</code>.</li>
+    <li>Nothing may depend on an application.</li>
+  </ul>
+  <aside class="notes">The layer is the key a node is written under, not a field of the node. An empty document is valid.</aside>
+</section>
+
+<section class="slide">
+  <h2>Nodes, deps and edge types</h2>
+  <div class="cols">
+    <ul>
+      <li>Node fields: <code>id</code>, <code>label</code>, <code>deps</code>, <code>edge_types</code>, <code>meta</code>.</li>
+      <li><code>deps</code> are incoming edges; ids are unique across imports.</li>
+      <li><code>meta</code> is <b>opaque</b>: the core never reads it.</li>
+      <li>Unknown keys are rejected, so a typo such as <code>primitves:</code> fails at load time.</li>
+    </ul>
+    <div class="card stack">
+      <h3>Five edge types</h3>
+      <div><code>depends_on</code> (default)</div>
+      <div><code>data_flow</code></div>
+      <div><code>prerequisite</code></div>
+      <div><code>constraint</code></div>
+      <div><code>inheritance</code></div>
+    </div>
+  </div>
+  <aside class="notes">Edge types affect rendering and documentation only. Validation treats all edges the same.</aside>
+</section>
+
+<section class="slide">
+  <h2>One layer model across domains</h2>
+  <table>
+    <tr><th>Tool</th><th>primitives</th><th>concepts</th><th>applications</th></tr>
+    <tr><td>GraphLang</td><td>node types</td><td>composed workflows</td><td>runnable workflows</td></tr>
+    <tr><td>SPL</td><td>built-in tools</td><td>workflow steps</td><td>runnable recipes</td></tr>
+    <tr><td>Graph-Code</td><td>leaf components, APIs</td><td>modules, services</td><td>deployable apps</td></tr>
+    <tr><td>ConceptBook</td><td>atomic facts</td><td>composed ideas</td><td>capstone insights</td></tr>
+    <tr><td>Work-Graph</td><td>files, symbols, requirements</td><td>process stages, traces</td><td>cited answers, reports</td></tr>
+    <tr><td>Momagrid / Solver</td><td>GPU node / variables</td><td>Hub-Spoke network / constraints</td><td>decentralized inference / objectives</td></tr>
+  </table>
+  <aside class="notes">This is the same three levels of composition in each tool. GraphLang's own file is a different, executable format, so the row shows the idea, not a shared file format.</aside>
+</section>
+
+<section class="slide">
+  <h2>Validation checks</h2>
+  <table>
+    <tr><th>Code</th><th>Severity</th><th>Meaning</th></tr>
+    <tr><td><code>duplicate_id</code></td><td>error</td><td>id defined more than once</td></tr>
+    <tr><td><code>unknown_dep</code></td><td>error</td><td>dep names a missing id</td></tr>
+    <tr><td><code>primitive_has_deps</code> / <code>layer_violation</code></td><td>error</td><td>a leaf with deps / a dependency on an application</td></tr>
+    <tr><td><code>cycle</code></td><td>error</td><td>not a DAG</td></tr>
+    <tr><td><code>orphan</code></td><td>warning</td><td>no deps and no dependents</td></tr>
+    <tr><td><code>not_reducible</code>, <code>disconnected</code></td><td>optional</td><td>on with <code>--strict</code></td></tr>
+  </table>
+  <aside class="notes">The two optional checks are off by default, so a graph that is valid today stays valid. not_reducible is an error and disconnected is a warning.</aside>
+</section>
+
+<section class="slide">
+  <h2>Demo: validating a broken graph</h2>
+<pre>$ zinet validate broken.yaml
+broken.yaml: error: primitive_has_deps [a]: ...
+broken.yaml: error: unknown_dep [c]: depends on
+  undefined id 'ghost'
+broken.yaml: error: cycle: dependency cycle among: c, d
+broken.yaml: warning: orphan [app]: not connected to
+  any other node</pre>
+  <ul>
+    <li>Exit code 1 on errors; warnings are printed but do not fail.</li>
+    <li>Exit code 2 on a usage or load failure.</li>
+  </ul>
+  <div class="demo"><b>Demo</b> write the broken.yaml from the tutorial and run <code>zinet validate broken.yaml</code>.</div>
+  <aside class="notes">The graph has a primitive with a dependency, an unknown id, a cycle and an isolated application. Each shows up as one line.</aside>
+</section>
+
+<section class="slide">
+  <h2>The CLI at a glance</h2>
+  <table>
+    <tr><th>Command</th><th>Use</th></tr>
+    <tr><td><code>validate</code></td><td>structural checks; <code>--strict</code> adds the optional ones</td></tr>
+    <tr><td><code>diff</code></td><td>compare two graphs</td></tr>
+    <tr><td><code>slice</code></td><td>a target plus its prerequisites</td></tr>
+    <tr><td><code>render</code></td><td>svg, png, pdf, mermaid, html, ascii</td></tr>
+    <tr><td><code>prettify</code> / <code>convert</code></td><td>canonical format / YAML and JSON</td></tr>
+    <tr><td><code>schema</code></td><td>write the JSON Schema</td></tr>
+  </table>
+  <aside class="notes">One command, seven subcommands. Exit code 2 always means a usage, load or render error.</aside>
+</section>
+
+<section class="slide">
+  <h2>Diff and slice</h2>
+<pre>zinet diff old.yaml new.yaml
+zinet slice graph.yaml target_id -o part.yaml</pre>
+  <ul>
+    <li><code>diff</code> prints <code>+ id</code> for added, <code>- id</code> for removed and <code>~ id.field: old -&gt; new</code> for changed nodes.</li>
+    <li><code>diff</code> exits 1 when the graphs differ, 0 when they do not.</li>
+    <li><code>slice</code> gives the target plus its prerequisite closure.</li>
+    <li>Without <code>-o</code>, the slice is written to stdout.</li>
+  </ul>
+  <aside class="notes">Slice is useful for pulling out just what one target needs. Diff works in CI because of the exit code.</aside>
+</section>
+
+<section class="slide">
+  <h2>Rendering and the interactive page</h2>
+  <div class="cols">
+    <ul>
+      <li>Formats: <code>svg</code>, <code>png</code>, <code>pdf</code>, <code>mermaid</code>, <code>html</code>, <code>ascii</code>.</li>
+      <li><code>html</code>, <code>mermaid</code> and <code>ascii</code> need nothing installed.</li>
+      <li><code>svg</code>, <code>png</code>, <code>pdf</code> need Graphviz <code>dot</code>; png and pdf need <code>-o</code>.</li>
+      <li>Cytoscape.js is bundled, so the page works offline: search, zoom, click a node.</li>
+    </ul>
+<pre>zinet render graph.yaml \
+  --format html -o graph.html</pre>
+  </div>
+  <aside class="notes">The default format is svg to stdout. The html page is a single file.</aside>
+</section>
+
+<section class="slide">
+  <h2>Drawing any networkx graph with <code>zinet.vis</code></h2>
+  <div class="cols">
+    <ul>
+      <li>Engines: cytoscape (default), graphviz, mermaid, ascii; pyvis and graphify as extras.</li>
+      <li>A <code>Style</code> reads your attribute names, so no app has to rename anything.</li>
+      <li><code>select</code> trims a big graph: filters, hidden kinds, hub edges, a node cap.</li>
+      <li>GraphLang and work-graph output is checked against golden files.</li>
+    </ul>
+<pre>from zinet.vis import render, select
+render(G, "graph.html")
+sub, note = select(G, node="app",
+                   hops=2)</pre>
+  </div>
+  <aside class="notes">GraphLang and work-graph used to carry their own drawing code. Now they use these engines.</aside>
+</section>
+
+<section class="slide">
+  <h2>Shared graph algorithms</h2>
+<pre>import zinet
+G = zinet.to_networkx(zinet.load_graph("graph.yaml"))
+zinet.learning_path(G, "app", known=["a"])
+zinet.productivity_order(G)
+zinet.reducible(G)
+zinet.build_order(G)
+zinet.gap(G, "app", ["a"])
+zinet.ensure_acyclic(G)   <span class="c"># raises CycleError</span></pre>
+  <ul>
+    <li>Plain <code>networkx.DiGraph</code>; options reproduce the older copies. Defaults follow graph-code.</li>
+    <li>A missing node raises <code>UnknownNodeError</code>.</li>
+  </ul>
+  <aside class="notes">Graph-code and ConceptBook had their own versions. The options select which behaviour you get, and tests freeze what each copy did.</aside>
+</section>
+
+<section class="slide">
+  <h2>Comments survive: prettify and convert</h2>
+  <div class="cols">
+    <ul>
+      <li><code>prettify --write</code> keeps YAML comments, or refuses to rewrite the file.</li>
+      <li><code>prettify</code> without <code>--write</code> shows a diff and exits 1 if the file would change.</li>
+      <li><code>convert</code> goes between YAML and JSON.</li>
+      <li>JSON has no comments, so they go into SQLite at <code>~/.zinet/comments.db</code>.</li>
+      <li>A comment whose node was removed is written as <code># [orphaned from &lt;id&gt;]</code>.</li>
+    </ul>
+    <div class="card stack">
+      <h3>Store location</h3>
+      <div><code>~/.zinet/comments.db</code></div>
+      <div><code>$ZINET_HOME</code></div>
+      <div><code>--store PATH</code></div>
+    </div>
+  </div>
+  <aside class="notes">This is the approach work-graph uses for its layer files, now shared code in zinet.roundtrip.</aside>
+</section>
+
+<section class="slide">
+  <h2>Two graph formats, one family</h2>
+  <div class="cols">
+    <ul>
+      <li>zinet: a <b>static</b> dependency graph.</li>
+      <li>GraphLang <code>*.graph.yaml</code>: an <b>executable</b> workflow with ports, control and data edges, loops.</li>
+      <li>The file name is only a convention, so each tool tells them apart by content.</li>
+      <li>Given the other kind, a tool names the file's kind and the right command instead of a schema error.</li>
+    </ul>
+    <div class="card stack">
+      <h3>By content</h3>
+      <div><code>workflow:</code> + <code>nodes:</code> + <code>edges:</code> is GraphLang</div>
+      <div><code>primitives:</code>, <code>concepts:</code>, <code>applications:</code> is zinet</div>
+    </div>
+  </div>
+  <aside class="notes">Folding GraphLang into zinet would force its model on the other apps, so the two stay separate and share drawing code.</aside>
+</section>
+
+<section class="slide">
+  <h2>Python API and install</h2>
+<pre>pip install zinet
+
+from zinet import (load_graph, validate,
+                   slice_to, dump_graph)
+graph = load_graph("solver_pipeline.yaml")
+for issue in validate(graph):
+    print(issue)
+prereqs = slice_to(graph, "minimize_cost")</pre>
+  <ul>
+    <li>Core dependencies: networkx, pydantic, pyyaml. Python 3.10 or newer.</li>
+    <li><code>load_graph</code> resolves imports but does not validate.</li>
+  </ul>
+  <aside class="notes">Version 0.2.1, Alpha status. For development, install from source with uv and the dev extra.</aside>
+</section>
+
+<section class="slide">
+  <h2>How it is tested</h2>
+  <ul>
+    <li>A pytest suite, with one fixture graph per domain in <code>tests/fixtures</code>.</li>
+    <li>A test fails if the committed <code>schemas/graph.schema.json</code> is out of date.</li>
+    <li>Characterization tests in <code>tests/characterization</code> freeze what the old copies did.</li>
+    <li>Where the copies disagree is written in <code>divergences.md</code>.</li>
+    <li>The interactive page's JavaScript is checked with <code>node</code> and headless Chrome, skipped when missing.</li>
+  </ul>
+  <aside class="notes">The golden files let the shared code replace the copies without changing their output.</aside>
+</section>
+
+<section class="slide">
+  <h2>Not done yet</h2>
+  <ul>
+    <li>No domain-specific JSON Schema overlays (solver, spl, cba).</li>
+    <li>No <code>graph.html</code> explorer in this package; it belongs to <code>cba</code>.</li>
+    <li><code>spl3</code> integration is the next step: SPL scripts compiling to <code>GraphIR</code>.</li>
+    <li>The ConceptBook / graph-code dialect (<code>composed_of</code>, <code>needs</code>) is not read yet.</li>
+    <li>Status is Alpha.</li>
+  </ul>
+  <aside class="notes">The algorithms and drawing already work on any networkx graph, so the dialect gap affects loading files, not the shared code.</aside>
+</section>
+
+<section class="slide">
+  <h2>References</h2>
+  <ul class="refs">
+    <li><a href="https://github.com/digital-duck/zinet">Repository: digital-duck/zinet</a></li>
+    <li>docs/SPECIFICATION.md: the format</li>
+    <li>schemas/graph.schema.json: JSON Schema</li>
+    <li>docs/GUIDE/TUTORIAL.md: using the command</li>
+    <li>docs/DEV/README-graph-vision.md and docs/DEV/readme-ecosystem.md: vision and related apps</li>
+  </ul>
+  <aside class="notes">The specification is the reference for rules a schema cannot express. The schema is the reference for structure.</aside>
+</section>
+
+<section class="slide">
+  <h2>Questions?</h2>
+  <aside class="notes">Open for questions.</aside>
+</section>
+</div>
+
+<script>
+(function () {
+  // the outline slide is built from the other slides' titles, so it cannot drift when a slide is added or renamed
+  (function () {
+    const all = [...document.querySelectorAll('.slide')], toc = document.getElementById('toc');
+    if (!toc) return;
+    all.forEach((sl, k) => {
+      const h = sl.querySelector('h2');
+      if (!h || sl === toc.closest('.slide')) return;
+      const li = document.createElement('li');
+      li.innerHTML = '<span class="n">' + (k + 1) + '</span><span>' + h.innerHTML + '</span>';
+      li.onclick = e => { e.stopPropagation(); window.__show && window.__show(k); };
+      toc.appendChild(li);
+    });
+  })();
+  const slides = [...document.querySelectorAll('.slide')];
+  const bar = document.getElementById('bar');
+  let i = Math.min(Math.max(parseInt(location.hash.slice(1), 10) - 1 || 0, 0), slides.length - 1);
+  let overview = false;
+
+  function notesBox() {
+    let box = document.getElementById('notes-box');
+    if (!box) { box = document.createElement('div'); box.id = 'notes-box'; document.body.appendChild(box); }
+    const aside = slides[i].querySelector('.notes');
+    box.innerHTML = aside ? aside.innerHTML : '';
+  }
+  function show(n) {
+    i = Math.min(Math.max(n, 0), slides.length - 1);
+    slides.forEach((s, k) => s.classList.toggle('on', k === i));
+    ['first', 'prev'].forEach(id => document.getElementById(id).disabled = i === 0);
+    ['next', 'last'].forEach(id => document.getElementById(id).disabled = i === slides.length - 1);
+    bar.style.width = ((i + 1) / slides.length * 100) + '%';
+    history.replaceState(null, '', '#' + (i + 1));
+    notesBox();
+    // page number in the corner of every slide but the first
+    slides.forEach((s, k) => {
+      let f = s.querySelector('.foot');
+      if (!f && k > 0) { f = document.createElement('div'); f.className = 'foot'; f.innerHTML = '<span></span><span></span>'; f.firstElementChild.textContent = document.body.dataset.title; s.appendChild(f); }
+      if (f && k > 0) f.lastElementChild.textContent = (k + 1) + ' / ' + slides.length;
+    });
+  }
+  window.__show = show;
+  function toggleOverview() {
+    overview = !overview;
+    const deck = document.getElementById('deck');
+    if (overview) {
+      deck.style.cssText = 'position:static;display:grid;grid-template-columns:repeat(3,1fr);gap:14px;padding:14px;place-items:start';
+      slides.forEach((s, k) => { s.classList.add('on'); s.style.cssText = 'width:100%;height:auto;aspect-ratio:16/9;font-size:9px;cursor:pointer'; s.onclick = () => { toggleOverview(); show(k); }; });
+      document.documentElement.style.overflow = 'auto'; document.body.style.overflow = 'auto';
+    } else {
+      deck.style.cssText = '';
+      slides.forEach(s => { s.style.cssText = ''; s.onclick = null; });
+      document.documentElement.style.overflow = ''; document.body.style.overflow = '';
+      show(i);
+    }
+  }
+  const go = (id, f) => document.getElementById(id).addEventListener('click', e => { e.stopPropagation(); if (!overview) f(); });
+  const outline = Math.max(0, slides.findIndex(s => s.id === 'outline'));
+  go('tocbtn', () => show(outline)); go('first', () => show(0)); go('prev', () => show(i - 1)); go('next', () => show(i + 1)); go('last', () => show(slides.length - 1));
+  document.getElementById('pdf').addEventListener('click', () => { if (overview) toggleOverview(); window.print(); });
+  document.addEventListener('keydown', e => {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    if (['ArrowRight', 'PageDown', ' ', 'Enter'].includes(e.key)) { e.preventDefault(); if (!overview) show(i + 1); }
+    else if (['ArrowLeft', 'PageUp', 'Backspace'].includes(e.key)) { e.preventDefault(); if (!overview) show(i - 1); }
+    else if (e.key === 't' || e.key === 'T') { if (!overview) show(outline); }
+    else if (e.key === 'Home') show(0);
+    else if (e.key === 'End') show(slides.length - 1);
+    else if (e.key === 'f' || e.key === 'F') { document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen(); }
+    else if (e.key === 'n' || e.key === 'N') document.body.classList.toggle('show-notes');
+    else if (e.key === 'o' || e.key === 'O' || e.key === 'Escape' && overview) toggleOverview();
+  });
+  document.addEventListener('click', e => {
+    if (overview || e.target.closest('a, button, pre')) return;
+    show(e.clientX > innerWidth / 2 ? i + 1 : i - 1);
+  });
+  show(i);
+})();
+</script>
+</body>
+</html>

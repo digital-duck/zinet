@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>zinet</title>
+<style>body{font:16px/1.6 system-ui,sans-serif;max-width:52rem;margin:2rem auto;padding:0 1rem;color:#1f2933}
+h1,h2,h3{line-height:1.25}h2{border-bottom:1px solid #d8dee4;padding-bottom:.2rem;margin-top:2rem}
+code{background:#f1f3f5;padding:.1em .3em;border-radius:3px;font-size:.92em}
+pre.mermaid{background:none;text-align:center}pre{background:#f6f8fa;padding:.8rem 1rem;overflow:auto;border-radius:6px}pre code{background:none;padding:0}
+table{border-collapse:collapse;margin:1rem 0}th,td{border:1px solid #d0d7de;padding:.35rem .6rem;text-align:left}th{background:#f6f8fa}
+blockquote{margin:1rem 0;padding:.1rem 1rem;border-left:4px solid #d0d7de;color:#57606a}a{color:#0969da}
+@media print{body{max-width:none;margin:0}a{color:inherit}}</style>
+</head>
+<body>
+<h1 id="zinet-user-guide">zinet: user guide</h1>
+<p>zinet is the Python package and <code>zinet</code> command for <code>graph.yaml</code>, the intermediate representation (IR) shared across the ZiNets ecosystem: a schema, a validator and graph transforms. It is for developers and tools that emit or consume static dependency graphs (SPL, ConceptBook, Graph-Code, Momagrid, Solver domains). It is not for running workflows: it persists a graph and runs nothing. GraphLang (<code>graf</code>) workflows are a different kind of graph.</p>
+<h2 id="contents">Contents</h2>
+<ul><li><a href="#installation">Installation</a></li><li><a href="#quick-start">Quick start</a></li><li><a href="#architecture">Architecture</a></li><li><a href="#concepts">Concepts</a><ul><li><a href="#three-layers">Three layers</a></li><li><a href="#nodes-and-fields">Nodes and fields</a></li><li><a href="#edge-types">Edge types</a></li><li><a href="#imports">Imports</a></li><li><a href="#two-graph-formats">Two graph formats</a></li><li><a href="#comment-preservation">Comment preservation</a></li><li><a href="#style-and-select">Style and select</a></li></ul></li><li><a href="#commands">Commands</a><ul><li><a href="#validate">validate</a></li><li><a href="#diff">diff</a></li><li><a href="#slice">slice</a></li><li><a href="#render">render</a></li><li><a href="#prettify">prettify</a></li><li><a href="#convert">convert</a></li><li><a href="#schema">schema</a></li></ul></li><li><a href="#validation-checks">Validation checks</a></li><li><a href="#python-api">Python API</a></li><li><a href="#drawing-with-zinetvis">Drawing with zinet.vis</a></li><li><a href="#configuration">Configuration</a></li><li><a href="#files-and-folders">Files and folders</a></li><li><a href="#examples">Examples</a></li><li><a href="#limits">Limits</a></li><li><a href="#references">References</a></li></ul>
+<h2 id="installation">Installation</h2>
+<p>From PyPI:</p>
+<pre><code class="language-bash">pip install zinet</code></pre>
+<p>From source, for development:</p>
+<pre><code class="language-bash">uv venv .venv &amp;&amp; uv pip install -p .venv/bin/python -e &quot;.[dev]&quot;
+zinet --version</code></pre>
+<p>The tutorial shows <code>zinet 0.2.1</code> as the version output.</p>
+<table><thead><tr><th>Item</th><th>Detail</th></tr></thead><tbody><tr><td>Python</td><td>&gt;=3.10</td></tr><tr><td>Core dependencies</td><td><code>networkx&gt;=3.2</code>, <code>pydantic&gt;=2.5</code>, <code>pyyaml&gt;=6.0</code></td></tr><tr><td>Extra <code>pyvis</code></td><td><code>pip install zinet[pyvis]</code>, for the <code>pyvis</code> engine of <code>zinet.vis</code></td></tr><tr><td>Extra <code>graphify</code></td><td><code>pip install zinet[graphify]</code>, for the <code>graphify</code> engine</td></tr><tr><td>Extra <code>dev</code></td><td><code>build</code>, <code>pytest&gt;=8</code>, <code>twine</code></td></tr><tr><td>Graphviz <code>dot</code></td><td>needed on PATH for <code>svg</code>, <code>png</code> and <code>pdf</code> output (<code>apt install graphviz</code>)</td></tr></tbody></table>
+<p>Mermaid, html and ascii output need nothing installed.</p>
+<h2 id="quick-start">Quick start</h2>
+<p>A graph has three layers, each a list of nodes. Save this as <code>graph.yaml</code>:</p>
+<pre><code class="language-yaml">version: &quot;1.0&quot;
+primitives:
+  - id: x_units
+    meta: {type: variable}
+concepts:
+  - id: capacity_constraint
+    deps: [x_units, max_units]
+    edge_types: {max_units: constraint}
+    meta: {expression: &quot;x_units &lt;= max_units&quot;}
+applications:
+  - id: minimize_cost
+    deps: [capacity_constraint]</code></pre>
+<p>This graph is deliberately incomplete: <code>max_units</code> is used but not defined, so <code>zinet validate</code> reports an <code>unknown_dep</code> error for it. Add <code>- id: max_units</code> under <code>primitives</code> to fix it.</p>
+<p>Validate the bundled solver fixture:</p>
+<pre><code class="language-bash">zinet validate tests/fixtures/solver_problem.yaml</code></pre>
+<pre><code class="language-text">tests/fixtures/solver_problem.yaml: ok (8 nodes)</code></pre>
+<p>Then render it:</p>
+<pre><code class="language-bash">zinet render tests/fixtures/solver_problem.yaml --format html -o graph.html</code></pre>
+<h2 id="architecture">Architecture</h2>
+<p>A YAML file is read by <code>io.load_graph</code> into the Pydantic <code>Graph</code> model. The validator, the transforms and the renderers all work on that model. <code>algorithms.to_networkx</code> converts it to a <code>networkx.DiGraph</code>, which <code>zinet.vis</code> can draw. The <code>zinet</code> command ties these together.</p>
+<pre class="mermaid">flowchart LR
+    Y[&quot;graph.yaml&quot;] --&gt; IO[&quot;io.load_graph&quot;]
+    IO --&gt; S[&quot;schema.Graph&quot;]
+    S --&gt; V[&quot;validator&quot;]
+    S --&gt; T[&quot;transforms&quot;]
+    S --&gt; R[&quot;render&quot;]
+    S --&gt; A[&quot;algorithms&quot;]
+    A --&gt; VIS[&quot;vis&quot;]
+    Y --&gt; P[&quot;prettify / roundtrip&quot;]
+    CLI[&quot;cli&quot;] --&gt; IO
+    CLI --&gt; P</pre>
+<ul><li><code>schema.py</code>: Pydantic models <code>Graph</code>, <code>Node</code>, <code>Layer</code>, <code>EdgeType</code>.</li><li><code>dag.py</code>: topological order and ancestors, domain-agnostic.</li><li><code>validator.py</code>: structural checks that produce a list of issues.</li><li><code>io.py</code>: <code>load_graph</code> (with imports), <code>dump_graph</code>, <code>to_yaml</code>.</li><li><code>prettify.py</code>: canonical formatting for <code>zinet prettify</code>.</li><li><code>roundtrip.py</code>: comment-preserving YAML, the SQLite comment store, and <code>zinet convert</code>.</li><li><code>transforms/</code>: <code>diff_graphs</code> and <code>slice_to</code> (<code>diff.py</code>, <code>slice.py</code>).</li><li><code>algorithms.py</code>: graph algorithms on a plain networkx <code>DiGraph</code>.</li><li><code>render.py</code>: DOT and Mermaid generation for zinet graphs; svg/png/pdf via <code>dot</code>.</li><li><code>vis/</code>: drawing for any networkx graph (engines, <code>select</code>, <code>Style</code>).</li><li><code>formats.py</code>: recognises other graph files by content.</li><li><code>cli.py</code>: the <code>zinet</code> command.</li></ul>
+<h2 id="concepts">Concepts</h2>
+<h3 id="three-layers">Three layers</h3>
+<p>Every node lives in exactly one layer, named by the key it is written under.</p>
+<table><thead><tr><th>Layer</th><th>Role</th><th>Dependency rule</th></tr></thead><tbody><tr><td><code>primitives</code></td><td>Irreducible leaves: tools, parameters, variables</td><td>Must have no <code>deps</code></td></tr><tr><td><code>concepts</code></td><td>Ideas, steps or components composed from other nodes</td><td>May depend on primitives and concepts</td></tr><tr><td><code>applications</code></td><td>Capstones: recipes, systems, objectives</td><td>May depend on any layer, but nothing may depend on an application</td></tr></tbody></table>
+<h3 id="nodes-and-fields">Nodes and fields</h3>
+<table><thead><tr><th>Field</th><th>Meaning</th></tr></thead><tbody><tr><td><code>id</code></td><td>Required, non-empty. Unique across the whole document, including imports.</td></tr><tr><td><code>label</code></td><td>Optional human-readable name, used by <code>render</code>.</td></tr><tr><td><code>deps</code></td><td>Ids this node depends on (its incoming edges). Default <code>[]</code>.</td></tr><tr><td><code>edge_types</code></td><td>Optional mapping from a dep id to an edge type. Each key must appear in <code>deps</code>.</td></tr><tr><td><code>meta</code></td><td>Opaque domain payload; the core never reads it.</td></tr></tbody></table>
+<p>Unknown top-level keys and unknown node keys are rejected, so a typo such as <code>primitves:</code> fails at load time. Domain data goes in <code>meta</code>.</p>
+<h3 id="edge-types">Edge types</h3>
+<p>An edge runs from a dependency to the node that lists it. Without an entry in <code>edge_types</code>, the type is <code>depends_on</code>.</p>
+<table><thead><tr><th>Type</th><th>Meaning</th></tr></thead><tbody><tr><td><code>depends_on</code></td><td>Default. Generic dependency or composition.</td></tr><tr><td><code>data_flow</code></td><td>A value or artifact passes from dependency to dependent.</td></tr><tr><td><code>prerequisite</code></td><td>The dependency must be understood before the dependent.</td></tr><tr><td><code>constraint</code></td><td>The dependency bounds or defines the dependent.</td></tr><tr><td><code>inheritance</code></td><td>The dependent extends or specializes the dependency.</td></tr></tbody></table>
+<p>Edge types affect rendering and documentation only; validation treats all edges the same.</p>
+<h3 id="imports">Imports</h3>
+<p><code>imports</code> lists relative paths (resolved relative to the importing file) to other graph files. Their nodes are merged without namespacing, so ids must be unique across the whole import tree.</p>
+<h3 id="two-graph-formats">Two graph formats</h3>
+<p>zinet stores a static knowledge or dependency graph. The sibling GraphLang (<code>graf</code>) stores an executable workflow in <code>*.graph.yaml</code>. The file name is only a convention, so each tool tells the files apart by content:</p>
+<ul><li><code>workflow:</code> with <code>nodes:</code> and <code>edges:</code> is GraphLang.</li><li><code>primitives:</code>, <code>concepts:</code> or <code>applications:</code> as lists of nodes is zinet.</li></ul>
+<p>Given the other kind, a tool says what the file is and which command to use, instead of a schema error. ConceptBook and graph-code write the same three layers as mappings with <code>composed_of</code> / <code>needs</code>; zinet does not read that dialect yet, but its algorithms and drawing work on any networkx graph.</p>
+<h3 id="comment-preservation">Comment preservation</h3>
+<p><code>prettify --write</code> keeps YAML comments. Each comment is pinned to what it sits next to (a node by <code>id</code>, a key of that node, or a top-level section; a comment block at the top of the file stays on top) and put back into the canonical text. If any comment cannot be put back exactly, the file is not rewritten.</p>
+<p>JSON has no comments, so <code>zinet convert</code> stores a YAML file's comments in a small SQLite database and puts them back when the JSON is converted to YAML again. A comment whose node was removed or renamed is written at the end of the file as <code># [orphaned from &lt;id&gt;] ...</code> and returns if the node does.</p>
+<h3 id="style-and-select">Style and select</h3>
+<p><code>zinet.vis</code> draws and trims any networkx graph. A <code>Style</code> is a set of small functions that read your attribute names (node label, kind, colour, shape, group; edge label and dashing), so no app has to rename attributes. <code>select</code> cuts a readable neighbourhood out of a big graph.</p>
+<h2 id="commands">Commands</h2>
+<p>Exit codes: <code>0</code> success; <code>1</code> validation errors, differences found, or a file that needs prettify; <code>2</code> usage, load or render failure.</p>
+<h3 id="validate">validate</h3>
+<pre><code class="language-bash">zinet validate graph.yaml [--strict] [--check NAME] [--no-imports]</code></pre>
+<table><thead><tr><th>Option</th><th>Meaning</th><th>Default</th></tr></thead><tbody><tr><td><code>--strict</code></td><td>Run both optional checks (<code>reducible</code> and <code>connected</code>)</td><td>off</td></tr><tr><td><code>--check NAME</code></td><td>Run an optional check (<code>reducible</code>, <code>connected</code>)</td><td>none</td></tr><tr><td><code>--no-imports</code></td><td>Do not resolve <code>imports</code></td><td>imports resolved</td></tr></tbody></table>
+<p>Exits 1 on errors; warnings are printed but do not fail.</p>
+<h3 id="diff">diff</h3>
+<pre><code class="language-bash">zinet diff old.yaml new.yaml</code></pre>
+<p>Prints <code>+ id</code> for added nodes, <code>- id</code> for removed nodes and <code>~ id.field: old -&gt; new</code> for changes. Exits 1 when the graphs differ, otherwise prints <code>no differences</code>.</p>
+<h3 id="slice">slice</h3>
+<pre><code class="language-bash">zinet slice graph.yaml target_id -o part.yaml</code></pre>
+<table><thead><tr><th>Option</th><th>Meaning</th><th>Default</th></tr></thead><tbody><tr><td><code>-o FILE</code></td><td>Write the result to FILE</td><td>YAML to stdout</td></tr></tbody></table>
+<p>The result is the target plus its prerequisite closure.</p>
+<h3 id="render">render</h3>
+<pre><code class="language-bash">zinet render graph.yaml [--format FORMAT] [-o FILE] [--no-imports]</code></pre>
+<table><thead><tr><th>Option</th><th>Meaning</th><th>Default</th></tr></thead><tbody><tr><td><code>--format</code></td><td><code>svg</code>, <code>png</code>, <code>pdf</code>, <code>mermaid</code>, <code>html</code> or <code>ascii</code></td><td><code>svg</code>, to stdout</td></tr><tr><td><code>-o FILE</code></td><td>Output file; required for <code>png</code> and <code>pdf</code></td><td>stdout</td></tr><tr><td><code>--no-imports</code></td><td>Do not resolve <code>imports</code></td><td>imports resolved</td></tr></tbody></table>
+<p><code>html</code> is an interactive page (search, zoom, click a node) that works offline. <code>ascii</code> is a plain-text outline by depth. <code>svg</code>, <code>png</code> and <code>pdf</code> need Graphviz <code>dot</code>.</p>
+<h3 id="prettify">prettify</h3>
+<pre><code class="language-bash">zinet prettify graph.yaml [--write]</code></pre>
+<table><thead><tr><th>Option</th><th>Meaning</th><th>Default</th></tr></thead><tbody><tr><td><code>--write</code></td><td>Rewrite the file in place; comments are kept</td><td>off (shows a diff)</td></tr></tbody></table>
+<p>Without <code>--write</code>, exits 1 if the file would change, so it can run in CI.</p>
+<h3 id="convert">convert</h3>
+<pre><code class="language-bash">zinet convert graph.yaml [-o FILE] [--store PATH]
+zinet convert graph.json</code></pre>
+<table><thead><tr><th>Option</th><th>Meaning</th><th>Default</th></tr></thead><tbody><tr><td><code>-o FILE</code></td><td>Output file</td><td>same name with <code>.json</code> (from YAML) or <code>.yaml</code> (from JSON)</td></tr><tr><td><code>--store PATH</code></td><td>Comment database to use</td><td><code>~/.zinet/comments.db</code>, or <code>$ZINET_HOME</code></td></tr></tbody></table>
+<p>Takes a <code>.yaml</code>, <code>.yml</code> or <code>.json</code> file.</p>
+<h3 id="schema">schema</h3>
+<pre><code class="language-bash">zinet schema -o schemas/graph.schema.json</code></pre>
+<table><thead><tr><th>Option</th><th>Meaning</th><th>Default</th></tr></thead><tbody><tr><td><code>-o FILE</code></td><td>Write the JSON Schema to FILE</td><td>stdout</td></tr></tbody></table>
+<p>The stdout default is inferred from the other commands; the README shows only the <code>-o</code> form.</p>
+<h2 id="validation-checks">Validation checks</h2>
+<table><thead><tr><th>Code</th><th>Severity</th><th>Meaning</th></tr></thead><tbody><tr><td><code>duplicate_id</code></td><td>error</td><td>an id is defined more than once</td></tr><tr><td><code>unknown_dep</code></td><td>error</td><td>a dep names an id that does not exist</td></tr><tr><td><code>primitive_has_deps</code></td><td>error</td><td>a primitive depends on something</td></tr><tr><td><code>layer_violation</code></td><td>error</td><td>a node depends on an application</td></tr><tr><td><code>cycle</code></td><td>error</td><td>the dependency graph is not a DAG (self-loops count)</td></tr><tr><td><code>orphan</code></td><td>warning</td><td>a node with no deps and no dependents</td></tr><tr><td><code>not_reducible</code></td><td>error</td><td>optional (<code>--check reducible</code>): a concept or application with no primitive ancestor</td></tr><tr><td><code>disconnected</code></td><td>warning</td><td>optional (<code>--check connected</code>): the graph is in more than one piece when edges are read as undirected</td></tr></tbody></table>
+<p><code>not_reducible</code> and <code>disconnected</code> are off by default, so a graph that is valid today stays valid. <code>--strict</code> turns both on.</p>
+<h2 id="python-api">Python API</h2>
+<pre><code class="language-python">from zinet import load_graph, validate, diff_graphs, slice_to, dump_graph
+
+graph = load_graph(&quot;solver_pipeline.yaml&quot;)   # resolves imports
+for issue in validate(graph):
+    print(issue)
+prereqs = slice_to(graph, &quot;minimize_cost&quot;)</code></pre>
+<p><code>load_graph</code> does not validate; call <code>validate</code> separately.</p>
+<p>The algorithms work on a <code>networkx.DiGraph</code> with edges from a dependency to its dependent and an optional <code>kind</code> attribute per node (<code>primitive</code>, <code>concept</code>, <code>application</code>; none means referenced but never declared). <code>to_networkx(graph)</code> builds one from a zinet <code>Graph</code>.</p>
+<pre><code class="language-python">import zinet
+G = zinet.to_networkx(zinet.load_graph(&quot;graph.yaml&quot;))
+zinet.learning_path(G, &quot;app&quot;, known=[&quot;a&quot;])   # what is still needed to reach `app`, dependencies first
+zinet.productivity_order(G)                  # order that unlocks the most nodes as early as possible
+zinet.reducible(G)                           # does everything rest on primitives?
+zinet.build_order(G), zinet.gap(G, &quot;app&quot;, [&quot;a&quot;]), zinet.applications_of(G, &quot;a&quot;), zinet.restrict(G, nodes)
+zinet.ensure_acyclic(G)                      # raises CycleError, naming the nodes on the cycle</code></pre>
+<p>Other functions listed in the changelog: <code>is_acyclic</code>, <code>mandatory_subgraph</code>. <code>topological_order</code> and <code>ancestors</code> also accept a <code>DiGraph</code>.</p>
+<table><thead><tr><th>Option</th><th>Used for</th></tr></thead><tbody><tr><td><code>include_primitives</code>, <code>include_target</code></td><td>which nodes the result contains</td></tr><tr><td>`order="topological"\</td><td>"alphabetical"\</td><td>"reach"`</td><td>ordering</td></tr><tr><td><code>weighted_applications</code>, <code>seed_by_reach</code></td><td>behaviour of the code the functions replace</td></tr><tr><td><code>primitive_ancestry</code>, <code>declared</code>, <code>declared_or_listed</code>, <code>named_primitives</code></td><td>the four <code>reducible</code> rules</td></tr></tbody></table>
+<p>Defaults follow graph-code. Errors: <code>UnknownNodeError</code> (a <code>KeyError</code>) for a missing node, <code>CycleError</code> for a cycle.</p>
+<h2 id="drawing-with-zinetvis">Drawing with zinet.vis</h2>
+<pre><code class="language-python">from zinet.vis import render, select, zinet_style
+G = zinet.to_networkx(zinet.load_graph(&quot;graph.yaml&quot;))
+render(G, &quot;graph.html&quot;)                         # engine=&quot;cytoscape&quot; (default)
+sub, note = select(G, node=&quot;app&quot;, hops=2)       # filters, hidden kinds, hub edges, a node cap</code></pre>
+<table><thead><tr><th>Engine</th><th>Output</th><th>Needs</th></tr></thead><tbody><tr><td><code>cytoscape</code> (default)</td><td>one HTML file with Cytoscape.js bundled (MIT); works offline; takes node layout from <code>dot</code> if Graphviz is installed</td><td>nothing</td></tr><tr><td><code>graphviz</code></td><td>svg, png or pdf by file extension</td><td>Graphviz <code>dot</code></td></tr><tr><td><code>mermaid</code></td><td>flowchart text (<code>-o FILE.md</code> wraps it in a fenced block)</td><td>nothing</td></tr><tr><td><code>ascii</code></td><td>plain-text outline</td><td>nothing</td></tr><tr><td><code>pyvis</code></td><td>interactive graph</td><td><code>zinet[pyvis]</code></td></tr><tr><td><code>graphify</code></td><td>graph output</td><td><code>zinet[graphify]</code></td></tr></tbody></table>
+<p><code>Style</code> options:</p>
+<table><thead><tr><th>Option</th><th>Meaning</th><th>Default</th></tr></thead><tbody><tr><td><code>secondary_hidden</code></td><td>start the dashed edges (data wiring) behind a "show ... edges" checkbox</td><td>off</td></tr><tr><td><code>groups_collapsed</code></td><td>start every group (a LOOP) as one box; click to open, double-click an open group to close</td><td>off</td></tr><tr><td><code>show_kind</code></td><td>when <code>False</code>, nodes show only their label (colour and legend still say the kind)</td><td><code>True</code></td></tr></tbody></table>
+<p>On the interactive page, hovering a node fades everything but its connections, and clicking it opens its details. "Collapse groups" / "Expand groups" act on all groups. GraphLang turns both <code>secondary_hidden</code> and <code>groups_collapsed</code> on.</p>
+<h2 id="configuration">Configuration</h2>
+<table><thead><tr><th>Setting</th><th>Meaning</th></tr></thead><tbody><tr><td><code>~/.zinet/comments.db</code></td><td>default SQLite comment store used by <code>zinet convert</code></td></tr><tr><td><code>$ZINET_HOME</code></td><td>overrides the store location</td></tr><tr><td><code>--store PATH</code></td><td>overrides both for one <code>convert</code> call</td></tr><tr><td><code>schemas/graph.schema.json</code></td><td>JSON Schema, regenerated with <code>zinet schema -o schemas/graph.schema.json</code>; a test fails if the committed file is out of date</td></tr></tbody></table>
+<h2 id="files-and-folders">Files and folders</h2>
+<table><thead><tr><th>Path</th><th>Holds</th></tr></thead><tbody><tr><td><code>src/zinet/</code></td><td>the package (see Architecture)</td></tr><tr><td><code>src/zinet/vis/data/</code></td><td>bundled <code>cytoscape.min.js</code> (Cytoscape.js 3.30.2, MIT) and <code>LICENSE-cytoscape.txt</code></td></tr><tr><td><code>docs/SPECIFICATION.md</code></td><td>the graph.yaml format specification</td></tr><tr><td><code>docs/GUIDE/</code></td><td><code>TUTORIAL.md</code> and generated pages in <code>graf-docs/</code></td></tr><tr><td><code>docs/DEV/</code></td><td>design notes: <code>README-graph-vision.md</code>, <code>readme-ecosystem.md</code></td></tr><tr><td><code>schemas/</code></td><td>generated JSON Schema</td></tr><tr><td><code>tests/</code></td><td>pytest suite</td></tr><tr><td><code>tests/fixtures/</code></td><td>one graph per domain</td></tr><tr><td><code>tests/characterization/</code></td><td>golden files (<code>golden/</code>) that freeze what the copies of the graph code in other apps did, plus <code>divergences.md</code> on where they differ</td></tr></tbody></table>
+<h2 id="examples">Examples</h2>
+<p>A broken graph with a primitive that has a dependency, an unknown id, a cycle and an isolated application:</p>
+<pre><code class="language-yaml"># broken.yaml
+primitives:
+  - id: a
+    deps: [b]
+  - id: b
+concepts:
+  - id: c
+    deps: [ghost, d]
+  - id: d
+    deps: [c]
+applications:
+  - id: app</code></pre>
+<pre><code class="language-bash">zinet validate broken.yaml</code></pre>
+<pre><code class="language-text">broken.yaml: error: primitive_has_deps [a]: primitives are leaves but depend on [&#x27;b&#x27;]
+broken.yaml: error: unknown_dep [c]: depends on undefined id &#x27;ghost&#x27;
+broken.yaml: error: cycle: dependency cycle among: c, d
+broken.yaml: warning: orphan [app]: not connected to any other node</code></pre>
+<p>The command exits 1 because of the errors.</p>
+<p>The fixtures in <code>tests/fixtures/</code>:</p>
+<table><thead><tr><th>File</th><th>Domain (from its name)</th></tr></thead><tbody><tr><td><code>character_decomposition.yaml</code></td><td>Chinese character decomposition</td></tr><tr><td><code>concept_book.yaml</code></td><td>ConceptBook</td></tr><tr><td><code>solver_problem.yaml</code></td><td>Solver (8 nodes)</td></tr><tr><td><code>spl_pipeline.yaml</code></td><td>SPL</td></tr></tbody></table>
+<h2 id="limits">Limits</h2>
+<p>Not yet implemented:</p>
+<ul><li>Domain-specific JSON Schema overlays (solver, spl, cba).</li><li>The <code>graph.html</code> interactive explorer, which belongs to <code>cba</code>.</li><li><code>spl3</code> integration (SPL scripts compiling to <code>GraphIR</code>), the stated next step.</li><li>Reading the ConceptBook / graph-code dialect (<code>composed_of</code> / <code>needs</code>).</li></ul>
+<p>Design decisions:</p>
+<ul><li><code>load_graph</code> does not validate.</li><li>Unknown top-level and node keys are rejected.</li><li>Imports merge without namespacing, so ids must be unique.</li><li>Only core checks live here; domain rules (for example, solver bounds) belong in the back-end.</li></ul>
+<h2 id="references">References</h2>
+<ul><li><a href="docs/SPECIFICATION.md">docs/SPECIFICATION.md</a>: the graph.yaml format specification.</li><li><a href="schemas/graph.schema.json">schemas/graph.schema.json</a>: machine-readable JSON Schema.</li><li><a href="docs/GUIDE/TUTORIAL.md">docs/GUIDE/TUTORIAL.md</a>: a walk through the <code>zinet</code> command.</li><li><a href="docs/DEV/readme-ecosystem.md">docs/DEV/readme-ecosystem.md</a>: the related graph-first apps and how they relate to zinet.</li><li><a href="docs/DEV/README-graph-vision.md">docs/DEV/README-graph-vision.md</a>: the graph vision and the layered design.</li><li><a href="CHANGELOG.md">CHANGELOG.md</a>: changes by version.</li><li><a href="src/zinet/vis/data/LICENSE-cytoscape.txt">src/zinet/vis/data/LICENSE-cytoscape.txt</a>: license of the bundled Cytoscape.js.</li><li><a href="https://github.com/digital-duck/graflang">GraphLang</a>: the sibling executable-workflow project (<code>graf</code>).</li></ul>
+<script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";mermaid.initialize({startOnLoad:true,securityLevel:"strict"});</script>
+</body>
+</html>
