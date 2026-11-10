@@ -19,7 +19,12 @@ CYTOSCAPE_PAGE = """<!doctype html>
   body{display:flex;flex-direction:column}       /* the bar may wrap to two rows in a narrow window: the picture and the side panel take what is left */
   #bar{display:flex;gap:12px;align-items:center;padding:8px 12px;min-height:34px;border-bottom:1px solid #ddd;flex-wrap:wrap;flex:none}
   #main{flex:1;display:flex;min-height:0}
-  #cy{flex:1;min-width:0;position:relative}
+  #cyw{flex:1;min-width:0;position:relative}
+  #cy{position:absolute;inset:0 12px 12px 0}       /* room on the right and at the bottom for the scroll bars */
+  .sb{position:absolute;background:#f1f1f1;user-select:none}
+  .sb.h{left:0;right:12px;bottom:0;height:12px}.sb.v{top:0;bottom:12px;right:0;width:12px}
+  .sb .th{position:absolute;background:#b8bcc4;border-radius:6px;cursor:grab}.sb .th:hover,.sb .th.drag{background:#8a8f99}
+  .sb.h .th{top:2px;bottom:2px}.sb.v .th{left:2px;right:2px}
   #side{flex:none;width:340px;font-size:15px;overflow:auto;border-left:1px solid #ddd;padding:8px;box-sizing:border-box}
   .sw{display:inline-block;width:12px;height:12px;border-radius:3px;margin:0 3px 0 8px}
   .ln{display:inline-block;width:22px;border-top:2px solid #6b7280;vertical-align:middle;margin:0 3px 0 8px}
@@ -28,14 +33,14 @@ CYTOSCAPE_PAGE = """<!doctype html>
   label{font-size:15px;cursor:pointer;white-space:nowrap}
   pre{white-space:pre-wrap;word-break:break-word;margin:4px 0}
   .hint{opacity:.65;font-size:14px}
-  @media (prefers-color-scheme: dark){html,body{background:#16181d;color:#e6e6e6}#bar,#side{border-color:#333}input,select{font-size:15px;background:#222;color:#eee;border:1px solid #444}}
+  @media (prefers-color-scheme: dark){html,body{background:#16181d;color:#e6e6e6}#bar,#side{border-color:#333}.sb{background:#1f2228}.sb .th{background:#4a4f59}.sb .th:hover,.sb .th.drag{background:#6b7180}input,select{font-size:15px;background:#222;color:#eee;border:1px solid #444}}
 </style></head><body>
 <div id="bar"><b>__TITLE__</b><input id="q" placeholder="find a node" size="18" style="font-size:15px">
  <select id="layout" style="font-size:15px">__LAYOUTS__</select>
  <button id="zin" title="Zoom in">+</button><button id="zout" title="Zoom out">&minus;</button><button id="zfit" title="Fit the whole graph">Fit</button><button id="reset" title="Clear the selection, the highlight and the search">Reset</button><button id="capture" title="Save the picture as a PDF (in an app that listens it is saved there; on its own page it downloads)">Capture</button>
  __CONTROLS__
  <span>__LEGEND__</span><span style="opacity:.7">__NOTE__</span></div>
-<div id="main"><div id="cy"></div><div id="side"><i>Hover a node to see its connections; click it for details.</i></div></div>
+<div id="main"><div id="cyw"><div id="cy"></div><div class="sb h" id="hsb"><div class="th"></div></div><div class="sb v" id="vsb"><div class="th"></div></div></div><div id="side"><i>Hover a node to see its connections; click it for details.</i></div></div>
 <script>__CYTOSCAPE__</script>
 <script>
 const data = __DATA__;
@@ -134,14 +139,15 @@ function setAll(collapseThem){
 function describe(n){
   const d = n.data();
   const other = x => (x.source().id()===n.id() ? x.target() : x.source()).data('label');
-  const row = x => (x.source().id()===n.id() ? '🟠➡️ ' : '🟢⬅️ ') + esc(x.data('relation')) + ' ' +
+  const row = x => (x.source().id()===n.id() ? '🟠 ' : '🟢 ') + esc(x.data('relation')) + ' ' +
     esc(other(x)) + (x.data('info') ? '  (' + esc(x.data('info')) + ')' : '');
   const edges = n.connectedEdges();
-  const rows = [...edges.filter(x => x.target().id()===n.id() && x.source().id()!==n.id()).map(row).sort(),   // incoming first
-                ...edges.filter(x => x.source().id()===n.id()).map(row).sort()];
+  const ins = edges.filter(x => x.target().id()===n.id() && x.source().id()!==n.id()).map(row).sort();
+  const outs = edges.filter(x => x.source().id()===n.id()).map(row).sort();
+  const list = rows => '<pre>' + (rows.length ? rows.join('\\n') : '<span class="hint">(none)</span>') + '</pre>';
   const hint = store[n.id()] ? '<div class="hint">Click it again to expand.</div>' : (n.isParent() ? '<div class="hint">Double-click to collapse.</div>' : '');
-  document.getElementById('side').innerHTML = '<b>Node: ' + esc(d.label) + '</b><pre>' + String(d.info || '').split('\\n').filter(l => l.trim()).map(l => '🔵 ' + esc(l)).join('\\n') + '</pre>' + hint + '<br><br>' +
-    '<b>Links</b><pre>' + rows.join('\\n') + '</pre>';
+  document.getElementById('side').innerHTML = '<b>Node: ' + esc(d.label) + ' 🟦</b><pre>' + String(d.info || '').split('\\n').filter(l => l.trim()).map(l => '🔷 ' + esc(l)).join('\\n') + '</pre>' + hint + '<br><br>' +
+    '<b>Links: input ⬅️</b>' + list(ins) + '<br>' + '<b>Links: output ➡️</b>' + list(outs);
 }
 cy.on('mouseover', 'node', e => { hover = e.target; refresh(); });
 cy.on('mouseout', 'node', () => { hover = null; refresh(); });
@@ -217,7 +223,48 @@ document.getElementById('capture').onclick = () => {
   img.src = url;
 };
 
+// ---- scroll bars: the canvas has none of its own, so two bars follow the view (drag a thumb, or click the track to page) --
+const SB = {h: document.getElementById('hsb'), v: document.getElementById('vsb')};
+let sbFrozen = null;                                  // the scroll range while a thumb is dragged (it would move under the mouse)
+function sbRange(){
+  const e = cy.extent(), b = cy.elements().boundingBox(), m = 30 / cy.zoom();
+  return {x1: Math.min(b.x1 - m, e.x1), x2: Math.max(b.x2 + m, e.x2), y1: Math.min(b.y1 - m, e.y1), y2: Math.max(b.y2 + m, e.y2)};
+}
+function sbUpdate(){
+  const e = cy.extent(), r = sbFrozen || sbRange();
+  for (const [ax, lo, hi, size, len] of [['h', 'x1', 'x2', 'w', 'width'], ['v', 'y1', 'y2', 'h', 'height']]) {
+    const total = r[hi] - r[lo], th = SB[ax].firstChild;
+    const frac = Math.min(1, e[size] / total), start = Math.max(0, (e[lo] - r[lo]) / total);
+    const pos = ax === 'h' ? 'left' : 'top';
+    th.style.display = frac >= 0.95 ? 'none' : '';       // the whole graph is in view (a fit leaves a little margin)
+    th.style[pos] = (start * 100) + '%'; th.style[len] = Math.max(frac * 100, 4) + '%';
+  }
+}
+cy.on('viewport position add remove', sbUpdate);
+for (const ax of ['h', 'v']) {
+  const track = SB[ax], th = track.firstChild, horiz = ax === 'h';
+  const trackLen = () => horiz ? track.clientWidth : track.clientHeight;
+  const panBy = model => { const p = cy.pan(); cy.pan(horiz ? {x: p.x - model * cy.zoom(), y: p.y} : {x: p.x, y: p.y - model * cy.zoom()}); };
+  th.addEventListener('mousedown', ev => {
+    ev.preventDefault(); ev.stopPropagation();
+    sbFrozen = sbRange(); th.classList.add('drag');
+    const total = horiz ? sbFrozen.x2 - sbFrozen.x1 : sbFrozen.y2 - sbFrozen.y1;
+    let last = horiz ? ev.clientX : ev.clientY;
+    const move = e2 => { const now = horiz ? e2.clientX : e2.clientY; panBy((now - last) * total / trackLen()); last = now; };
+    const up = () => { document.removeEventListener('mousemove', move); document.removeEventListener('mouseup', up);
+                       th.classList.remove('drag'); sbFrozen = null; sbUpdate(); };
+    document.addEventListener('mousemove', move); document.addEventListener('mouseup', up);
+  });
+  track.addEventListener('mousedown', ev => {         // a click beside the thumb moves the view by one screen towards it
+    if (ev.target !== track) return;
+    const box = th.getBoundingClientRect(), e = cy.extent();
+    const before = horiz ? ev.clientX < box.left : ev.clientY < box.top;
+    panBy((before ? -1 : 1) * 0.9 * (horiz ? e.w : e.h));
+  });
+}
+
 layout();
+sbUpdate();
 if (OPTS.collapsed && GROUPS.length) setAll(true); else refresh();
 </script></body></html>
 """
