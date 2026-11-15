@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.2
+
+- `Style.default_layout` (the arrangement the interactive page starts on) is now in the published package; 0.2.1 on PyPI was built before it, so GraphLang's `graf vis` failed with it.
+
 ## 0.2.1
 
 - `Style.show_kind` (default `True`): set it to `False` and nodes show only their label, in the interactive page, graphviz, mermaid and pyvis; the colour and the legend still say the kind.
