@@ -64,7 +64,7 @@ const cy = cytoscape({container: document.getElementById('cy'), elements: data, 
       'text-background-color': dark?'#16181d':'#fff', 'text-background-opacity':0.9, 'text-background-padding':2}},
     {selector:'edge[?dashed]', style:{'line-style':'dashed', width:1.5, 'line-color':'#4f8ef7', 'target-arrow-color':'#4f8ef7'}},
     {selector:'edge.off', style:{display:'none'}},
-    {selector:'.faded', style:{opacity:0.12}},
+    {selector:'.faded', style:{opacity:0.4}},
     {selector:'node[mark]', style:{'border-width':4, 'border-color':'#e5484d'}},
     {selector:'node:selected', style:{'border-width':4, 'border-color':'#e5484d'}}]});
 
