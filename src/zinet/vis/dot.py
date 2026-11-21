@@ -115,6 +115,28 @@ def _best_layout(G: nx.Graph, style: Style, canvas_aspect: float, rankdirs=("LR"
     return best
 
 
+def _contracted(G: nx.Graph, style: Style) -> nx.Graph:
+    """G with every group contracted to its outermost group's node: an edge into a member becomes an edge into that group (laying out only
+    the top-level nodes would drop every such edge and put the nodes in one row)."""
+    def top(n: str) -> str:
+        seen = {n}
+        while (g := style.group(n, G.nodes[n])) is not None and g in G and g not in seen:
+            n = g
+            seen.add(n)
+        return n
+    H = nx.DiGraph()
+    for n in G:
+        if style.group(n, G.nodes[n]) is None:
+            H.add_node(n, **G.nodes[n])
+    for u, v, d in G.edges(data=True):
+        a, b = top(u), top(v)
+        if a == b or a not in H or b not in H:
+            continue
+        if not H.has_edge(a, b) or (style.edge_dashed(u, v, H[a][b]) and not style.edge_dashed(u, v, d)):      # a control edge, which ranks the nodes, beats a data edge
+            H.add_edge(a, b, **d)
+    return H
+
+
 def dot_layouts(G: nx.Graph, style: Style, canvas_aspect: float = 1.6, rankdir: str | None = None) -> dict[str, dict[str, dict[str, float]]]:
     """Node positions for the interactive page, from Graphviz; {} when `dot` is missing or fails.
 
@@ -144,8 +166,7 @@ def dot_layouts(G: nx.Graph, style: Style, canvas_aspect: float = 1.6, rankdir: 
             centers[g] = {"x": (min(xs) + max(xs)) / 2, "y": (min(ys) + max(ys)) / 2}
     collapsed: dict[str, dict[str, float]] = {}
     if children:
-        outer = [n for n in G if style.group(n, G.nodes[n]) is None]
-        got = _dot_json(G.subgraph(outer), style, rankdir)
+        got = _dot_json(_contracted(G, style), style, rankdir)
         collapsed = got[0] if got else {}
     return {"expanded": expanded, "collapsed": collapsed, "centers": centers}
 

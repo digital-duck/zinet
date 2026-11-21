@@ -166,3 +166,19 @@ def test_the_page_starts_collapsed_with_data_edges_hidden_and_responds(tmp_path)
 def test_the_default_style_starts_expanded_with_everything_shown(tmp_path):
     first = run_in_chrome(cytoscape_html(workflow(), style()), tmp_path)[0]
     assert first["nodes"] == 6 and first["collapsed"] == [] and first["shown"] == first["all"] == 7 and first["checked"] is True
+
+
+@pytest.mark.skipif(not shutil.which("dot"), reason="Graphviz not installed")
+def test_the_collapsed_layout_ranks_groups_by_the_edges_of_their_members():
+    """Edges end at the members of a group, not at the group's own node; the contracted layout must still follow them (not one row)."""
+    G = nx.DiGraph()
+    G.add_node("s")
+    G.add_node("g1")
+    G.add_node("g2")
+    G.add_node("e")
+    G.add_node("m1", parent="g1")
+    G.add_node("m2", parent="g2")
+    G.add_edges_from([("s", "m1"), ("m1", "m2"), ("m2", "e")])
+    lay = dot_layouts(G, Style(group=lambda n, d: d.get("parent")), rankdir="TB")
+    ys = [lay["collapsed"][n]["y"] for n in ("s", "g1", "g2", "e")]
+    assert ys == sorted(set(ys)) and len(set(ys)) == 4, ys              # four ranks, in order, top to bottom (y grows downward)
