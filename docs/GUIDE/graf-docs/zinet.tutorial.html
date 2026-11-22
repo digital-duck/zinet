@@ -25,7 +25,7 @@ uv pip install -p .venv/bin/python -e &quot;.[dev]&quot;
 
 zinet --version</code></pre>
 <p>You should see:</p>
-<pre><code class="language-text">zinet 0.2.1</code></pre>
+<pre><code class="language-text">zinet 0.2.2</code></pre>
 <h2 id="step-2-look-at-a-graphyaml">Step 2: Look at a graph.yaml</h2>
 <p>A zinet graph has three layers, each a list of nodes: <code>primitives</code> (leaves that must not depend on anything), <code>concepts</code> (composed from primitives and other concepts) and <code>applications</code> (capstones that nothing may depend on). This is the shape of the file:</p>
 <pre><code class="language-yaml">version: &quot;1.0&quot;
