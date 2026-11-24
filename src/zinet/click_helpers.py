@@ -9,6 +9,7 @@ and lets the formatter wrap it instead.
     from zinet.click_helpers import FullHelpGroup, HELP_OPTION_NAMES
 
     @click.group(cls=FullHelpGroup, context_settings={"help_option_names": HELP_OPTION_NAMES})
+    @version_option("my-dist-name", "mytool")      # adds -v / --version
     def main(): ...
 
     @main.group()          # subgroups inherit FullHelpGroup (group_class = type)
@@ -19,10 +20,21 @@ from __future__ import annotations
 
 import click
 
-__all__ = ["FullHelpGroup", "HELP_OPTION_NAMES"]
+__all__ = ["FullHelpGroup", "HELP_OPTION_NAMES", "version_option"]
 
 # Pass as context_settings={"help_option_names": HELP_OPTION_NAMES} to accept -h as well as --help.
 HELP_OPTION_NAMES = ["-h", "--help"]
+
+
+def version_option(package: str, prog_name: str | None = None):
+    """`-v`/`--version` for a command group, printing `PROG, version X` read from the installed distribution `package`
+    (the pip name, e.g. "app-graph"), so there is no second version string to keep in step with pyproject.toml.
+
+        @click.group(cls=FullHelpGroup, ...)
+        @version_option("app-graph", "appgraph")
+        def main(): ...
+    """
+    return click.version_option(None, "-v", "--version", package_name=package, prog_name=prog_name, message="%(prog)s, version %(version)s")
 
 
 class FullHelpGroup(click.Group):

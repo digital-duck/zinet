@@ -2,7 +2,7 @@
 
 ## 0.2.3
 
-- `zinet.click_helpers` (`click` is now a core dependency): `FullHelpGroup`, a `click.Group` that never truncates command summaries with "..." in `--help` (subgroups inherit it), and `HELP_OPTION_NAMES` for `-h`/`--help`.
+- `zinet.click_helpers` (`click` is now a core dependency): `FullHelpGroup`, a `click.Group` that never truncates command summaries with "..." in `--help` (subgroups inherit it), `HELP_OPTION_NAMES` for `-h`/`--help`, and `version_option(package, prog_name)` for `-v`/`--version` (reads the installed distribution's version).
 
 ## 0.2.2
 
