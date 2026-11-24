@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.3
+
+- `zinet.click_helpers` (`click` is now a core dependency): `FullHelpGroup`, a `click.Group` that never truncates command summaries with "..." in `--help` (subgroups inherit it), and `HELP_OPTION_NAMES` for `-h`/`--help`.
+
 ## 0.2.2
 
 - `Style.default_layout` (the arrangement the interactive page starts on) is now in the published package; 0.2.1 on PyPI was built before it, so GraphLang's `graf vis` failed with it.
